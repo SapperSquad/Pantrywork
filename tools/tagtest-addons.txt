@@ -1,0 +1,31 @@
+# Delight-addon modules: Ocean's Delight (no self-tags — our identity module)
+# and End's Delight (self-tags, but exotic meats missing from official parents).
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- Ocean's Delight identity module ---
+item replace block 8 -60 8 container.0 with oceansdelight:guardian_tail
+execute if items block 8 -60 8 container.0 #c:foods/raw_fish
+item replace block 8 -60 8 container.0 with oceansdelight:cooked_guardian_tail
+execute if items block 8 -60 8 container.0 #c:foods/cooked_fish
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+item replace block 8 -60 8 container.0 with oceansdelight:guardian_soup
+execute if items block 8 -60 8 container.0 #c:foods/soup
+# --- End's Delight parent joins ---
+item replace block 8 -60 8 container.0 with ends_delight:raw_dragon_meat
+execute if items block 8 -60 8 container.0 #c:foods/raw_meat
+item replace block 8 -60 8 container.0 with ends_delight:roasted_dragon_meat
+execute if items block 8 -60 8 container.0 #c:foods/cooked_meat
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+# --- craft: the dragon sandwich (vanilla + End's Delight + Croptopia) ---
+kill @e[type=item]
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with minecraft:bread
+item replace block 8 -60 12 container.1 with ends_delight:roasted_dragon_meat
+item replace block 8 -60 12 container.2 with croptopia:lettuce
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if items entity @e[type=minecraft:item] contents minecraft:cake
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air

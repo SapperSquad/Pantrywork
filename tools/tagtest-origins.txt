@@ -1,0 +1,19 @@
+# Origins diet compat: modded meats/fish must appear in #origins:meat so
+# carnivore origins can eat them (and vegetarians are correctly blocked).
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+item replace block 8 -60 8 container.0 with farmersdelight:bacon
+execute if items block 8 -60 8 container.0 #origins:meat
+item replace block 8 -60 8 container.0 with ends_delight:roasted_dragon_meat
+execute if items block 8 -60 8 container.0 #origins:meat
+item replace block 8 -60 8 container.0 with oceansdelight:guardian_tail
+execute if items block 8 -60 8 container.0 #origins:meat
+item replace block 8 -60 8 container.0 with pamhc2foodcore:stockitem
+execute if items block 8 -60 8 container.0 #origins:meat
+item replace block 8 -60 8 container.0 with farmersdelight:ham
+execute if items block 8 -60 8 container.0 #origins:meat
+# --- vegetables must NOT be meat ---
+item replace block 8 -60 8 container.0 with croptopia:lettuce
+execute unless items block 8 -60 8 container.0 #origins:meat
+item replace block 8 -60 8 container.0 with pamhc2foodcore:cheeseitem
+execute unless items block 8 -60 8 container.0 #origins:meat

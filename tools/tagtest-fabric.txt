@@ -1,0 +1,33 @@
+# Fabric-side verification: same data jar, Fabric loader, FD Refabricated +
+# Croptopia Fabric. Run via tools\rcon.ps1 -File tools\tagtest-fabric.txt
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- dialect bridge on Fabric ---
+item replace block 8 -60 8 container.0 with croptopia:cheese
+execute if items block 8 -60 8 container.0 #c:foods/cheese
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+# --- FD Refabricated through the role chain ---
+item replace block 8 -60 8 container.0 with farmersdelight:cooked_bacon
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+# --- reverse bridge live on Fabric: FD milk satisfies Croptopia's c:milks ---
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute if items block 8 -60 8 container.0 #c:milks
+# --- vanilla + negative control ---
+item replace block 8 -60 8 container.0 with minecraft:bread
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/starch
+item replace block 8 -60 8 container.0 with minecraft:stone
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component
+# --- CRAFT: Croptopia banana smoothie made with FD Refabricated milk ---
+kill @e[type=item]
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with croptopia:banana
+item replace block 8 -60 12 container.1 with minecraft:ice
+item replace block 8 -60 12 container.2 with farmersdelight:milk_bottle
+item replace block 8 -60 12 container.3 with minecraft:glass_bottle
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if items entity @e[type=minecraft:item] contents croptopia:banana_smoothie
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air

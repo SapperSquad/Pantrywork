@@ -1,0 +1,12 @@
+{
+  "values": [
+    { "id": "#c:foods/raw_meat", "required": false },
+    { "id": "#c:foods/cooked_meat", "required": false },
+    { "id": "#c:foods/raw_fish", "required": false },
+    { "id": "#c:foods/cooked_fish", "required": false },
+    { "id": "#c:groundmeats", "required": false },
+    { "id": "#c:stock", "required": false },
+    { "id": "farmersdelight:ham", "required": false },
+    { "id": "farmersdelight:smoked_ham", "required": false }
+  ]
+}

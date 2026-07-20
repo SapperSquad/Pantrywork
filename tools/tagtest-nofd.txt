@@ -1,0 +1,21 @@
+# No-FD boot: vanilla items must still resolve role tags; craft must still work.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+item replace block 8 -60 8 container.0 with minecraft:bread
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/starch
+item replace block 8 -60 8 container.0 with minecraft:cooked_beef
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+item replace block 8 -60 8 container.0 with minecraft:carrot
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+item replace block 8 -60 8 container.0 with minecraft:stone
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component
+kill @e[type=item]
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with minecraft:bread
+item replace block 8 -60 12 container.1 with minecraft:cooked_beef
+item replace block 8 -60 12 container.2 with minecraft:carrot
+setblock 9 -60 12 minecraft:redstone_block
+execute if items entity @e[type=minecraft:item,limit=1] contents minecraft:cake
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air

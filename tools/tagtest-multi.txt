@@ -1,0 +1,43 @@
+# Cross-mod dialect-bridge checks: FD + Croptopia + Pam's HC2 all loaded.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- cheese: two dialects unified into c:foods/cheese, both reach dairy role ---
+item replace block 8 -60 8 container.0 with croptopia:cheese
+execute if items block 8 -60 8 container.0 #c:foods/cheese
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+item replace block 8 -60 8 container.0 with pamhc2foodcore:cheeseitem
+execute if items block 8 -60 8 container.0 #c:foods/cheese
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+# --- flour: both mods independently picked c:flour — natural collision, already merged ---
+item replace block 8 -60 8 container.0 with croptopia:flour
+execute if items block 8 -60 8 container.0 #c:flour
+item replace block 8 -60 8 container.0 with pamhc2foodcore:flouritem
+execute if items block 8 -60 8 container.0 #c:flour
+# --- dough: three mods, one canonical tag ---
+item replace block 8 -60 8 container.0 with farmersdelight:wheat_dough
+execute if items block 8 -60 8 container.0 #c:foods/dough
+item replace block 8 -60 8 container.0 with pamhc2foodcore:doughitem
+execute if items block 8 -60 8 container.0 #c:foods/dough
+item replace block 8 -60 8 container.0 with croptopia:dough
+execute if items block 8 -60 8 container.0 #c:foods/dough
+# --- produce through role tags ---
+item replace block 8 -60 8 container.0 with croptopia:lettuce
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+item replace block 8 -60 8 container.0 with pamhc2foodcore:freshmilkitem
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+item replace block 8 -60 8 container.0 with croptopia:milk_bottle
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+# --- negative control ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component
+# --- tri-mod craft: vanilla bread + FD bacon + Croptopia lettuce ---
+kill @e[type=item]
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with minecraft:bread
+item replace block 8 -60 12 container.1 with farmersdelight:cooked_bacon
+item replace block 8 -60 12 container.2 with croptopia:lettuce
+setblock 9 -60 12 minecraft:redstone_block
+execute if items entity @e[type=minecraft:item,limit=1] contents minecraft:cake
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air

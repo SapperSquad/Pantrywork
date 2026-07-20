@@ -1,0 +1,8 @@
+{
+  "values": [
+    "#c:foods/bread",
+    "#c:foods/cooked_rice",
+    "minecraft:baked_potato",
+    { "id": "#c:foods/pasta", "required": false }
+  ]
+}

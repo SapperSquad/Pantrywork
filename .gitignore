@@ -1,0 +1,10 @@
+.gradle/
+build/
+run/
+.idea/
+*.iml
+tools/*.class
+# Downloaded third-party mod jars + test servers — NEVER commit these
+# (that would be redistributing other people's mods).
+tools/work/
+tools/fabric-server/

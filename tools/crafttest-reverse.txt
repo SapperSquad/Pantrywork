@@ -1,0 +1,33 @@
+# Reverse-bridge crafts, with padding commands so the contents check runs
+# after the crafter's redstone tick (RCON cadence is ~150ms/command).
+kill @e[type=item]
+setblock 8 -60 12 minecraft:air
+setblock 9 -60 12 minecraft:air
+# --- CRAFT A: Croptopia grilled_cheese from Pam's cheese ---
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with minecraft:bread
+item replace block 8 -60 12 container.1 with pamhc2foodcore:cheeseitem
+item replace block 8 -60 12 container.2 with croptopia:frying_pan
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if items entity @e[type=minecraft:item] contents croptopia:grilled_cheese
+execute if items entity @e[type=minecraft:item] contents croptopia:frying_pan
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air
+# --- CRAFT B: Pam's grilledcheeseandham from Croptopia butter+cheese and FD bacon ---
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with pamhc2foodcore:skilletitem
+item replace block 8 -60 12 container.1 with minecraft:bread
+item replace block 8 -60 12 container.2 with croptopia:butter
+item replace block 8 -60 12 container.3 with croptopia:cheese
+item replace block 8 -60 12 container.4 with farmersdelight:bacon
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if items entity @e[type=minecraft:item] contents pamhc2foodcore:grilledcheeseandhamitem
+execute if items entity @e[type=minecraft:item] contents pamhc2foodcore:skilletitem
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air

@@ -1,0 +1,6 @@
+{
+  "values": [
+    { "id": "croptopia:dough", "required": false },
+    { "id": "farmersdelight:wheat_dough", "required": false }
+  ]
+}

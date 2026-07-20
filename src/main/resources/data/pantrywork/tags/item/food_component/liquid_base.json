@@ -1,0 +1,10 @@
+{
+  "values": [
+    "minecraft:water_bucket",
+    "#c:buckets/milk",
+    { "id": "#c:drinks/milk", "required": false },
+    { "id": "#c:stock", "required": false },
+    { "id": "farmersdelight:bone_broth", "required": false },
+    { "id": "farmersdelight:tomato_sauce", "required": false }
+  ]
+}

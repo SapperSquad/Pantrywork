@@ -1,0 +1,10 @@
+{
+  "values": [
+    "#c:buckets/milk",
+    { "id": "#c:drinks/milk", "required": false },
+    { "id": "#c:foods/cheese", "required": false },
+    { "id": "#c:foods/butter", "required": false },
+    { "id": "#c:yogurt", "required": false },
+    { "id": "#c:cream", "required": false }
+  ]
+}

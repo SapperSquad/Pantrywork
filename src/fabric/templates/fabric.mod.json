@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "${mod_id}",
+  "version": "${mod_version}",
+  "name": "${mod_name}",
+  "description": "${mod_description}",
+  "authors": ["${mod_authors}"],
+  "license": "${mod_license}",
+  "icon": "assets/pantrywork/icon.png",
+  "environment": "*",
+  "depends": {
+    "fabricloader": ">=0.14.0",
+    "minecraft": "~1.21.1"
+  }
+}

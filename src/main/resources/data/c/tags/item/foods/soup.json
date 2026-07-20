@@ -1,0 +1,9 @@
+{
+  "values": [
+    { "id": "oceansdelight:guardian_soup", "required": false },
+    { "id": "oceansdelight:bowl_of_guardian_soup", "required": false },
+    { "id": "ends_delight:shulker_soup", "required": false },
+    { "id": "ends_delight:dragon_meat_stew", "required": false },
+    { "id": "ends_delight:dragon_breath_and_chorus_soup", "required": false }
+  ]
+}

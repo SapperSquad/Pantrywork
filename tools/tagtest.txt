@@ -1,0 +1,37 @@
+# Pantrywork tag-membership checks. Run via: tools\rcon.ps1 -File tools\tagtest.txt
+# Pattern: put an item in a chest, `execute if items` against a tag.
+# "Test passed" = in tag; for the negative check, `unless` passing = correct.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- sanity: FD's own tagging visible ---
+item replace block 8 -60 8 container.0 with farmersdelight:bacon
+execute if items block 8 -60 8 container.0 #c:foods/raw_bacon
+# --- our c: extension tag ---
+item replace block 8 -60 8 container.0 with farmersdelight:cooked_rice
+execute if items block 8 -60 8 container.0 #c:foods/cooked_rice
+# --- parent join: c:foods now includes cooked_rice ---
+execute if items block 8 -60 8 container.0 #c:foods
+# --- role tags, modded items ---
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/starch
+item replace block 8 -60 8 container.0 with farmersdelight:cooked_bacon
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+item replace block 8 -60 8 container.0 with farmersdelight:bone_broth
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/liquid_base
+# --- role tags, vanilla items through the same tags ---
+item replace block 8 -60 8 container.0 with minecraft:bread
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/starch
+item replace block 8 -60 8 container.0 with minecraft:cooked_beef
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+item replace block 8 -60 8 container.0 with minecraft:carrot
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+item replace block 8 -60 8 container.0 with minecraft:milk_bucket
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+item replace block 8 -60 8 container.0 with minecraft:sugar
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/sweetener
+# --- negative control: stone is in nothing ("Test passed" = correctly absent) ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component

@@ -1,0 +1,49 @@
+# Reverse-bridge checks: foreign items inside each mod's OWN dialect tags,
+# then real Croptopia/Pam's recipes crafted with foreign ingredients.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- foreign members in dialect tags ---
+item replace block 8 -60 8 container.0 with pamhc2foodcore:cheeseitem
+execute if items block 8 -60 8 container.0 #c:cheeses
+item replace block 8 -60 8 container.0 with croptopia:cheese
+execute if items block 8 -60 8 container.0 #c:cheese
+item replace block 8 -60 8 container.0 with farmersdelight:wheat_dough
+execute if items block 8 -60 8 container.0 #c:dough
+execute if items block 8 -60 8 container.0 #c:doughs
+item replace block 8 -60 8 container.0 with croptopia:butter
+execute if items block 8 -60 8 container.0 #c:butter
+item replace block 8 -60 8 container.0 with farmersdelight:bacon
+execute if items block 8 -60 8 container.0 #c:rawpork
+item replace block 8 -60 8 container.0 with farmersdelight:bone_broth
+execute if items block 8 -60 8 container.0 #c:stock
+item replace block 8 -60 8 container.0 with farmersdelight:raw_pasta
+execute if items block 8 -60 8 container.0 #c:pasta
+item replace block 8 -60 8 container.0 with croptopia:olive_oil
+execute if items block 8 -60 8 container.0 #c:cookingoil
+# --- pre-existing convergence sanity (no Pantrywork involvement) ---
+item replace block 8 -60 8 container.0 with croptopia:salt
+execute if items block 8 -60 8 container.0 #c:salt
+# --- CRAFT A: Croptopia's grilled_cheese with PAM'S cheese ---
+kill @e[type=item]
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with minecraft:bread
+item replace block 8 -60 12 container.1 with pamhc2foodcore:cheeseitem
+item replace block 8 -60 12 container.2 with croptopia:frying_pan
+setblock 9 -60 12 minecraft:redstone_block
+execute if items entity @e[type=minecraft:item] contents croptopia:grilled_cheese
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air
+# --- CRAFT B: Pam's grilledcheeseandham with Croptopia butter+cheese and FD bacon (4 mods) ---
+kill @e[type=item]
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with pamhc2foodcore:skilletitem
+item replace block 8 -60 12 container.1 with minecraft:bread
+item replace block 8 -60 12 container.2 with croptopia:butter
+item replace block 8 -60 12 container.3 with croptopia:cheese
+item replace block 8 -60 12 container.4 with farmersdelight:bacon
+setblock 9 -60 12 minecraft:redstone_block
+execute if items entity @e[type=minecraft:item] contents pamhc2foodcore:grilledcheeseandhamitem
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air

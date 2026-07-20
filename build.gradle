@@ -1,0 +1,158 @@
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.+'
+}
+
+version = project.mod_version
+group = project.mod_group_id
+
+base {
+    archivesName = project.mod_id
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+neoForge {
+    version = project.neo_version
+
+    parchment {
+        mappingsVersion = project.parchment_mappings_version
+        minecraftVersion = project.parchment_minecraft_version
+    }
+
+    runs {
+        client {
+            client()
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'pantrywork'
+        }
+        server {
+            server()
+            programArgument '--nogui'
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'pantrywork'
+        }
+        gameTestServer {
+            type = 'gameTestServer'
+            systemProperty 'neoforge.enabledGameTestNamespaces', 'pantrywork'
+        }
+    }
+
+    mods {
+        pantrywork {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+// Reverse-bridge tag JSONs are emitted here by tools/GenerateBridges.ps1.
+sourceSets.main.resources { srcDir 'src/generated/resources' }
+
+// `gradlew build -Prelease` strips dev-only content (test recipes,
+// gametest classes) from the jar.
+tasks.named('processResources', ProcessResources) {
+    if (project.hasProperty('release')) {
+        exclude 'data/pantrywork/recipe/test/**'
+        exclude 'data/pantrywork/structure/**'   // gametest arena template
+    }
+}
+tasks.named('jar', Jar) {
+    if (project.hasProperty('release')) {
+        exclude 'com/pantrywork/gametest/**'
+    }
+    // mod-list logo referenced by logoFile in neoforge.mods.toml
+    from('promo/icon-512.png') { rename { 'icon.png' } }
+}
+
+repositories {
+    mavenCentral()
+    exclusiveContent {
+        forRepository {
+            maven {
+                name = 'Modrinth'
+                url = 'https://api.modrinth.com/maven'
+            }
+        }
+        filter { includeGroup 'maven.modrinth' }
+    }
+}
+
+dependencies {
+    // Target mods are dev-run-only: FML discovers classpath mods in dev, so
+    // runServer/runClient boot with them loaded and the compat tags can be
+    // verified against the real items. Nothing here is a hard dependency —
+    // every entry in neoforge.mods.toml is optional. Boot-matrix testing:
+    // `gradlew runServer -PnoCompatMods` boots without any of them, which
+    // must load cleanly (all cross-mod tag entries are required=false).
+    if (!project.hasProperty('noCompatMods')) {
+        runtimeOnly "maven.modrinth:farmers-delight:${project.farmers_delight_version}"
+        // CurseForge-only mods, fetched manually to tools/work/jars (see
+        // tools/work/jars/SOURCES.md). Croptopia requires EpheroLib.
+        runtimeOnly files(
+            'tools/work/jars/croptopia-neoforge-1.21.1-4.2.4.jar',
+            'tools/work/jars/EpheroLib-1.21.1-NEO-FORGE-1.2.0.jar',
+            'tools/work/jars/pamhc2foodcore-NEOFORGE-1.21.1-1.0.4.jar',
+            'tools/work/jars/oceansdelight-neoforge-1.0.4-1.21.1.jar',
+            'tools/work/jars/ends_delight-2.6.1+neoforge.1.21.1.jar',
+            'tools/work/jars/origins-0.3.jar',
+            'tools/work/jars/jupiter-2.3.7-1.21.1-neoforge.jar')
+    }
+}
+
+// Fabric build: the payload is pure data, so the Fabric jar is the same
+// tag files wrapped in a fabric.mod.json — no classes (which also avoids
+// the mojmap/intermediary mapping problem entirely). Dev-only content is
+// always excluded here, independent of -Prelease.
+var generateFabricMetadata = tasks.register('generateFabricMetadata', ProcessResources) {
+    var props = [
+        mod_id: project.mod_id,
+        mod_name: project.mod_name,
+        mod_version: project.mod_version,
+        mod_license: project.mod_license,
+        mod_authors: project.mod_authors,
+        mod_description: project.mod_description,
+    ]
+    inputs.properties props
+    expand props
+    from 'src/fabric/templates'
+    into "${layout.buildDirectory.get()}/generated/sources/fabricMetadata"
+}
+
+tasks.register('fabricJar', Jar) {
+    group = 'build'
+    description = 'Data-only Fabric 1.21.1 jar.'
+    archiveBaseName = project.mod_id
+    archiveClassifier = 'fabric'
+    from generateFabricMetadata
+    from('src/main/resources') {
+        include 'data/**'
+        exclude 'data/pantrywork/recipe/test/**'
+        exclude 'data/pantrywork/structure/**'
+    }
+    from('src/generated/resources') { include 'data/**' }
+    from('promo/icon-512.png') {
+        into 'assets/pantrywork'
+        rename { 'icon.png' }
+    }
+}
+
+var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
+    var replaceProperties = [
+        minecraft_version: project.minecraft_version,
+        minecraft_version_range: project.minecraft_version_range,
+        neo_version: project.neo_version,
+        neo_version_range: project.neo_version_range,
+        loader_version_range: project.loader_version_range,
+        mod_id: project.mod_id,
+        mod_name: project.mod_name,
+        mod_license: project.mod_license,
+        mod_version: project.mod_version,
+        mod_authors: project.mod_authors,
+        mod_description: project.mod_description,
+    ]
+    inputs.properties replaceProperties
+    expand replaceProperties + [project: project]
+
+    from 'src/main/templates'
+    into "${layout.buildDirectory.get()}/generated/sources/modMetadata"
+}
+
+sourceSets.main.resources.srcDir generateModMetadata

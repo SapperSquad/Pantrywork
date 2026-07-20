@@ -1,0 +1,9 @@
+{
+  "values": [
+    "minecraft:sugar",
+    "minecraft:honey_bottle",
+    { "id": "#c:sugar", "required": false },
+    { "id": "#c:sugars", "required": false },
+    { "id": "#c:honey", "required": false }
+  ]
+}

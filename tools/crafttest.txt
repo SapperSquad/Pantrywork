@@ -1,0 +1,27 @@
+# Universal-sandwich end-to-end: same tag recipe crafted from FD ingredients,
+# then from pure vanilla ingredients. Crafter ejects upward; result = cake.
+kill @e[type=item]
+setblock 8 -60 12 minecraft:air
+setblock 9 -60 12 minecraft:air
+# --- round 1: bread + FD cooked bacon + FD cabbage leaf ---
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with minecraft:bread
+item replace block 8 -60 12 container.1 with farmersdelight:cooked_bacon
+item replace block 8 -60 12 container.2 with farmersdelight:cabbage_leaf
+setblock 9 -60 12 minecraft:redstone_block
+execute if entity @e[type=minecraft:item]
+execute if items entity @e[type=minecraft:item,limit=1] contents minecraft:cake
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air
+# --- round 2: pure vanilla — bread + cooked beef + carrot ---
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with minecraft:bread
+item replace block 8 -60 12 container.1 with minecraft:cooked_beef
+item replace block 8 -60 12 container.2 with minecraft:carrot
+setblock 9 -60 12 minecraft:redstone_block
+execute if entity @e[type=minecraft:item]
+execute if items entity @e[type=minecraft:item,limit=1] contents minecraft:cake
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air

@@ -1,0 +1,10 @@
+{
+  "values": [
+    { "id": "#c:rawfish", "required": false },
+    { "id": "#c:fishes", "required": false },
+    { "id": "oceansdelight:guardian", "required": false },
+    { "id": "oceansdelight:guardian_tail", "required": false },
+    { "id": "oceansdelight:elder_guardian_slice", "required": false },
+    { "id": "oceansdelight:fugu_slice", "required": false }
+  ]
+}
