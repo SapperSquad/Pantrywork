@@ -145,6 +145,8 @@ list, re-check it every release — images can't be grepped and go stale invisib
 - Environment: client **optional**, server **required** — pure data (tags/recipes) that runs on the
   logical server and syncs to clients. Server-only install works for multiplayer; a client install
   is how singleplayer gets it (integrated server); a client joining a modded server needs nothing.
-- License: **MIT** (`mod_license` in `gradle.properties`). Correct choice here — a bridging layer
-  is only useful if other authors can depend on and extend it.
+- License: **All Rights Reserved** (`mod_license` in `gradle.properties`; no LICENSE file —
+  README carries the copyright notice. Fleet-wide policy set by SapperSquad 2026-07-28, reversing the
+  earlier MIT choice. Other mods depending on the tags still works — tag *names* aren't licensed
+  code — but redistribution/forks now need permission.)
 - Platforms that received the last release: **none yet — unpublished.**

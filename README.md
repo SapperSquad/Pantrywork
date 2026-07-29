@@ -43,3 +43,11 @@ Docs: [docs/TAXONOMY.md](docs/TAXONOMY.md) (tag design) ·
 
 Status: pre-release, launch-ready. Formerly developed under the working
 name "FoodTags".
+
+## Copyright
+
+Copyright (c) 2026 SapperSquad. All rights reserved.
+
+No license is granted: this work may not be copied, modified,
+redistributed, or included in other distributions without express
+permission from the copyright holder.
