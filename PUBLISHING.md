@@ -145,6 +145,7 @@ list, re-check it every release — images can't be grepped and go stale invisib
 - Environment: client **optional**, server **required** — pure data (tags/recipes) that runs on the
   logical server and syncs to clients. Server-only install works for multiplayer; a client install
   is how singleplayer gets it (integrated server); a client joining a modded server needs nothing.
-- License: **MIT** (`mod_license` in `gradle.properties`). Correct choice here — a bridging layer
-  is only useful if other authors can depend on and extend it.
+- License: split policy (SapperSquad, 2026-07-28) — **All Rights Reserved** on the Modrinth/CurseForge
+  listing (`mod_license`/jar metadata match), **MIT** LICENSE in the GitHub repo. Authors who
+  want to depend on or extend the taxonomy work from the MIT source.
 - Platforms that received the last release: **none yet — unpublished.**
