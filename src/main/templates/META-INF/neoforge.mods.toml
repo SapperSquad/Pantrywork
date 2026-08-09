@@ -81,3 +81,17 @@ logoFile = "icon.png"
     versionRange = "[0,)"
     ordering = "AFTER"
     side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "brewinandchewin"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "aquaculture"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"

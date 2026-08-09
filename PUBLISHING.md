@@ -7,9 +7,11 @@ Store copy for the Modrinth / CurseForge project pages. Bump this file in the sa
 
 | Upload as version | File | Game version tag | Loader |
 |---|---|---|---|
-| `0.2.0+mc1.21.1` | `dist/0.2.0/pantrywork-0.2.0.jar` | 1.21.1 | neoforge |
-| `0.2.0+mc1.21.x-fabric` | `dist/0.2.0/pantrywork-0.2.0-fabric.jar` | 1.21.1–1.21.11 | fabric |
-| `0.2.0+mc26-fabric` | `dist/0.2.0/pantrywork-0.2.0-fabric-mc26.jar` | 26.1, 26.1.1, 26.1.2, 26.2 | fabric |
+| `0.3.0+mc1.21.1` | `dist/0.3.0/pantrywork-0.3.0.jar` | 1.21.1 | neoforge |
+| `0.3.0+mc1.21.x-fabric` | `dist/0.3.0/pantrywork-0.3.0-fabric.jar` | 1.21.1–1.21.11 | fabric |
+| `0.3.0+mc26-fabric` | `dist/0.3.0/pantrywork-0.3.0-fabric-mc26.jar` | 26.1.2, 26.2 | fabric |
+
+Publish: `tools\publish.ps1 -Version 0.3.0 -ChangelogFile tools\changelog-current.md` (dry-run first).
 
 Build all three with `./gradlew build -Prelease fabricJar fabricJar26`. The NeoForge jar's content is
 unchanged from 0.1.0, so re-uploading it is optional — but keeping one version number across all
@@ -91,7 +93,7 @@ Works in singleplayer too (your game runs an internal server; just install it no
 Supported: **Farmer's Delight** (incl. Refabricated on Fabric) · **Croptopia** ·
 **Pam's HarvestCraft 2 Food Core** · **Ocean's Delight** (full identity module) ·
 **End's Delight** (parent joins) · **[Let's Do] Vinery, Farm & Charm, Meadow** ·
-**Origins** (carnivore/vegetarian diet tags).
+**Aquaculture 2** · **Brewin' & Chewin'** · **Origins** (carnivore/vegetarian diet tags).
 
 ## 🧑‍🍳 For pack makers
 

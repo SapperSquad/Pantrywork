@@ -1,14 +1,7 @@
-**0.2.0 - Let's Do series support, Minecraft 26.x, and a wider Fabric range.**
+**0.3.0 - Aquaculture 2 and Brewin' & Chewin' support.**
 
-**Let's Do compat (new):** Vinery, Farm & Charm, and Meadow.
-- *Meadow*: its cheese and salt recipes now accept Croptopia's, Pam's, and Farmer's Delight's equivalents; its cheeses and buffalo meat feed the role tags.
-- *Farm & Charm*: introduced a third meat dialect (flat-underscored `c:raw_pork` vs Pam's `c:rawpork`) - every canonical meat tag now bridges all three, in both directions.
-- *Vinery*: ships no common tags at all, so it gets a per-item module - grapes and cherries into `c:foods/fruit`, its juices and cider into `c:drinks`.
+- **Aquaculture 2**: its 27 fish already use the official `c:foods/raw_fish` dialect, so they now flow into the other mods' fish tags too - a Pam's, Ocean's Delight, or Farm & Charm recipe that wants fish will accept any Aquaculture catch, and its cooked fillet counts as a protein everywhere.
+- **Brewin' & Chewin'**: its four ripe cheeses join the shared cheese pool (so they work in any mod's cheese recipe, and vice versa), its sixteen fermented drinks join `c:drinks`, and its soups were already canonical.
+- Under the hood, the reverse-bridge generator now follows food that a mod files behind its own namespaced tags (like Brewin's), not just `c:` tags - so future mods that do the same are handled automatically.
 
-**Minecraft 26.x (new):** a Fabric build for 26.x, verified live on 26.1.2 (Farmer's Delight Refabricated + Croptopia 4.3.1, including a cross-mod craft) and on 26.2 (FD Refabricated).
-
-**Fabric 1.21.x now covers 1.21.1 through 1.21.11**, verified live on 1.21.10 and 1.21.11.
-
-**Fix:** seeds no longer cross bridges. Croptopia files its seeds inside its produce tags; without this a seed could have satisfied another mod's food recipe.
-
-NeoForge stays on 1.21.1 - Farmer's Delight, Pam's HarvestCraft 2, and Croptopia's NeoForge builds have nothing newer to bridge yet.
+No changes for existing users; every cross-mod entry stays optional, so any subset of the supported mods (or none) works.

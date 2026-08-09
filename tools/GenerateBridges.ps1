@@ -31,9 +31,17 @@ $neoforgeJar = Get-ChildItem "$env:USERPROFILE\.gradle\caches\modules-2\files-2.
 $sources = @($neoforgeJar) + (Get-ChildItem $jarsDir -Filter "*.jar" | ForEach-Object FullName)
 foreach ($jar in $sources) {
   $zip = [IO.Compression.ZipFile]::OpenRead($jar)
-  foreach ($e in ($zip.Entries | Where-Object { $_.FullName -match '^data/c/tags/item/.+\.json$' })) {
+  # c: tags keyed by bare path ("foods/cheese"); every other namespace keyed
+  # "ns:path" ("brewinandchewin:foods/cheese_wedge") so a food mod that files
+  # its items behind its own tag (not a c: tag) can still be followed by a
+  # canonical tag that references it. minecraft: tags are skipped as noise.
+  foreach ($e in ($zip.Entries | Where-Object { $_.FullName -match '^data/[^/]+/tags/item/.+\.json$' })) {
+    $ns = ($e.FullName -split '/')[1]
+    if ($ns -eq 'minecraft') { continue }
     $r = New-Object IO.StreamReader($e.Open()); $json = $r.ReadToEnd(); $r.Close()
-    Add-TagFile ($e.FullName -replace '^data/c/tags/item/','' -replace '\.json$','') $json
+    $path = $e.FullName -replace "^data/$ns/tags/item/",'' -replace '\.json$',''
+    $key = if ($ns -eq 'c') { $path } else { "${ns}:$path" }
+    Add-TagFile $key $json
   }
   $zip.Dispose()
 }
@@ -51,9 +59,11 @@ function Resolve-Tag($tagPath, $visited) {
   foreach ($id in $tagEntries[$tagPath]) {
     if ($id.StartsWith('#')) {
       $ref = $id.Substring(1)
-      if ($ref.StartsWith('c:')) {
-        foreach ($i in (Resolve-Tag ($ref.Substring(2)) $visited)) { [void]$items.Add($i) }
-      } # non-c: tag refs (mod-namespace tags) aren't indexed here; skip
+      # c: tags are keyed by bare path; every other namespace keeps its "ns:path"
+      # key, so both a "#c:foods/cheese" and a "#brewinandchewin:foods/cheese_wedge"
+      # reference resolve to the items behind them.
+      $key = if ($ref.StartsWith('c:')) { $ref.Substring(2) } else { $ref }
+      foreach ($i in (Resolve-Tag $key $visited)) { [void]$items.Add($i) }
     } else {
       [void]$items.Add($id)
     }

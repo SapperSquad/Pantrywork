@@ -1,5 +1,6 @@
 {
   "values": [
+    { "id": "aquaculture:fish_fillet_cooked", "required": false },
     { "id": "farmersdelight:cooked_cod_slice", "required": false },
     { "id": "farmersdelight:cooked_salmon_slice", "required": false },
     { "id": "minecraft:cooked_cod", "required": false },

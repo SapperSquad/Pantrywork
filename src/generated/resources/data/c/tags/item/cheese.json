@@ -1,5 +1,9 @@
 {
   "values": [
+    { "id": "brewinandchewin:flaxen_cheese_wedge", "required": false },
+    { "id": "brewinandchewin:flaxen_cheese_wheel", "required": false },
+    { "id": "brewinandchewin:scarlet_cheese_wedge", "required": false },
+    { "id": "brewinandchewin:scarlet_cheese_wheel", "required": false },
     { "id": "croptopia:cheese", "required": false }
   ]
 }

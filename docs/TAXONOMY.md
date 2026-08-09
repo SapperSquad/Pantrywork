@@ -107,6 +107,17 @@ adoption (migration is mechanical).
 | Let's Do Vinery 1.5.3 | **no — zero c: tags** | per-item module: grapes/cherry → `c:foods/fruit`, 9 juices + cider → `c:drinks` |
 | Let's Do Farm & Charm 1.1.23 | yes — 39 tags, **third dialect: flat-underscored** (`c:raw_pork`, `c:cooked_beef`) | full dialect map bridged both ways; verified |
 | Let's Do Meadow 1.4.8 | yes — 12 tags using our bridged names (`cheese`/`cheeses`/`milk`/`salt`) | flows in unmodified; gap-fill for buffalo meat. Its 6 cheese + 13 salt recipes now accept foreign ingredients |
+| Aquaculture 2 2.7.21 | yes — **official dialect** (`c:foods/raw_fish` w/ 27 fish, `c:foods/cooked_fish`) | fish already canonical + role; the generator propagates its 27 fish into the Pam's/Ocean's/F&C fish dialects |
+| Brewin' & Chewin' 4.5.0 | yes, but into its **own `brewinandchewin:` namespaced tags** (cheese wedges/wheels, `fermented_drinks`) | ripe cheeses → `c:foods/cheese`, 16 drinks → `c:drinks`; soups already canonical |
+
+### The generator follows non-`c:` tags now
+
+Brewin files its cheese behind `brewinandchewin:foods/cheese_wedge` rather
+than a `c:` tag. As of 0.3.0, `GenerateBridges.ps1` indexes **every**
+namespace's item tags (not just `c:`) and follows references into them, so a
+canonical tag that points at a mod's own tag still pulls the items behind it
+into the reverse bridges. Any future mod that hides food this way is handled
+with no special-casing.
 
 ### A third meat dialect
 

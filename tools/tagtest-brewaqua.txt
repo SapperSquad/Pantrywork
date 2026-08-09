@@ -1,0 +1,34 @@
+# Brewin' & Chewin' (namespaced tags) + Aquaculture 2 (official fish dialect).
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- BREWIN cheese: identity + dairy role, both dialects (reverse) ---
+item replace block 8 -60 8 container.0 with brewinandchewin:flaxen_cheese_wheel
+execute if items block 8 -60 8 container.0 #c:foods/cheese
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+execute if items block 8 -60 8 container.0 #c:cheese
+execute if items block 8 -60 8 container.0 #c:cheeses
+# --- BREWIN drinks ---
+item replace block 8 -60 8 container.0 with brewinandchewin:beer
+execute if items block 8 -60 8 container.0 #c:drinks
+item replace block 8 -60 8 container.0 with brewinandchewin:mead
+execute if items block 8 -60 8 container.0 #c:drinks
+# --- BREWIN soup already canonical (its own c:foods/soup) ---
+item replace block 8 -60 8 container.0 with brewinandchewin:creamy_onion_soup
+execute if items block 8 -60 8 container.0 #c:foods/soup
+# --- AQUACULTURE raw fish: official tag + reverse into other dialects ---
+item replace block 8 -60 8 container.0 with aquaculture:atlantic_cod
+execute if items block 8 -60 8 container.0 #c:foods/raw_fish
+execute if items block 8 -60 8 container.0 #c:rawfish
+execute if items block 8 -60 8 container.0 #c:fishes
+execute if items block 8 -60 8 container.0 #c:raw_fishes
+# --- AQUACULTURE cooked fillet: cooked_fish + protein role ---
+item replace block 8 -60 8 container.0 with aquaculture:fish_fillet_cooked
+execute if items block 8 -60 8 container.0 #c:foods/cooked_fish
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+execute if items block 8 -60 8 container.0 #c:cookedfish
+# --- unripe cheese must NOT count as cheese (deliberately excluded) ---
+item replace block 8 -60 8 container.0 with brewinandchewin:unripe_flaxen_cheese_wheel
+execute unless items block 8 -60 8 container.0 #c:foods/cheese
+# --- negative control ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component

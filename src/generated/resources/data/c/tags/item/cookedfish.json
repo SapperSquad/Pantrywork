@@ -1,5 +1,6 @@
 {
   "values": [
+    { "id": "aquaculture:fish_fillet_cooked", "required": false },
     { "id": "farm_and_charm:cooked_cod", "required": false },
     { "id": "farm_and_charm:cooked_salmon", "required": false },
     { "id": "farmersdelight:cooked_cod_slice", "required": false },

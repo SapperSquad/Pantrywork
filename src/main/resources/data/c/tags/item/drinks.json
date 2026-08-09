@@ -10,6 +10,7 @@
     { "id": "vinery:red_savanna_grapejuice", "required": false },
     { "id": "vinery:white_savanna_grapejuice", "required": false },
     { "id": "vinery:red_taiga_grapejuice", "required": false },
-    { "id": "vinery:white_taiga_grapejuice", "required": false }
+    { "id": "vinery:white_taiga_grapejuice", "required": false },
+    { "id": "#brewinandchewin:fermented_drinks", "required": false }
   ]
 }

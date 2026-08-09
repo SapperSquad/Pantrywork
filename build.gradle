@@ -98,7 +98,10 @@ dependencies {
             'tools/work/jars/letsdo-vinery-neoforge-1.5.3.jar',
             'tools/work/jars/letsdo-farm_and_charm-neoforge-1.1.23.jar',
             'tools/work/jars/letsdo-meadow-neoforge-1.4.8.jar',
-            'tools/work/jars/architectury-13.0.11-neoforge.jar')
+            'tools/work/jars/architectury-13.0.11-neoforge.jar',
+            // Brewin' & Chewin' (bundles GreenhouseConfig via jarjar) + Aquaculture 2
+            'tools/work/jars/BrewinAndChewin-neoforge-4.5.0+1.21.1.jar',
+            'tools/work/jars/Aquaculture-1.21.1-2.7.21.jar')
     }
 }
 

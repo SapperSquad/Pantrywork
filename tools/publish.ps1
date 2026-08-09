@@ -142,9 +142,16 @@ foreach ($f in $files) {
             Write-Host "[DryRun] Would POST to Modrinth /version (project id: '$ModrinthProjectId'):"
             Write-Host $data
         } else {
-            $headers = @{ Authorization = $ModrinthToken }
-            $result = Invoke-MultipartPost -Uri "https://api.modrinth.com/v2/version" -Headers $headers -JsonFieldName "data" -JsonBody $data -FileFieldName "file" -FilePath $jar
-            Write-Host "Modrinth: uploaded $versionNumber"
+            # Each upload is independent: a failure here (e.g. a version number
+            # that already exists from a previous run) is reported and skipped,
+            # never fatal, so the other files and the other platform still go.
+            try {
+                $headers = @{ Authorization = $ModrinthToken }
+                $result = Invoke-MultipartPost -Uri "https://api.modrinth.com/v2/version" -Headers $headers -JsonFieldName "data" -JsonBody $data -FileFieldName "file" -FilePath $jar
+                Write-Host "Modrinth: uploaded $versionNumber"
+            } catch {
+                Write-Warning "Modrinth: FAILED $versionNumber - $($_.Exception.Message)"
+            }
         }
     }
 
@@ -155,8 +162,16 @@ foreach ($f in $files) {
     } elseif (-not $CurseForgeToken) {
         Write-Host "[DryRun]   CURSEFORGE_TOKEN not set - cannot verify version ids"
     } else {
-        # Resolve every Minecraft version to its CurseForge id, plus the loader id.
+        # Resolve the Minecraft versions, the loader id, and the environment
+        # ids. CurseForge rejects an upload (error 1021) unless the gameVersions
+        # array includes at least one entry from the environment group; this mod
+        # runs on both, so tag Client + Server.
         $ldId = Get-CurseForgeVersionIdByType -Name $f.loaderCf -TypeSlugPrefix "modloader" -Token $CurseForgeToken
+        $envIds = @()
+        foreach ($en in @('Client','Server')) {
+            $eid = Get-CurseForgeVersionIdByType -Name $en -TypeSlugPrefix "environment" -Token $CurseForgeToken
+            if ($eid) { $envIds += $eid }
+        }
         $gvIds = @()
         $unresolved = @()
         foreach ($v in $f.mc) {
@@ -165,12 +180,12 @@ foreach ($f in $files) {
         }
         if ($DryRun) {
             Write-Host "[DryRun] CurseForge project $CurseForgeProjectId"
-            Write-Host "[DryRun]   loader '$($f.loaderCf)' -> $ldId"
+            Write-Host "[DryRun]   loader '$($f.loaderCf)' -> $ldId ; environment (Client,Server) -> $($envIds -join ', ')"
             Write-Host "[DryRun]   resolved $($gvIds.Count)/$($f.mc.Count) game versions -> $($gvIds -join ', ')"
             if ($unresolved.Count -gt 0) { Write-Host "[DryRun]   UNRESOLVED (would be dropped): $($unresolved -join ', ')" }
         } else {
-            if (-not $ldId -or $gvIds.Count -eq 0) {
-                Write-Warning "Skipping CurseForge upload for $($f.jar) - loader or all game versions unresolved."
+            if (-not $ldId -or $gvIds.Count -eq 0 -or $envIds.Count -eq 0) {
+                Write-Warning "Skipping CurseForge upload for $($f.jar) - loader, environment, or all game versions unresolved."
             } else {
                 if ($unresolved.Count -gt 0) { Write-Warning "$($f.jar): dropping unresolved CurseForge versions: $($unresolved -join ', ')" }
                 $metadata = @{
@@ -178,11 +193,15 @@ foreach ($f in $files) {
                     changelogType = "markdown"
                     displayName   = "Pantrywork $Version ($($f.loaderCf) $($f.label))"
                     releaseType   = "release"
-                    gameVersions  = @($gvIds + $ldId)
+                    gameVersions  = @($gvIds + $ldId + $envIds)
                 } | ConvertTo-Json -Depth 5
-                $headers = @{ "X-Api-Token" = $CurseForgeToken }
-                $result = Invoke-MultipartPost -Uri "https://minecraft.curseforge.com/api/projects/$CurseForgeProjectId/upload-file" -Headers $headers -JsonFieldName "metadata" -JsonBody $metadata -FileFieldName "file" -FilePath $jar
-                Write-Host "CurseForge: uploaded $($f.jar)"
+                try {
+                    $headers = @{ "X-Api-Token" = $CurseForgeToken }
+                    $result = Invoke-MultipartPost -Uri "https://minecraft.curseforge.com/api/projects/$CurseForgeProjectId/upload-file" -Headers $headers -JsonFieldName "metadata" -JsonBody $metadata -FileFieldName "file" -FilePath $jar
+                    Write-Host "CurseForge: uploaded $($f.jar)"
+                } catch {
+                    Write-Warning "CurseForge: FAILED $($f.jar) - $($_.Exception.Message)"
+                }
             }
         }
     }
