@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "#c:cookedchicken", "required": false }
+    { "id": "#c:cookedchicken", "required": false },
+    { "id": "#c:cooked_chicken", "required": false }
   ]
 }

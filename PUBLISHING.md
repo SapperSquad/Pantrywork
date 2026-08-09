@@ -90,7 +90,8 @@ Works in singleplayer too (your game runs an internal server; just install it no
 
 Supported: **Farmer's Delight** (incl. Refabricated on Fabric) · **Croptopia** ·
 **Pam's HarvestCraft 2 Food Core** · **Ocean's Delight** (full identity module) ·
-**End's Delight** (parent joins) · **Origins** (carnivore/vegetarian diet tags).
+**End's Delight** (parent joins) · **[Let's Do] Vinery, Farm & Charm, Meadow** ·
+**Origins** (carnivore/vegetarian diet tags).
 
 ## 🧑‍🍳 For pack makers
 

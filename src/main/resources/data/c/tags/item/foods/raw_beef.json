@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "#c:rawbeef", "required": false }
+    { "id": "#c:rawbeef", "required": false },
+    { "id": "#c:raw_beef", "required": false }
   ]
 }

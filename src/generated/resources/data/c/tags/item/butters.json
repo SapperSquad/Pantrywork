@@ -1,5 +1,6 @@
 {
   "values": [
+    { "id": "farm_and_charm:butter", "required": false },
     { "id": "pamhc2foodcore:butteritem", "required": false }
   ]
 }

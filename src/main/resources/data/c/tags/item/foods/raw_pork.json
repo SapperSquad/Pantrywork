@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "#c:rawpork", "required": false }
+    { "id": "#c:rawpork", "required": false },
+    { "id": "#c:raw_pork", "required": false }
   ]
 }

@@ -1,5 +1,7 @@
 {
   "values": [
+    { "id": "farm_and_charm:bacon_with_eggs", "required": false },
+    { "id": "farm_and_charm:chicken_wrapped_in_bacon", "required": false },
     { "id": "farmersdelight:cooked_bacon", "required": false }
   ]
 }

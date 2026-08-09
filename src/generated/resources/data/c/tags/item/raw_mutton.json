@@ -1,6 +1,5 @@
 {
   "values": [
-    { "id": "farm_and_charm:lamb_ham", "required": false },
     { "id": "farmersdelight:mutton_chops", "required": false }
   ]
 }

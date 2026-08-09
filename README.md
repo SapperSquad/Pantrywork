@@ -27,8 +27,9 @@ other's in recipes.
 and 26.x — the Fabric jars are pure data (no code, no Fabric API requirement).
 
 Supported so far: Farmer's Delight (+ Refabricated on Fabric), Croptopia,
-Pam's HarvestCraft 2 Food Core, Ocean's Delight, End's Delight, and
-Origins (carnivore/vegetarian diet tags).
+Pam's HarvestCraft 2 Food Core, Ocean's Delight, End's Delight, the
+**[Let's Do] series** (Vinery, Farm & Charm, Meadow), and Origins
+(carnivore/vegetarian diet tags).
 
 Verified live, never inferred: full RCON test suites plus 5 GameTests
 (`gradlew runGameTestServer`) green on NeoForge with all compat mods

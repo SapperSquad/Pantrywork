@@ -2,8 +2,21 @@
 
 ## 0.2.0 — 2026-08-08
 
-**Minecraft 26.x support, and a wider Fabric range.** No content changes —
-the tag payload is byte-identical across all three files.
+**Let's Do series support, Minecraft 26.x, and a wider Fabric range.**
+
+- **New: Let's Do compat** — Vinery, Farm & Charm, and Meadow.
+  - *Meadow* is the headline: its cheese and salt recipes now accept
+    Croptopia's, Pam's, and Farmer's Delight's equivalents, and its cheeses
+    and buffalo meat feed the role tags.
+  - *Farm & Charm* introduced a third meat dialect (flat-underscored
+    `c:raw_pork` vs Pam's `c:rawpork`); every canonical meat tag now bridges
+    all three, both directions.
+  - *Vinery* ships no common tags at all, so it gets a per-item module:
+    grapes and cherries into `c:foods/fruit`, its juices and cider into
+    `c:drinks`.
+- **Fix: seeds no longer cross bridges.** Croptopia files its seeds inside
+  its produce tags; without this, a seed could have satisfied another mod's
+  food recipe.
 
 - **New: Fabric jar for Minecraft 26.x** (`-fabric-mc26`), verified live on
   26.1.2 (Farmer's Delight Refabricated 3.6.15 + Croptopia 4.3.1, including

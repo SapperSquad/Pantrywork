@@ -1,0 +1,50 @@
+# Let's Do series bridges: Vinery (ships no tags), Farm & Charm (flat-underscored
+# dialect), Meadow (uses our bridged names already).
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- VINERY: per-item module, no tags of its own ---
+item replace block 8 -60 8 container.0 with vinery:red_grape
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+# Fruit deliberately has NO role tag today: garnish is the savory pool
+# (vegetable/berry/leafy_green). Pinned here so the semantics can't drift
+# silently - if a future version gives fruit a role, this assertion flips.
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+item replace block 8 -60 8 container.0 with vinery:cherry
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+item replace block 8 -60 8 container.0 with vinery:red_grapejuice
+execute if items block 8 -60 8 container.0 #c:drinks
+# --- FARM & CHARM: flat-underscored dialect into canonical + roles ---
+item replace block 8 -60 8 container.0 with farm_and_charm:bacon
+execute if items block 8 -60 8 container.0 #c:foods/raw_pork
+item replace block 8 -60 8 container.0 with farm_and_charm:roasted_chicken
+execute if items block 8 -60 8 container.0 #c:foods/cooked_chicken
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+item replace block 8 -60 8 container.0 with farm_and_charm:butter
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+item replace block 8 -60 8 container.0 with farm_and_charm:dough
+execute if items block 8 -60 8 container.0 #c:foods/dough
+item replace block 8 -60 8 container.0 with farm_and_charm:tomato
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+# --- MEADOW: cheeses + buffalo meat gap-fill ---
+item replace block 8 -60 8 container.0 with meadow:cheese_slice
+execute if items block 8 -60 8 container.0 #c:foods/cheese
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+item replace block 8 -60 8 container.0 with meadow:cooked_buffalo_meat
+execute if items block 8 -60 8 container.0 #c:foods/cooked_meat
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+item replace block 8 -60 8 container.0 with meadow:raw_buffalo_meat
+execute if items block 8 -60 8 container.0 #c:foods/raw_meat
+# --- REVERSE: foreign items now satisfy Let's Do dialect tags ---
+item replace block 8 -60 8 container.0 with croptopia:cheese
+execute if items block 8 -60 8 container.0 #c:cheese
+item replace block 8 -60 8 container.0 with pamhc2foodcore:cheeseitem
+execute if items block 8 -60 8 container.0 #c:cheeses
+item replace block 8 -60 8 container.0 with farmersdelight:bacon
+execute if items block 8 -60 8 container.0 #c:raw_pork
+item replace block 8 -60 8 container.0 with farm_and_charm:butter
+execute if items block 8 -60 8 container.0 #c:butters
+# --- negative control: a seed must NOT be food (regression on the seed bug) ---
+item replace block 8 -60 8 container.0 with croptopia:strawberry_seed
+execute unless items block 8 -60 8 container.0 #c:strawberries
+item replace block 8 -60 8 container.0 with minecraft:stone
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component

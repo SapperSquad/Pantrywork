@@ -2,6 +2,7 @@
   "values": [
     { "id": "#c:foods/raw_dragon_meat", "required": false },
     { "id": "#c:foods/raw_ender_mite_meat", "required": false },
-    { "id": "#c:foods/shulker_meat", "required": false }
+    { "id": "#c:foods/shulker_meat", "required": false },
+    { "id": "meadow:raw_buffalo_meat", "required": false }
   ]
 }

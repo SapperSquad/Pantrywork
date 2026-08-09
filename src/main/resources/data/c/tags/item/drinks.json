@@ -1,0 +1,15 @@
+{
+  "values": [
+    { "id": "#c:drinks/milk", "required": false },
+    { "id": "vinery:apple_juice", "required": false },
+    { "id": "vinery:apple_cider", "required": false },
+    { "id": "vinery:red_grapejuice", "required": false },
+    { "id": "vinery:white_grapejuice", "required": false },
+    { "id": "vinery:red_jungle_grapejuice", "required": false },
+    { "id": "vinery:white_jungle_grapejuice", "required": false },
+    { "id": "vinery:red_savanna_grapejuice", "required": false },
+    { "id": "vinery:white_savanna_grapejuice", "required": false },
+    { "id": "vinery:red_taiga_grapejuice", "required": false },
+    { "id": "vinery:white_taiga_grapejuice", "required": false }
+  ]
+}

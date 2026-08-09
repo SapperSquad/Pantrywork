@@ -1,6 +1,7 @@
 {
   "values": [
     { "id": "#c:foods/roasted_dragon_meat", "required": false },
-    { "id": "#c:foods/roasted_shulker_meat", "required": false }
+    { "id": "#c:foods/roasted_shulker_meat", "required": false },
+    { "id": "meadow:cooked_buffalo_meat", "required": false }
   ]
 }

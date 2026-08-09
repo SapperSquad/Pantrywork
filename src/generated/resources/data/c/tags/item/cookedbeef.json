@@ -1,5 +1,7 @@
 {
   "values": [
+    { "id": "farm_and_charm:beef_patty_with_vegetables", "required": false },
+    { "id": "farm_and_charm:potato_with_roast_meat", "required": false },
     { "id": "farmersdelight:beef_patty", "required": false }
   ]
 }

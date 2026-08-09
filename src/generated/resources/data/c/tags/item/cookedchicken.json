@@ -1,5 +1,8 @@
 {
   "values": [
+    { "id": "farm_and_charm:chicken_wrapped_in_bacon", "required": false },
+    { "id": "farm_and_charm:roasted_chicken", "required": false },
+    { "id": "farm_and_charm:stuffed_chicken", "required": false },
     { "id": "farmersdelight:cooked_chicken_cuts", "required": false }
   ]
 }

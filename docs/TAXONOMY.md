@@ -104,6 +104,36 @@ adoption (migration is mechanical).
 | End's Delight 2.6.1 | yes — FD-style, but exotic meats not joined to parents | tag-ref gap-fill into `raw_meat`/`cooked_meat`; verified |
 | Origins (NeoForge) 0.3 | n/a — consumer, not producer | `origins:meat` fed from canonical tags; verified (carnivore can eat modded meat) |
 | FD Refabricated 3.3.3 (Fabric) | yes — mirrors FD's dialect | covered by the FD bridges; verified on the Fabric build |
+| Let's Do Vinery 1.5.3 | **no — zero c: tags** | per-item module: grapes/cherry → `c:foods/fruit`, 9 juices + cider → `c:drinks` |
+| Let's Do Farm & Charm 1.1.23 | yes — 39 tags, **third dialect: flat-underscored** (`c:raw_pork`, `c:cooked_beef`) | full dialect map bridged both ways; verified |
+| Let's Do Meadow 1.4.8 | yes — 12 tags using our bridged names (`cheese`/`cheeses`/`milk`/`salt`) | flows in unmodified; gap-fill for buffalo meat. Its 6 cheese + 13 salt recipes now accept foreign ingredients |
+
+### A third meat dialect
+
+Farm & Charm added a variant nobody else uses — flat-underscored — so the
+meats now collide three ways and every canonical meat tag bridges all of them:
+
+| Concept | Official (NeoForge/FD) | Pam's | Farm & Charm |
+|---|---|---|---|
+| raw pork | `c:foods/raw_pork` | `c:rawpork` | `c:raw_pork` |
+| cooked beef | `c:foods/cooked_beef` | `c:cookedbeef` | `c:cooked_beef` |
+
+### Seeds never cross a bridge
+
+Croptopia files its seeds *inside* its produce tags (`c:strawberries` holds
+both the strawberry and its seed). That is legitimate inside Croptopia, but
+injecting a seed into another mod's food tag would let a seed satisfy a food
+recipe — so `GenerateBridges.ps1` excludes `_seed`/`_sapling` items from every
+injection, and `tools/tagtest-letsdo.txt` asserts it.
+
+### Known gap: fruit has no role
+
+`c:foods/fruit` is bridged on the identity axis but maps to **no role tag** —
+`garnish` is deliberately the savory pool (vegetable/berry/leafy_green). So
+Croptopia's ~40 fruits and Vinery's grapes are identity-tagged but roleless.
+Giving fruit a role (either widening `garnish` or adding a `fruit` role) is a
+semantic change to a shipped mod, so it is left as an open design decision
+rather than made silently. Pinned by an assertion in the Let's Do suite.
 
 Not yet bridged: Croptopia's ~600 per-dish plural tags (`hamburgers`,
 `beef_jerkies`…) — most are dish-level, low interop value; revisit with

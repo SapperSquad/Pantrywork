@@ -93,7 +93,12 @@ dependencies {
             'tools/work/jars/oceansdelight-neoforge-1.0.4-1.21.1.jar',
             'tools/work/jars/ends_delight-2.6.1+neoforge.1.21.1.jar',
             'tools/work/jars/origins-0.3.jar',
-            'tools/work/jars/jupiter-2.3.7-1.21.1-neoforge.jar')
+            'tools/work/jars/jupiter-2.3.7-1.21.1-neoforge.jar',
+            // Let's Do series (all three need Architectury API)
+            'tools/work/jars/letsdo-vinery-neoforge-1.5.3.jar',
+            'tools/work/jars/letsdo-farm_and_charm-neoforge-1.1.23.jar',
+            'tools/work/jars/letsdo-meadow-neoforge-1.4.8.jar',
+            'tools/work/jars/architectury-13.0.11-neoforge.jar')
     }
 }
 

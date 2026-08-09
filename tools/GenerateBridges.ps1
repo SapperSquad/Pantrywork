@@ -67,6 +67,12 @@ function Resolve-Tag($tagPath, $visited) {
 $blacklist = @('minecraft:pufferfish', 'minecraft:golden_apple',
                'minecraft:enchanted_golden_apple', 'minecraft:golden_carrot')
 
+# Croptopia files its seeds INTO its produce tags (c:strawberries holds both
+# strawberry and strawberry_seed). That is fine inside Croptopia, but pushing a
+# seed into another mod's food tag would let a seed satisfy a food recipe.
+# Seeds never cross a bridge.
+$blacklistPattern = '_seed$|_seeds$|_sapling$'
+
 # --- categories: dialect tags that mean the same thing.
 # 'emit' lists the tags that receive injections (dialect tags only —
 # canonical c:foods/* tags already absorb dialects via forward refs).
@@ -79,19 +85,24 @@ $categories = @(
   @{ name='oil';            tags=@('olive_oils','cookingoil');                        emit=@('olive_oils','cookingoil') },
   @{ name='stock';          tags=@('stock');  extra=@('farmersdelight:bone_broth');   emit=@('stock') },
   @{ name='pasta';          tags=@('pasta','foods/pasta');                            emit=@('pasta') },
-  @{ name='raw_pork';       tags=@('rawpork','foods/raw_pork');                       emit=@('rawpork') },
-  @{ name='raw_beef';       tags=@('rawbeef','beef_replacements','foods/raw_beef');   emit=@('rawbeef','beef_replacements') },
-  @{ name='raw_chicken';    tags=@('rawchicken','chicken_replacements','foods/raw_chicken'); emit=@('rawchicken','chicken_replacements') },
-  @{ name='raw_mutton';     tags=@('rawmutton','foods/raw_mutton');                   emit=@('rawmutton') },
-  @{ name='cooked_pork';    tags=@('cookedpork','foods/cooked_pork');                 emit=@('cookedpork') },
-  @{ name='cooked_beef';    tags=@('cookedbeef','foods/cooked_beef');                 emit=@('cookedbeef') },
-  @{ name='cooked_chicken'; tags=@('cookedchicken','foods/cooked_chicken');           emit=@('cookedchicken') },
-  @{ name='cooked_mutton';  tags=@('cookedmutton','foods/cooked_mutton');             emit=@('cookedmutton') },
-  @{ name='raw_fish';       tags=@('rawfish','fishes','foods/raw_fish');              emit=@('rawfish','fishes') },
-  @{ name='cooked_fish';    tags=@('cookedfish','foods/cooked_fish');                 emit=@('cookedfish') },
-  @{ name='tomato';         tags=@('tomatoes','foods/tomato');                        emit=@('tomatoes') },
-  @{ name='onion';          tags=@('onions','foods/onion');                           emit=@('onions') },
-  @{ name='cabbage';        tags=@('cabbage','foods/cabbage');                        emit=@('cabbage') },
+  # Three dialects collide on the meats: FD/official `foods/raw_pork`, Pam's
+  # concatenated `rawpork`, and Let's Do Farm & Charm's flat-underscored
+  # `raw_pork`. All three names get the full union.
+  @{ name='raw_pork';       tags=@('rawpork','raw_pork','foods/raw_pork');            emit=@('rawpork','raw_pork') },
+  @{ name='raw_beef';       tags=@('rawbeef','raw_beef','beef_replacements','foods/raw_beef');   emit=@('rawbeef','raw_beef','beef_replacements') },
+  @{ name='raw_chicken';    tags=@('rawchicken','raw_chicken','chicken_replacements','foods/raw_chicken'); emit=@('rawchicken','raw_chicken','chicken_replacements') },
+  @{ name='raw_mutton';     tags=@('rawmutton','raw_mutton','foods/raw_mutton');      emit=@('rawmutton','raw_mutton') },
+  @{ name='raw_bacon';      tags=@('raw_bacon','foods/raw_bacon');                    emit=@('raw_bacon') },
+  @{ name='cooked_pork';    tags=@('cookedpork','cooked_pork','foods/cooked_pork');   emit=@('cookedpork','cooked_pork') },
+  @{ name='cooked_beef';    tags=@('cookedbeef','cooked_beef','foods/cooked_beef');   emit=@('cookedbeef','cooked_beef') },
+  @{ name='cooked_chicken'; tags=@('cookedchicken','cooked_chicken','foods/cooked_chicken'); emit=@('cookedchicken','cooked_chicken') },
+  @{ name='cooked_mutton';  tags=@('cookedmutton','cooked_mutton','foods/cooked_mutton'); emit=@('cookedmutton','cooked_mutton') },
+  @{ name='raw_fish';       tags=@('rawfish','fishes','raw_fishes','foods/raw_fish'); emit=@('rawfish','fishes','raw_fishes') },
+  @{ name='cooked_fish';    tags=@('cookedfish','cooked_fishes','foods/cooked_fish'); emit=@('cookedfish','cooked_fishes') },
+  @{ name='tomato';         tags=@('tomatoes','crops/tomato','foods/tomato');         emit=@('tomatoes','crops/tomato') },
+  @{ name='onion';          tags=@('onions','crops/onion','foods/onion');             emit=@('onions','crops/onion') },
+  @{ name='cabbage';        tags=@('cabbage','crops/cabbage','foods/cabbage');        emit=@('cabbage','crops/cabbage') },
+  @{ name='strawberry';     tags=@('strawberries','strawberry');                      emit=@('strawberries','strawberry') },
   @{ name='rice_grain';     tags=@('rice','crops/rice');                              emit=@('rice') },
   @{ name='vegetables';     tags=@('vegetables','foods/vegetable');                   emit=@('vegetables') },
   @{ name='fruits';         tags=@('fruits','foods/fruit');                           emit=@('fruits') }
@@ -109,6 +120,7 @@ foreach ($cat in $categories) {
   }
   if ($cat.extra) { foreach ($i in $cat.extra) { [void]$union.Add($i) } }
   foreach ($b in $blacklist) { [void]$union.Remove($b) }
+  foreach ($s in @($union | Where-Object { $_ -match $blacklistPattern })) { [void]$union.Remove($s) }
   [void]$report.AppendLine("[$($cat.name)] union: $(($union | Sort-Object) -join ', ')")
   foreach ($t in $cat.emit) {
     if (-not $tagEntries.ContainsKey($t)) { [void]$report.AppendLine("  $t : tag not defined by any source, skipped"); continue }

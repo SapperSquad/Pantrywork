@@ -1,6 +1,7 @@
 {
   "values": [
     { "id": "#c:cookedfish", "required": false },
+    { "id": "#c:cooked_fishes", "required": false },
     { "id": "oceansdelight:cooked_guardian_tail", "required": false },
     { "id": "oceansdelight:cooked_elder_guardian_slice", "required": false },
     { "id": "oceansdelight:kelp_encrusted_cod", "required": false }

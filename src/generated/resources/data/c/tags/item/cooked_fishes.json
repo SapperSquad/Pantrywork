@@ -1,9 +1,9 @@
 {
   "values": [
-    { "id": "farm_and_charm:cooked_cod", "required": false },
-    { "id": "farm_and_charm:cooked_salmon", "required": false },
     { "id": "farmersdelight:cooked_cod_slice", "required": false },
     { "id": "farmersdelight:cooked_salmon_slice", "required": false },
+    { "id": "minecraft:cooked_cod", "required": false },
+    { "id": "minecraft:cooked_salmon", "required": false },
     { "id": "oceansdelight:cooked_elder_guardian_slice", "required": false },
     { "id": "oceansdelight:cooked_guardian_tail", "required": false },
     { "id": "oceansdelight:kelp_encrusted_cod", "required": false }
