@@ -296,29 +296,41 @@ public class GenPromo {
         g.setColor(BODY);
         g.drawString("The food-mod interop layer - NeoForge & Fabric", 100, 470);
 
-        // right: four mods' cheeses converge into one canonical tag. Labelled by
+        // Right: four mods' cheeses converge into one canonical tag. Labelled by
         // mod rather than tag - several of them legitimately use the same tag
         // name, so tag labels would read as duplicates.
-        int cx = 1210, s = 108;
-        int[] ys = {60, 200, 340, 480};
+        //
+        // Labels sit to the RIGHT of their slot on purpose: left-aligned labels
+        // grow leftwards as mod names get longer and collide with the headline
+        // (0.3.0 shipped with "Pam's HC2" overlapping the K in PANTRYWORK).
+        // This way a longer name can never reach the wordmark.
+        int cx = 1180, s = 100;
+        int[] ys = {70, 205, 340, 475};
         BufferedImage[] items = {tex("cheese"), tex("cheeseitem"),
                                  tex("meadow__cheese_slice"), tex("brewinandchewin__flaxen_cheese_wheel")};
         Color[] mods = {C_CROP, C_PAMS, C_MEADOW, C_BREW};
         String[] labels = {"Croptopia", "Pam's HC2", "Meadow", "Brewin' & Chewin'"};
+        int labelX = cx + s + 16;
+        // Arrows start past the WIDEST label, measured rather than guessed, so a
+        // longer mod name can never be crossed out by its own arrow.
+        g.setFont(new Font("Segoe UI", Font.BOLD, 22));
+        int widest = 0;
+        for (String l : labels) widest = Math.max(widest, g.getFontMetrics().stringWidth(l));
+        int arrowX = labelX + widest + 20;
         for (int i = 0; i < items.length; i++) {
             slotItem(g, items[i], mods[i], cx, ys[i], s);
-            g.setFont(new Font("Segoe UI", Font.BOLD, 24));
+            g.setFont(new Font("Segoe UI", Font.BOLD, 22));
             g.setColor(mods[i]);
-            g.drawString(labels[i], cx - g.getFontMetrics().stringWidth(labels[i]) - 28, ys[i] + s / 2 + 9);
-            arrow(g, new Color(245, 233, 208, 150), cx + s + 14, ys[i] + s / 2, 1556, 320);
+            g.drawString(labels[i], labelX, ys[i] + s / 2 + 8);
+            arrow(g, new Color(245, 233, 208, 140), arrowX, ys[i] + s / 2, 1608, 320);
         }
-        tagShape(g, AMBER, 1580, 248, 310, 144);
-        g.setFont(new Font("Consolas", Font.BOLD, 29));
+        tagShape(g, AMBER, 1632, 252, 258, 136);
+        g.setFont(new Font("Consolas", Font.BOLD, 25));
         g.setColor(BG_DARK);
-        g.drawString("#c:foods", 1688, 302);
-        g.drawString("/cheese", 1694, 338);
-        g.setFont(new Font("Segoe UI", Font.BOLD, 21));
-        g.drawString("one tag", 1698, 372);
+        g.drawString("#c:foods", 1726, 302);
+        g.drawString("/cheese", 1732, 334);
+        g.setFont(new Font("Segoe UI", Font.BOLD, 19));
+        g.drawString("one tag", 1736, 364);
         g.dispose();
         return img;
     }
