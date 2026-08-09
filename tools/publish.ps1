@@ -105,28 +105,33 @@ function Get-CurseForgeVersionIdByType {
     return $valid[0].id
 }
 
-# The two release artifacts. Loader names: Modrinth uses lowercase loader slugs;
-# CurseForge models loaders as game-version entries under the 'modloader' type.
+# The three release artifacts, each carrying the Minecraft versions it was
+# actually verified against (see PUBLISHING.md verification log). Loader names:
+# Modrinth uses lowercase loader slugs; CurseForge models loaders as
+# game-version entries under the 'modloader' type.
+$fabric121 = @('1.21.1','1.21.2','1.21.3','1.21.4','1.21.5','1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11')
+$fabric26  = @('26.1.2','26.2')
 $files = @(
-    @{ jar = "pantrywork-$Version.jar";        loaderModrinth = "neoforge"; loaderCf = "NeoForge"; suffix = "" },
-    @{ jar = "pantrywork-$Version-fabric.jar"; loaderModrinth = "fabric";   loaderCf = "Fabric";   suffix = "-fabric" }
+    @{ jar = "pantrywork-$Version.jar";             loaderModrinth = "neoforge"; loaderCf = "NeoForge"; label = "1.21.1";  mc = @('1.21.1') },
+    @{ jar = "pantrywork-$Version-fabric.jar";      loaderModrinth = "fabric";   loaderCf = "Fabric";   label = "1.21.x"; mc = $fabric121 },
+    @{ jar = "pantrywork-$Version-fabric-mc26.jar"; loaderModrinth = "fabric";   loaderCf = "Fabric";   label = "26";     mc = $fabric26 }
 )
-$mc = "1.21.1"
 
 foreach ($f in $files) {
     $jar = Join-Path $dist $f.jar
     if (-not (Test-Path $jar)) { Write-Warning "missing $jar - skipped"; continue }
-    Write-Host "`n=== $($f.jar) ==="
+    $suffix = if ($f.loaderModrinth -eq 'fabric') { "-fabric" } else { "" }
+    Write-Host "`n=== $($f.jar)  [$($f.loaderCf) $($f.label): $($f.mc -join ', ')] ==="
 
     if (-not $SkipModrinth) {
-        $versionNumber = "$Version+mc$mc$($f.suffix)"
+        $versionNumber = "$Version+mc$($f.label)$suffix"
         $data = @{
             name           = "Pantrywork $versionNumber"
             version_number = $versionNumber
             project_id     = $ModrinthProjectId
             file_parts     = @("file")
             primary_file   = "file"
-            game_versions  = @($mc)
+            game_versions  = $f.mc
             loaders        = @($f.loaderModrinth)
             version_type   = "release"
             featured       = $false
@@ -147,28 +152,33 @@ foreach ($f in $files) {
         Write-Host "CurseForge: SKIPPED (-SkipCurseForge)"
     } elseif ($CurseForgeProjectId -eq 0) {
         Write-Host "CurseForge: SKIPPED - no project id. Pass -CurseForgeProjectId <number> or set CURSEFORGE_PROJECT_ID."
+    } elseif (-not $CurseForgeToken) {
+        Write-Host "[DryRun]   CURSEFORGE_TOKEN not set - cannot verify version ids"
     } else {
+        # Resolve every Minecraft version to its CurseForge id, plus the loader id.
+        $ldId = Get-CurseForgeVersionIdByType -Name $f.loaderCf -TypeSlugPrefix "modloader" -Token $CurseForgeToken
+        $gvIds = @()
+        $unresolved = @()
+        foreach ($v in $f.mc) {
+            $id = Get-CurseForgeVersionIdByType -Name $v -TypeSlugPrefix "minecraft-" -Token $CurseForgeToken
+            if ($id) { $gvIds += $id } else { $unresolved += $v }
+        }
         if ($DryRun) {
             Write-Host "[DryRun] CurseForge project $CurseForgeProjectId"
-            if ($CurseForgeToken) {
-                $gvId = Get-CurseForgeVersionIdByType -Name $mc -TypeSlugPrefix "minecraft-" -Token $CurseForgeToken
-                $ldId = Get-CurseForgeVersionIdByType -Name $f.loaderCf -TypeSlugPrefix "modloader" -Token $CurseForgeToken
-                Write-Host "[DryRun]   '$mc' -> $gvId ; '$($f.loaderCf)' -> $ldId ; would POST upload-file"
-            } else {
-                Write-Host "[DryRun]   CURSEFORGE_TOKEN not set - cannot verify version ids"
-            }
+            Write-Host "[DryRun]   loader '$($f.loaderCf)' -> $ldId"
+            Write-Host "[DryRun]   resolved $($gvIds.Count)/$($f.mc.Count) game versions -> $($gvIds -join ', ')"
+            if ($unresolved.Count -gt 0) { Write-Host "[DryRun]   UNRESOLVED (would be dropped): $($unresolved -join ', ')" }
         } else {
-            $gvId = Get-CurseForgeVersionIdByType -Name $mc -TypeSlugPrefix "minecraft-" -Token $CurseForgeToken
-            $ldId = Get-CurseForgeVersionIdByType -Name $f.loaderCf -TypeSlugPrefix "modloader" -Token $CurseForgeToken
-            if (-not $gvId -or -not $ldId) {
-                Write-Warning "Skipping CurseForge upload for $($f.jar) - unresolved version ids."
+            if (-not $ldId -or $gvIds.Count -eq 0) {
+                Write-Warning "Skipping CurseForge upload for $($f.jar) - loader or all game versions unresolved."
             } else {
+                if ($unresolved.Count -gt 0) { Write-Warning "$($f.jar): dropping unresolved CurseForge versions: $($unresolved -join ', ')" }
                 $metadata = @{
                     changelog     = $changelog
                     changelogType = "markdown"
-                    displayName   = "Pantrywork $Version ($($f.loaderCf) $mc)"
+                    displayName   = "Pantrywork $Version ($($f.loaderCf) $($f.label))"
                     releaseType   = "release"
-                    gameVersions  = @($gvId, $ldId)
+                    gameVersions  = @($gvIds + $ldId)
                 } | ConvertTo-Json -Depth 5
                 $headers = @{ "X-Api-Token" = $CurseForgeToken }
                 $result = Invoke-MultipartPost -Uri "https://minecraft.curseforge.com/api/projects/$CurseForgeProjectId/upload-file" -Headers $headers -JsonFieldName "metadata" -JsonBody $metadata -FileFieldName "file" -FilePath $jar
