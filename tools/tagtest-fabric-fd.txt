@@ -1,0 +1,16 @@
+# Reduced Fabric suite for versions where only FD Refabricated exists
+# (currently the 1.21.11 pass). No Croptopia items or recipes.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+item replace block 8 -60 8 container.0 with farmersdelight:cooked_bacon
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+item replace block 8 -60 8 container.0 with farmersdelight:bacon
+execute if items block 8 -60 8 container.0 #c:rawpork
+item replace block 8 -60 8 container.0 with farmersdelight:bone_broth
+execute if items block 8 -60 8 container.0 #c:stock
+item replace block 8 -60 8 container.0 with minecraft:bread
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/starch
+item replace block 8 -60 8 container.0 with minecraft:stone
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component

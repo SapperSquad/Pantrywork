@@ -23,19 +23,20 @@ other's in recipes.
 - **Zero hard dependencies**: every cross-mod reference is optional; works
   with any subset of supported mods installed — or none.
 
-**Both loaders, Minecraft 1.21.1**: NeoForge (21.1.241+) and Fabric (the
-Fabric jar is pure data — no code, no Fabric API requirement).
+**Both loaders**: NeoForge on 1.21.1 (21.1.241+), and Fabric on 1.21.1–1.21.11
+and 26.x — the Fabric jars are pure data (no code, no Fabric API requirement).
 
 Supported so far: Farmer's Delight (+ Refabricated on Fabric), Croptopia,
 Pam's HarvestCraft 2 Food Core, Ocean's Delight, End's Delight, and
 Origins (carnivore/vegetarian diet tags).
 
-Verified live (2026-07-19): full RCON test suites plus 5 GameTests
+Verified live, never inferred: full RCON test suites plus 5 GameTests
 (`gradlew runGameTestServer`) green on NeoForge with all compat mods
-loaded, boot-matrix clean with none loaded, and the Fabric jar verified
-on a real Fabric server — highlights include Pam's grilled-cheese-and-ham
-crafted from four mods' ingredients (NeoForge) and Croptopia's banana
-smoothie made with FD Refabricated milk (Fabric).
+loaded, boot-matrix clean with none loaded, and the Fabric jars booted on
+real servers across **1.21.1, 1.21.10, 1.21.11, 26.1.2, and 26.2**.
+Highlights: Pam's grilled-cheese-and-ham crafted from four mods'
+ingredients (NeoForge), and Croptopia's banana smoothie made with Farmer's
+Delight Refabricated milk — on both 1.21.10 and 26.1.2.
 
 Docs: [docs/TAXONOMY.md](docs/TAXONOMY.md) (tag design) ·
 [CLAUDE.md](CLAUDE.md) (build/test harness) ·

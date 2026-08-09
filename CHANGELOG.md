@@ -1,8 +1,24 @@
 # Changelog
 
-## 0.1.0 — unreleased (built 2026-07-19)
+## 0.2.0 — 2026-08-08
 
-Initial version. NeoForge 1.21.1 (21.1.241+).
+**Minecraft 26.x support, and a wider Fabric range.** No content changes —
+the tag payload is byte-identical across all three files.
+
+- **New: Fabric jar for Minecraft 26.x** (`-fabric-mc26`), verified live on
+  26.1.2 (Farmer's Delight Refabricated 3.6.15 + Croptopia 4.3.1, including
+  a cross-mod craft) and on 26.2 (FD Refabricated). 26.x kept the
+  `data/c/tags/item` layout and both mods kept their tag dialects, so the
+  bridges port unchanged.
+- **Fabric 1.21.x range widened to 1.21.1–1.21.11**, verified live on
+  1.21.10 (FD Refabricated + Croptopia Refabricated) and 1.21.11 (FD
+  Refabricated). The in-jar range is now explicit (`>=1.21.1 <1.22`).
+- NeoForge stays 1.21.1-only: Farmer's Delight, Pam's HarvestCraft 2, and
+  Croptopia's NeoForge builds have nothing newer to bridge yet.
+
+## 0.1.0 — 2026-07-20
+
+Initial release. NeoForge 1.21.1 (21.1.241+) and Fabric 1.21.1.
 
 - Identity layer: extends the official `c:foods/*` convention (cheese,
   butter, dough merges, cooked_rice, raw/cooked meat parent joins) and

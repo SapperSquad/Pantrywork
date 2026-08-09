@@ -1,8 +1,5 @@
-**0.1.0 - Initial release.** A shared tag vocabulary for food mods, for NeoForge and Fabric on Minecraft 1.21.1 (the Fabric jar is pure data - no code, no Fabric API requirement).
+**0.2.0 - Minecraft 26.x support, and a wider Fabric range.** No content changes: the tag payload is byte-identical across all three files.
 
-- Identity layer extending the official `c:foods/*` convention, bridging Croptopia's and Pam's HarvestCraft 2's tag dialects into it.
-- Role layer: `pantrywork:food_component/{protein, starch, dairy, garnish, liquid_base, sweetener}` as tags-of-tags over the identity layer.
-- Reverse bridges: 24 dialect tags gain other mods' equivalent items, so Croptopia's and Pam's own recipes accept foreign ingredients.
-- Compat modules for Farmer's Delight (incl. Refabricated), Croptopia, Pam's HC2 Food Core, Ocean's Delight, End's Delight, and Origins.
-- `PantryworkTagKeys` API class for downstream mods (NeoForge jar).
-- Every cross-mod entry is optional - any subset of the supported mods works.
+- **New: Fabric build for Minecraft 26.x**, verified live on 26.1.2 (Farmer's Delight Refabricated + Croptopia 4.3.1, including a cross-mod craft) and on 26.2 (FD Refabricated). 26.x kept the common-tag layout and both mods kept their dialects, so every bridge ports unchanged.
+- **Fabric 1.21.x now covers 1.21.1 through 1.21.11**, verified live on 1.21.10 (FD Refabricated + Croptopia Refabricated) and 1.21.11 (FD Refabricated).
+- NeoForge stays on 1.21.1: Farmer's Delight, Pam's HarvestCraft 2, and Croptopia's NeoForge builds have nothing newer to bridge yet. Nothing changes for existing NeoForge users.

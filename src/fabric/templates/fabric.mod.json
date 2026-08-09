@@ -10,6 +10,6 @@
   "environment": "*",
   "depends": {
     "fabricloader": ">=0.14.0",
-    "minecraft": "~1.21.1"
+    "minecraft": "${mc_range}"
   }
 }

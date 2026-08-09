@@ -7,15 +7,30 @@ Store copy for the Modrinth / CurseForge project pages. Bump this file in the sa
 
 | Upload as version | File | Game version tag | Loader |
 |---|---|---|---|
-| `0.1.0+mc1.21.1` | `build/libs/pantrywork-0.1.0.jar` | 1.21.1 | neoforge |
-| `0.1.0+mc1.21.1-fabric` | `build/libs/pantrywork-0.1.0-fabric.jar` | 1.21.1 | fabric |
+| `0.2.0+mc1.21.1` | `dist/0.2.0/pantrywork-0.2.0.jar` | 1.21.1 | neoforge |
+| `0.2.0+mc1.21.x-fabric` | `dist/0.2.0/pantrywork-0.2.0-fabric.jar` | 1.21.1–1.21.11 | fabric |
+| `0.2.0+mc26-fabric` | `dist/0.2.0/pantrywork-0.2.0-fabric-mc26.jar` | 26.1, 26.1.1, 26.1.2, 26.2 | fabric |
+
+Build all three with `./gradlew build -Prelease fabricJar fabricJar26`. The NeoForge jar's content is
+unchanged from 0.1.0, so re-uploading it is optional — but keeping one version number across all
+files keeps the store listing coherent.
+
+Fabric version range verified 2026-08-08: same unmodified jar passed live suites on 1.21.10
+(FD Refabricated + Croptopia Refabricated, incl. cross-mod smoothie craft) and 1.21.11
+(FD Refabricated; Croptopia Refabricated caps at 1.21.10). Croptopia Refabricated audit:
+same croptopia: namespace, same tag dialect (640 c: files) — bridges hit it unmodified.
+NeoForge file stays 1.21.1-only: FD proper/Pam's/Croptopia NeoForge have nothing newer to bridge.
 
 Build the NeoForge artifact with `./gradlew build -Prelease` — the plain `build` task leaves the
 GameTest classes, the `pantrywork:empty` structure template, and the dev-only test recipes in the jar.
-Build the Fabric artifact with `./gradlew fabricJar` — data-only (no classes), dev content always
-excluded; verified live 2026-07-19 on a Fabric server with FD Refabricated + Croptopia Fabric
-(all tag checks green incl. a Croptopia smoothie crafted from FD Refabricated milk). Version
-roadmap: 26.x (Fabric-first) as the food ecosystem ports there; no 1.20.x (pre-`c:`-unification).
+Fabric artifacts (`fabricJar`, `fabricJar26`) are data-only (no classes) with dev content always
+excluded; each carries the Minecraft range it was actually verified against.
+
+**Verification log** (every claim below was a live server boot + RCON suite, never inference):
+1.21.1 FD+Croptopia+Pam's · 1.21.10 FD Refab + Croptopia Refab (7/7, cross-mod craft) ·
+1.21.11 FD Refab (6/6) · 26.1.2 FD Refab + Croptopia 4.3.1 (7/7, cross-mod craft) · 26.2 FD Refab (6/6).
+Version roadmap: no 1.20.x (pre-`c:`-unification); NeoForge widens only when FD/Pam's/Croptopia
+ship NeoForge builds past 1.21.1.
 
 ## RELEASE BLOCKERS — clear these before first upload
 
@@ -118,6 +133,8 @@ list, re-check it every release — images can't be grepped and go stale invisib
 
 ## Changelog for the 0.1.0 uploads
 
+> **0.2.0 — Minecraft 26.x support.** See `tools/changelog-current.md` for the paste-ready body.
+>
 > **0.1.0 — Initial release.** A shared tag vocabulary for food mods, for NeoForge and Fabric on
 > Minecraft 1.21.1 (the Fabric jar is pure data — no code, no Fabric API requirement).
 > - Identity layer extending the official `c:foods/*` convention, bridging Croptopia's and

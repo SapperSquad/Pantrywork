@@ -13,7 +13,8 @@ Requires JDK 21 — pinned machine-wide via `~/.gradle/gradle.properties`
 
 ```
 ./gradlew build                       # NeoForge jar in build/libs
-./gradlew fabricJar                   # Fabric 1.21.1 jar (data-only, no classes)
+./gradlew fabricJar                   # Fabric 1.21.x jar (data-only, no classes)
+./gradlew fabricJar26                 # Fabric 26.x jar (same payload, 26.x version range)
 ./gradlew runServer                   # headless dev server + all compat mods (FD, Croptopia+EpheroLib, Pam's, Ocean's/End's Delight, Origins+Jupiter)
 ./gradlew runServer -PnoCompatMods    # boot-matrix run: no compat mods loaded
 ```

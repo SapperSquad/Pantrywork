@@ -101,37 +101,60 @@ dependencies {
 // tag files wrapped in a fabric.mod.json — no classes (which also avoids
 // the mojmap/intermediary mapping problem entirely). Dev-only content is
 // always excluded here, independent of -Prelease.
-var generateFabricMetadata = tasks.register('generateFabricMetadata', ProcessResources) {
-    var props = [
-        mod_id: project.mod_id,
-        mod_name: project.mod_name,
-        mod_version: project.mod_version,
-        mod_license: project.mod_license,
-        mod_authors: project.mod_authors,
-        mod_description: project.mod_description,
-    ]
-    inputs.properties props
-    expand props
-    from 'src/fabric/templates'
-    into "${layout.buildDirectory.get()}/generated/sources/fabricMetadata"
+// One data payload, one jar per verified Minecraft line. Separate jars (rather
+// than a single open-ended range) keep each claim tied to what was actually
+// booted and tested, and limit the blast radius if a future MC line ever moves
+// the data layout. 26.x kept data/c/tags/item + data/<ns>/recipe, so the tag
+// files are byte-identical between the two.
+def fabricMetadata(String taskName, String mcRange, String outDir) {
+    return tasks.register(taskName, ProcessResources) {
+        var props = [
+            mod_id: project.mod_id,
+            mod_name: project.mod_name,
+            mod_version: project.mod_version,
+            mod_license: project.mod_license,
+            mod_authors: project.mod_authors,
+            mod_description: project.mod_description,
+            mc_range: mcRange,
+        ]
+        inputs.properties props
+        expand props
+        from 'src/fabric/templates'
+        into "${layout.buildDirectory.get()}/generated/sources/$outDir"
+    }
 }
 
-tasks.register('fabricJar', Jar) {
-    group = 'build'
-    description = 'Data-only Fabric 1.21.1 jar.'
-    archiveBaseName = project.mod_id
-    archiveClassifier = 'fabric'
-    from generateFabricMetadata
-    from('src/main/resources') {
+def fabricPayload(Jar jar) {
+    jar.archiveBaseName = project.mod_id
+    jar.from('src/main/resources') {
         include 'data/**'
         exclude 'data/pantrywork/recipe/test/**'
         exclude 'data/pantrywork/structure/**'
     }
-    from('src/generated/resources') { include 'data/**' }
-    from('promo/icon-512.png') {
+    jar.from('src/generated/resources') { include 'data/**' }
+    jar.from('promo/icon-512.png') {
         into 'assets/pantrywork'
         rename { 'icon.png' }
     }
+}
+
+var fabricMeta121 = fabricMetadata('generateFabricMetadata', '>=1.21.1 <1.22', 'fabricMetadata')
+var fabricMeta26 = fabricMetadata('generateFabricMetadata26', '>=26.1 <27', 'fabricMetadata26')
+
+tasks.register('fabricJar', Jar) {
+    group = 'build'
+    description = 'Data-only Fabric jar for Minecraft 1.21.x.'
+    archiveClassifier = 'fabric'
+    from fabricMeta121
+    fabricPayload(it)
+}
+
+tasks.register('fabricJar26', Jar) {
+    group = 'build'
+    description = 'Data-only Fabric jar for Minecraft 26.x.'
+    archiveClassifier = 'fabric-mc26'
+    from fabricMeta26
+    fabricPayload(it)
 }
 
 var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
