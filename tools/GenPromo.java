@@ -35,6 +35,16 @@ public class GenPromo {
     static final Color C_PAMS    = new Color(0xC77FD0);
     static final Color C_ENDS    = new Color(0x9B6BD8);
     static final Color C_OCEANS  = new Color(0x5FB7D4);
+    static final Color C_VINERY  = new Color(0xB0455F);
+    static final Color C_FARM    = new Color(0xE0B84A);
+    static final Color C_MEADOW  = new Color(0x6FA88C);
+    static final Color C_AQUA    = new Color(0x3E7BB8);
+    static final Color C_BREW    = new Color(0xB07A35);
+
+    // Bumped whenever a compat module ships. Baked into gallery art, so it must
+    // be re-checked every release - images can't be grepped when they go stale.
+    static final int FOOD_MOD_COUNT = 10;
+    static final int DIALECT_COUNT = 4;
 
     static final String TEX = "tools/work/tex/";
 
@@ -48,11 +58,12 @@ public class GenPromo {
             System.out.println("done");
             return;
         }
-        write(icon(),       "promo/icon-512.png");
-        write(banner(),     "promo/banner-1920x640.png");
-        write(galleryTag(), "promo/gallery-1-one-tag.png");
+        write(icon(),        "promo/icon-512.png");
+        write(banner(),      "promo/banner-1920x640.png");
+        write(galleryTag(),  "promo/gallery-1-one-tag.png");
         write(galleryCraft(),"promo/gallery-2-four-mod-craft.png");
         write(galleryRole(), "promo/gallery-3-role-tags.png");
+        write(galleryRoster(),"promo/gallery-4-supported-mods.png");
         System.out.println("done");
     }
 
@@ -283,26 +294,31 @@ public class GenPromo {
         g.drawString("One cheese. Every recipe.", 100, 410);
         g.setFont(new Font("Segoe UI", Font.PLAIN, 34));
         g.setColor(BODY);
-        g.drawString("The food-mod interop layer for NeoForge 1.21.1", 100, 470);
+        g.drawString("The food-mod interop layer - NeoForge & Fabric", 100, 470);
 
-        // right: three dialect cheeses converge into one canonical tag
-        int cx = 1250, s = 120;
-        int[] ys = {90, 260, 430};
-        BufferedImage[] items = {tex("cheese"), tex("cheeseitem"), tex("wheat_dough")};
-        Color[] mods = {C_CROP, C_PAMS, C_FD};
-        String[] labels = {"c:cheeses", "c:cheese", "c:foods/dough/wheat"};
-        for (int i = 0; i < 3; i++) {
+        // right: four mods' cheeses converge into one canonical tag. Labelled by
+        // mod rather than tag - several of them legitimately use the same tag
+        // name, so tag labels would read as duplicates.
+        int cx = 1210, s = 108;
+        int[] ys = {60, 200, 340, 480};
+        BufferedImage[] items = {tex("cheese"), tex("cheeseitem"),
+                                 tex("meadow__cheese_slice"), tex("brewinandchewin__flaxen_cheese_wheel")};
+        Color[] mods = {C_CROP, C_PAMS, C_MEADOW, C_BREW};
+        String[] labels = {"Croptopia", "Pam's HC2", "Meadow", "Brewin' & Chewin'"};
+        for (int i = 0; i < items.length; i++) {
             slotItem(g, items[i], mods[i], cx, ys[i], s);
-            g.setFont(new Font("Consolas", Font.PLAIN, 26));
+            g.setFont(new Font("Segoe UI", Font.BOLD, 24));
             g.setColor(mods[i]);
-            g.drawString(labels[i], cx - g.getFontMetrics().stringWidth(labels[i]) - 18, ys[i] + s / 2 + 8);
-            arrow(g, new Color(245, 233, 208, 150), cx + s + 14, ys[i] + s / 2, 1560, 320);
+            g.drawString(labels[i], cx - g.getFontMetrics().stringWidth(labels[i]) - 28, ys[i] + s / 2 + 9);
+            arrow(g, new Color(245, 233, 208, 150), cx + s + 14, ys[i] + s / 2, 1556, 320);
         }
-        tagShape(g, AMBER, 1585, 250, 290, 140);
-        g.setFont(new Font("Consolas", Font.BOLD, 34));
+        tagShape(g, AMBER, 1580, 248, 310, 144);
+        g.setFont(new Font("Consolas", Font.BOLD, 29));
         g.setColor(BG_DARK);
-        g.drawString("#c:foods", 1668, 310);
-        g.drawString("one tag", 1672, 352);
+        g.drawString("#c:foods", 1688, 302);
+        g.drawString("/cheese", 1694, 338);
+        g.setFont(new Font("Segoe UI", Font.BOLD, 21));
+        g.drawString("one tag", 1698, 372);
         g.dispose();
         return img;
     }
@@ -315,26 +331,31 @@ public class GenPromo {
         Graphics2D g = canvas(img);
         pantryBackground(g, W, H);
         eyebrow(g, "PANTRYWORK", 80, 100);
-        headline(g, "Three dialects. One vocabulary.", 76, 180, 64);
+        headline(g, "Four dialects. One vocabulary.", 76, 180, 64);
         g.setFont(new Font("Segoe UI", Font.PLAIN, 30));
         g.setColor(BODY);
         g.drawString("The big food mods already ship common tags - in naming dialects that never reference each other.", 80, 250);
 
-        // bottom: dialect chips, three fixed lanes with measured widths
-        int rowY = 710;
-        int[] laneX = {110, 700, 1140};
-        Color[] laneC = {C_CROP, C_PAMS, C_FD};
-        String[] laneName = {"Croptopia (701 tags)", "Pam's HC2 (196 tags)", "Farmer's Delight (70 tags)"};
-        String[][] laneChips = {{"c:cheeses", "c:doughs", "c:milks"},
+        // bottom: dialect chips, four fixed lanes with measured widths
+        int rowY = 715;
+        int[] laneX = {90, 470, 850, 1230};
+        Color[] laneC = {C_CROP, C_PAMS, C_FD, C_FARM};
+        String[] laneName = {"Croptopia (701)", "Pam's HC2 (196)", "Farmer's Delight (70)", "Farm & Charm (39)"};
+        String[][] laneChips = {{"c:cheeses", "c:doughs"},
                                 {"c:cheese", "c:rawpork"},
-                                {"c:foods/raw_pork"}};
-        g.setFont(new Font("Segoe UI", Font.BOLD, 28));
-        for (int i = 0; i < 3; i++) {
+                                {"c:foods/raw_pork"},
+                                {"c:raw_pork", "c:butter"}};
+        g.setFont(new Font("Segoe UI", Font.BOLD, 25));
+        for (int i = 0; i < laneX.length; i++) {
             g.setColor(laneC[i]);
-            g.drawString(laneName[i], laneX[i], rowY - 28);
+            g.drawString(laneName[i], laneX[i], rowY - 26);
             int cx2 = laneX[i];
-            for (String c : laneChips[i]) cx2 += chip(g, c, laneC[i], BG_DARK, cx2, rowY, 54, 26) + 12;
+            for (String c : laneChips[i]) cx2 += chip(g, c, laneC[i], BG_DARK, cx2, rowY, 48, 22) + 10;
         }
+        // the punchline: three of those mean the same thing
+        g.setFont(new Font("Segoe UI", Font.ITALIC, 25));
+        g.setColor(BODY);
+        g.drawString("rawpork / raw_pork / foods/raw_pork - three spellings, one ingredient", 90, 830);
 
         // middle: canonical band
         int midY = 470;
@@ -361,9 +382,10 @@ public class GenPromo {
         for (String r : roles) x += chip(g, r, AMBER, BG_DARK, x, topY + 34, 50, 26) + 14;
 
         // arrows dialect -> canonical -> role
-        arrow(g, new Color(245, 233, 208, 140), 300, rowY - 64, 300, midY + 100);
-        arrow(g, new Color(245, 233, 208, 140), 840, rowY - 64, 700, midY + 100);
-        arrow(g, new Color(245, 233, 208, 140), 1290, rowY - 64, 1030, midY + 100);
+        arrow(g, new Color(245, 233, 208, 140), 250, rowY - 62, 280, midY + 100);
+        arrow(g, new Color(245, 233, 208, 140), 620, rowY - 62, 600, midY + 100);
+        arrow(g, new Color(245, 233, 208, 140), 990, rowY - 62, 900, midY + 100);
+        arrow(g, new Color(245, 233, 208, 140), 1350, rowY - 62, 1180, midY + 100);
         arrow(g, new Color(255, 200, 69, 170), 500, midY - 25, 500, topY + 100);
         g.dispose();
         return img;
@@ -420,6 +442,66 @@ public class GenPromo {
         return img;
     }
 
+    // ---- gallery 4: the supported-mod roster ------------------------------
+
+    static BufferedImage galleryRoster() throws Exception {
+        int W = 1600, H = 900;
+        BufferedImage img = new BufferedImage(W, H, BufferedImage.TYPE_INT_RGB);
+        Graphics2D g = canvas(img);
+        pantryBackground(g, W, H);
+        eyebrow(g, "PANTRYWORK", 80, 100);
+        headline(g, "Ten food mods bridged.", 76, 180, 64);
+        g.setFont(new Font("Segoe UI", Font.PLAIN, 30));
+        g.setColor(BODY);
+        g.drawString("Install all of them, a few of them, or none - Pantrywork bridges whatever it finds.", 80, 250);
+
+        String[][] roster = {
+            {"cheese",                              "Croptopia"},
+            {"cheeseitem",                          "Pam's HarvestCraft 2"},
+            {"cooked_bacon",                        "Farmer's Delight"},
+            {"cooked_guardian_tail",                "Ocean's Delight"},
+            {"roasted_dragon_meat",                 "End's Delight"},
+            {"vinery__red_grape",                   "Let's Do Vinery"},
+            {"farm_and_charm__butter",              "Let's Do Farm & Charm"},
+            {"meadow__cheese_slice",                "Let's Do Meadow"},
+            {"aquaculture__atlantic_cod",           "Aquaculture 2"},
+            {"brewinandchewin__flaxen_cheese_wheel","Brewin' & Chewin'"}
+        };
+        Color[] cols = {C_CROP, C_PAMS, C_FD, C_OCEANS, C_ENDS,
+                        C_VINERY, C_FARM, C_MEADOW, C_AQUA, C_BREW};
+
+        int cols5 = 5, s = 112, gapX = 300, x0 = 118, y0 = 340, gapY = 250;
+        for (int i = 0; i < roster.length; i++) {
+            int cx = x0 + (i % cols5) * gapX;
+            int cy = y0 + (i / cols5) * gapY;
+            slotItem(g, tex(roster[i][0]), cols[i], cx, cy, s);
+            // name wraps onto a second line when it is too wide for the column
+            g.setFont(new Font("Segoe UI", Font.BOLD, 22));
+            String name = roster[i][1];
+            java.util.List<String> lines = new java.util.ArrayList<>();
+            if (g.getFontMetrics().stringWidth(name) <= 250) {
+                lines.add(name);
+            } else {
+                int cut = name.lastIndexOf(' ', name.length() / 2 + 4);
+                if (cut < 0) cut = name.indexOf(' ');
+                lines.add(name.substring(0, cut));
+                lines.add(name.substring(cut + 1));
+            }
+            int ty = cy + s + 34;
+            for (String ln : lines) {
+                g.setColor(CREAM);
+                g.drawString(ln, cx + (s - g.getFontMetrics().stringWidth(ln)) / 2, ty);
+                ty += 26;
+            }
+        }
+
+        g.setFont(new Font("Segoe UI", Font.ITALIC, 26));
+        g.setColor(BODY);
+        g.drawString("Plus Origins diet compat - carnivores and vegetarians can finally eat modded food.", 118, 852);
+        g.dispose();
+        return img;
+    }
+
     // ---- gallery 3: role tags for recipe authors --------------------------
 
     static BufferedImage galleryRole() throws Exception {
@@ -467,17 +549,18 @@ public class GenPromo {
         g.setFont(new Font("Segoe UI", Font.PLAIN, 30));
         g.setColor(BODY);
         g.drawString("accepts, today:", ax, ay + 44);
-        BufferedImage[] prot = {tex("cooked_beef"), tex("cooked_chicken"), tex("cooked_bacon"),
-                                tex("roasted_dragon_meat"), tex("cooked_guardian_tail")};
-        Color[] pmods = {C_VANILLA, C_VANILLA, C_FD, C_ENDS, C_OCEANS};
-        String[] pnames = {"Steak", "Chicken", "Bacon", "Dragon meat", "Guardian tail"};
-        int ix = ax, iy = ay + 90, is = 110;
-        g.setFont(new Font("Segoe UI", Font.PLAIN, 22));
+        BufferedImage[] prot = {tex("cooked_beef"), tex("cooked_bacon"), tex("roasted_dragon_meat"),
+                                tex("cooked_guardian_tail"), tex("aquaculture__fish_fillet_cooked"),
+                                tex("meadow__cooked_buffalo_meat")};
+        Color[] pmods = {C_VANILLA, C_FD, C_ENDS, C_OCEANS, C_AQUA, C_MEADOW};
+        String[] pnames = {"Steak", "Bacon", "Dragon", "Guardian", "Fillet", "Buffalo"};
+        int ix = ax, iy = ay + 90, is = 96;
+        g.setFont(new Font("Segoe UI", Font.PLAIN, 20));
         for (int i = 0; i < prot.length; i++) {
             slotItem(g, prot[i], pmods[i], ix, iy, is);
             g.setColor(BODY);
-            g.drawString(pnames[i], ix + (is - g.getFontMetrics().stringWidth(pnames[i])) / 2, iy + is + 30);
-            ix += is + 24;
+            g.drawString(pnames[i], ix + (is - g.getFontMetrics().stringWidth(pnames[i])) / 2, iy + is + 28);
+            ix += is + 18;
         }
         g.setFont(new Font("Segoe UI", Font.BOLD, 30));
         g.setColor(CREAM);

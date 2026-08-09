@@ -121,13 +121,24 @@ cross-mod identity, reverse bridges, and recipe resolution through `RecipeManage
 bridged mods' real item textures (extracted to `tools/work/tex/`; re-extract from
 `tools/work/jars/` if missing).
 
-| File | Caption |
-|---|---|
-| `promo/icon-512.png` | Project icon: the `c:` tag + cheese |
-| `promo/banner-1920x640.png` | Header/banner: three dialect cheeses converging into one tag |
-| `promo/gallery-1-one-tag.png` | The two layers: identity tags bridging three dialects, role tags on top |
-| `promo/gallery-2-four-mod-craft.png` | Pam's Grilled Cheese & Ham crafted from four mods' ingredients — the whole pitch in one image |
-| `promo/gallery-3-role-tags.png` | Recipe JSON targeting `#pantrywork:food_component/protein`, beside the items it accepts |
+| File | Caption | Status at 0.3.0 |
+|---|---|---|
+| `promo/icon-512.png` | Project icon: pantry shelf | unchanged |
+| `promo/banner-1920x640.png` | Four mods' cheeses converging into one tag | **REPLACE** — old one said "NeoForge 1.21.1" (now NeoForge & Fabric) and showed 3 mods |
+| `promo/gallery-1-one-tag.png` | The two layers: identity tags bridging four dialects, role tags on top | **REPLACE** — old one said "Three dialects"; Farm & Charm made it four |
+| `promo/gallery-2-four-mod-craft.png` | Pam's Grilled Cheese & Ham crafted from four mods' ingredients — the whole pitch in one image | unchanged |
+| `promo/gallery-3-role-tags.png` | Recipe JSON targeting `#pantrywork:food_component/protein`, beside the items it accepts | **REPLACE** — protein row now shows 6 sources incl. Aquaculture + Meadow |
+| `promo/gallery-4-supported-mods.png` | All ten bridged mods, with the "install all, some, or none" promise | **NEW** |
+
+**Gallery uploads are manual.** The Modrinth PAT used by `publish.ps1` carries version scopes only
+(create/delete versions); the gallery API returns 401 without project-edit scope. CurseForge has no
+public gallery API at all. Either upload on each site by hand, or issue a PAT with project-edit
+scope if you want this scripted later.
+
+**Counts baked into the art** (`FOOD_MOD_COUNT`, `DIALECT_COUNT` in `tools/GenPromo.java`, plus the
+headline strings): re-check these every time a compat module ships — images can't be grepped, so a
+stale count survives silently. This release is the proof: "Three dialects" was wrong the moment
+Farm & Charm landed.
 
 No art carries version-specific claims yet. If a card ever states a mod count or supported-mod
 list, re-check it every release — images can't be grepped and go stale invisibly.
