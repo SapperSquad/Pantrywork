@@ -50,8 +50,9 @@ ship NeoForge builds past 1.21.1.
 
 ## Summary (the short-description field)
 
-> The ore dictionary that food mods never got. Bridges Farmer's Delight, Croptopia, and Pam's
-> HarvestCraft 2 into one shared tag vocabulary, so any mod's cheese works in any other's recipe.
+> The ore dictionary that food mods never got. Bridges ten food mods — Farmer's Delight, Croptopia,
+> Pam's, the Let's Do series, Aquaculture and more — into one shared tag vocabulary, so any mod's
+> cheese works in any other's recipe.
 
 ---
 
@@ -59,22 +60,25 @@ ship NeoForge builds past 1.21.1.
 
 # 🍞 One cheese. Every recipe.
 
-Farmer's Delight has cheese. Croptopia has cheese. Pam's has cheese. **None of them are the
-same cheese** — three mods, three incompatible tag dialects, none referencing the others. So the
-recipe that wants cheese takes exactly one of them, and your pack quietly has three parallel
-food economies that never touch.
+Farmer's Delight has cheese. Croptopia has cheese. Pam's has cheese. Meadow and Brewin' & Chewin'
+have cheese. **None of them are the same cheese** — they all tag their food, in four incompatible
+naming dialects that never reference each other. So the recipe that wants cheese takes exactly one
+of them, and your pack quietly runs parallel food economies that never touch.
 
 Pantrywork fixes that. It is pure data: a tag layer that bridges those dialects into the official
 NeoForge / Farmer's Delight `c:foods/*` convention, then adds a second layer describing what an
 ingredient *does*. No blocks, no items, no gameplay changes. Just recipes that finally work.
 
+**NeoForge and Fabric**, on Minecraft 1.21.1 through 1.21.11 and 26.x.
+
 ## 🏷️ Two layers
 
 **Identity** — `c:foods/*`. Extends the built-in convention and translates the others into it.
-Croptopia's plural dialect (`c:cheeses`) and Pam's concatenated dialect (`c:rawpork`) both resolve
-to canonical names (`c:foods/cheese`, `c:foods/raw_pork`). Bridges run in **both** directions:
-24 dialect tags also gain the other mods' equivalent items, so Croptopia's and Pam's *own* recipes
-start accepting foreign ingredients too.
+Croptopia's plural dialect (`c:cheeses`), Pam's concatenated dialect (`c:rawpork`), and Farm &
+Charm's underscored dialect (`c:raw_pork`) all resolve to canonical names (`c:foods/cheese`,
+`c:foods/raw_pork`). Bridges run in **both** directions: 36 dialect tags also gain the other mods'
+equivalent items, so those mods' *own* recipes start accepting foreign ingredients too — Meadow's
+cheese recipes take Croptopia cheese, Pam's fish recipes take an Aquaculture catch.
 
 **Role** — `pantrywork:food_component/{protein, starch, dairy, garnish, liquid_base, sweetener}`.
 Tags-of-tags over the identity layer, describing function rather than identity. Author one recipe
@@ -107,10 +111,13 @@ hardcoding strings or taking a dependency on the mods being bridged.
 
 ## ✅ Verified, not assumed
 
-Tested live on NeoForge 1.21.1 with Farmer's Delight 1.3.2, Croptopia 4.2.4, and Pam's HC2 Food
-Core 1.0.4 loaded together — including a single crafting recipe that consumes vanilla bread,
-Farmer's Delight bacon, and Croptopia lettuce at once. Automated GameTests cover role tags,
-cross-mod identity, reverse bridges, and recipe resolution through `RecipeManager`.
+Every claim here was checked on a running server, not inferred. The supported mods are loaded
+together and the bridges are exercised for real — Pam's own Grilled Cheese & Ham crafted from
+Croptopia dairy and Farmer's Delight bacon; Croptopia's banana smoothie made with Farmer's Delight
+Refabricated milk. The Fabric build is booted on 1.21.10, 1.21.11, 26.1.2 and 26.2; the NeoForge
+build on 1.21.1. A separate run boots it with **none** of the supported mods installed, to prove it
+stays silent in a pack that has none of them. Automated GameTests cover role tags, cross-mod
+identity, reverse bridges, and recipe resolution through `RecipeManager`.
 
 ---
 
