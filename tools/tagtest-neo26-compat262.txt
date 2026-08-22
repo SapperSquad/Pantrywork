@@ -1,0 +1,28 @@
+# NeoForge 26.2 compat boot: Croptopia + EpheroLib (Aquaculture has no 26.2
+# build yet). Forward bridge + role chains + vanilla + purity.
+# Run via tools\rcon.ps1 -File tools\tagtest-neo26-compat262.txt
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- forward bridge: croptopia dialect -> canonical ---
+item replace block 8 -60 8 container.0 with croptopia:cheese
+execute if items block 8 -60 8 container.0 #c:foods/cheese
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+# --- vanilla role chain still resolves alongside croptopia ---
+item replace block 8 -60 8 container.0 with minecraft:cooked_beef
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+# --- negative control ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component
+# --- release purity: dev-only recipe absent (crafter consumes nothing) ---
+kill @e[type=item]
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with minecraft:bread
+item replace block 8 -60 12 container.1 with minecraft:cooked_beef
+item replace block 8 -60 12 container.2 with minecraft:carrot
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if items block 8 -60 12 container.0 minecraft:bread
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air

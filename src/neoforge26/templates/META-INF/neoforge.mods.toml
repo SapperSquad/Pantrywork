@@ -1,0 +1,103 @@
+# NeoForge 26.x metadata. This jar is pure data (no classes): the 1.21.1
+# API class doesn't link against 26.x's renamed MC types, so the 26.x line
+# ships tags only. No modLoader/loaderVersion — on 26.x their absence IS the
+# no-code declaration (lowcodefml is deprecated and warns at boot).
+license = "${mod_license}"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+authors = "${mod_authors}"
+description = '''${mod_description}'''
+# Both logo keys on purpose: 26.1.x only knows logoFile; 26.2 deprecates it
+# for iconFile and (since 26.2.0.62) suppresses the dev-env warning when the
+# new key coexists — the sanctioned pattern for one jar spanning both lines.
+logoFile = "icon.png"
+iconFile = "icon.png"
+
+[[dependencies.${mod_id}]]
+    modId = "neoforge"
+    type = "required"
+    versionRange = "${neo_version_range}"
+    ordering = "NONE"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "minecraft"
+    type = "required"
+    versionRange = "${minecraft_version_range}"
+    ordering = "NONE"
+    side = "BOTH"
+
+# Compat targets. All optional: Pantrywork works with any subset installed —
+# tag entries for absent mods are marked required=false and just get skipped.
+[[dependencies.${mod_id}]]
+    modId = "farmersdelight"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "croptopia"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "pamhc2foodcore"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "oceansdelight"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "ends_delight"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "vinery"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "farm_and_charm"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "meadow"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "brewinandchewin"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "aquaculture"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"

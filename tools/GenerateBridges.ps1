@@ -10,6 +10,11 @@
 # Output: src/generated/resources/data/c/tags/item/<dialect>.json
 # Report: tools/work/bridges-report.txt
 # Rerun whenever a compat jar in tools/work/jars changes.
+#
+# -ExtraJarDirs: additional jar directories to union in (e.g. tools\work\jars-26x
+# so 26.x-only items — Croptopia 4.3.x foods, Aquaculture 2.9.x fish — join the
+# bridges; on older MC lines those entries are required=false and just skip).
+param([string[]]$ExtraJarDirs = @())
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 $root = Split-Path $PSScriptRoot -Parent
@@ -29,6 +34,10 @@ function Add-TagFile($tagPath, $json) {
 }
 $neoforgeJar = Get-ChildItem "$env:USERPROFILE\.gradle\caches\modules-2\files-2.1\net.neoforged\neoforge\21.1.241" -Recurse -Filter "neoforge-21.1.241-universal.jar" | Select-Object -First 1 -ExpandProperty FullName
 $sources = @($neoforgeJar) + (Get-ChildItem $jarsDir -Filter "*.jar" | ForEach-Object FullName)
+foreach ($d in $ExtraJarDirs) {
+  $dir = if ([IO.Path]::IsPathRooted($d)) { $d } else { Join-Path $root $d }
+  $sources += (Get-ChildItem $dir -Filter "*.jar" | ForEach-Object FullName)
+}
 foreach ($jar in $sources) {
   $zip = [IO.Compression.ZipFile]::OpenRead($jar)
   # c: tags keyed by bare path ("foods/cheese"); every other namespace keyed

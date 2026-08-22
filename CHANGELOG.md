@@ -1,5 +1,33 @@
 # Changelog
 
+## 0.4.0 — 2026-08-22
+
+**NeoForge comes to Minecraft 26.x.**
+
+- **New artifact: `-neoforge-mc26`**, a data-only NeoForge jar for Minecraft
+  26.1–26.2 (no-code FML loading; the `PantryworkTagKeys` class stays
+  1.21.1-line-only until the 26.x rename churn is worth chasing). Verified
+  live on NeoForge 26.1.2.94 — the exact build All the Mods 11 ships —
+  solo and alongside ATM11's own food mods (Croptopia 4.3.1 + Aquaculture
+  2.9.2), and on NeoForge 26.2.0.64 solo and with Croptopia's 26.2 build.
+- **Aquaculture 2.9.x's new Largemouth Bass** joins the generated fish
+  bridges (`c:fishes`, `c:raw_fishes`, `c:rawfish`).
+- **Croptopia 4.3.x re-verified on 26.x, both loaders.** Its new foods ride
+  the fruit/vegetable umbrella tags through the forward bridges; its 26.x
+  port dropped its own `c:fishes` definition, so on 26.x that dialect tag
+  now exists purely through Pantrywork's generated union.
+- **Fabric 26.2 coverage deepened**: Croptopia reached 26.2 (it was
+  FD-only there at 0.2.0), and the cross-mod smoothie craft is now
+  verified on 26.2 as well. FD Refabricated bumped to 3.6.17 in the
+  harnesses (no tag drift).
+- **Vanilla 26.1/26.2 audited for new foods: none exist** (26.1's Golden
+  Dandelion is mob feed, not player food; 26.2 added no edibles), so the
+  taxonomy needed no vanilla additions. Data formats 101.1 and 107.1 both
+  parse the payload unchanged — confirmed by the live boots.
+- Build/tooling: `neoJar26` Gradle task, NeoForge 26.1.2/26.2 RCON test
+  harnesses (`tools/neo-server-*`), `GenerateBridges.ps1 -ExtraJarDirs`
+  for unioning 26.x-only compat jars into the bridges.
+
 ## 0.3.0 — 2026-08-09
 
 **Aquaculture 2 and Brewin' & Chewin' support.**

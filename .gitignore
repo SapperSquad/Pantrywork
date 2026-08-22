@@ -8,3 +8,4 @@ tools/*.class
 # (that would be redistributing other people's mods).
 tools/work/
 tools/fabric-server*/
+tools/neo-server*/

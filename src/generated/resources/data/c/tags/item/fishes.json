@@ -14,6 +14,7 @@
     { "id": "aquaculture:carp", "required": false },
     { "id": "aquaculture:catfish", "required": false },
     { "id": "aquaculture:gar", "required": false },
+    { "id": "aquaculture:largemouth_bass", "required": false },
     { "id": "aquaculture:muskellunge", "required": false },
     { "id": "aquaculture:pacific_halibut", "required": false },
     { "id": "aquaculture:perch", "required": false },

@@ -110,11 +110,12 @@ function Get-CurseForgeVersionIdByType {
 # Modrinth uses lowercase loader slugs; CurseForge models loaders as
 # game-version entries under the 'modloader' type.
 $fabric121 = @('1.21.1','1.21.2','1.21.3','1.21.4','1.21.5','1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11')
-$fabric26  = @('26.1.2','26.2')
+$mc26      = @('26.1.2','26.2')
 $files = @(
-    @{ jar = "pantrywork-$Version.jar";             loaderModrinth = "neoforge"; loaderCf = "NeoForge"; label = "1.21.1";  mc = @('1.21.1') },
-    @{ jar = "pantrywork-$Version-fabric.jar";      loaderModrinth = "fabric";   loaderCf = "Fabric";   label = "1.21.x"; mc = $fabric121 },
-    @{ jar = "pantrywork-$Version-fabric-mc26.jar"; loaderModrinth = "fabric";   loaderCf = "Fabric";   label = "26";     mc = $fabric26 }
+    @{ jar = "pantrywork-$Version.jar";               loaderModrinth = "neoforge"; loaderCf = "NeoForge"; label = "1.21.1";  mc = @('1.21.1') },
+    @{ jar = "pantrywork-$Version-fabric.jar";        loaderModrinth = "fabric";   loaderCf = "Fabric";   label = "1.21.x"; mc = $fabric121 },
+    @{ jar = "pantrywork-$Version-fabric-mc26.jar";   loaderModrinth = "fabric";   loaderCf = "Fabric";   label = "26";     mc = $mc26 },
+    @{ jar = "pantrywork-$Version-neoforge-mc26.jar"; loaderModrinth = "neoforge"; loaderCf = "NeoForge"; label = "26";     mc = $mc26 }
 )
 
 foreach ($f in $files) {

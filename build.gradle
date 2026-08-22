@@ -165,6 +165,44 @@ tasks.register('fabricJar26', Jar) {
     fabricPayload(it)
 }
 
+// NeoForge 26.x build: same data-only pattern as the Fabric jars. lowcodefml
+// (no classes — PantryworkTagKeys is 1.21.1-line only until it's worth porting
+// to the 26.x renames), iconFile instead of logoFile, and its own MC/Neo
+// ranges. Verified the same way as the Fabric jars: live server boots + RCON
+// suites, never inference.
+var neoMeta26 = tasks.register('generateNeoMetadata26', ProcessResources) {
+    var props = [
+        mod_id: project.mod_id,
+        mod_name: project.mod_name,
+        mod_version: project.mod_version,
+        mod_license: project.mod_license,
+        mod_authors: project.mod_authors,
+        mod_description: project.mod_description,
+        minecraft_version_range: '[26.1,27)',
+        neo_version_range: '[26.1,)',
+        loader_version_range: '[1,)',
+    ]
+    inputs.properties props
+    expand props
+    from 'src/neoforge26/templates'
+    into "${layout.buildDirectory.get()}/generated/sources/neoMetadata26"
+}
+
+tasks.register('neoJar26', Jar) {
+    group = 'build'
+    description = 'Data-only NeoForge jar for Minecraft 26.x.'
+    archiveClassifier = 'neoforge-mc26'
+    from neoMeta26
+    from('src/main/resources') {
+        include 'data/**'
+        exclude 'data/pantrywork/recipe/test/**'
+        exclude 'data/pantrywork/structure/**'
+    }
+    from('src/generated/resources') { include 'data/**' }
+    // root-level icon.png, referenced by iconFile in the 26.x mods.toml
+    from('promo/icon-512.png') { rename { 'icon.png' } }
+}
+
 var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     var replaceProperties = [
         minecraft_version: project.minecraft_version,

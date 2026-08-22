@@ -12,12 +12,18 @@ Requires JDK 21 — pinned machine-wide via `~/.gradle/gradle.properties`
 (`org.gradle.java.home`), same as PhytoForge.
 
 ```
-./gradlew build                       # NeoForge jar in build/libs
+./gradlew build                       # NeoForge 1.21.1 jar in build/libs
 ./gradlew fabricJar                   # Fabric 1.21.x jar (data-only, no classes)
 ./gradlew fabricJar26                 # Fabric 26.x jar (same payload, 26.x version range)
+./gradlew neoJar26                    # NeoForge 26.1-26.2 jar (data-only; template in src/neoforge26)
 ./gradlew runServer                   # headless dev server + all compat mods (FD, Croptopia+EpheroLib, Pam's, Ocean's/End's Delight, Origins+Jupiter)
 ./gradlew runServer -PnoCompatMods    # boot-matrix run: no compat mods loaded
 ```
+
+NeoForge 26.x metadata gotchas (learned live 2026-08-22): omit `modLoader`/`loaderVersion`
+entirely for a no-code jar (lowcodefml still works but warns deprecated); ship BOTH
+`logoFile` and `iconFile` (26.1 only knows the former, 26.2 deprecates it — coexistence is
+the sanctioned span pattern and silences the warning since 26.2.0.62).
 
 Fabric side: the jar is the same data wrapped in `fabric.mod.json`
 (template in `src/fabric/templates`; dev content always excluded). Test
@@ -69,7 +75,34 @@ Test suites (all verified green 2026-07-19):
 
 Reverse-bridge data is GENERATED: `tools/GenerateBridges.ps1` (rerun after
 compat-jar updates; writes src/generated/resources + a report). Category
-map and blacklist live at the top of the script.
+map and blacklist live at the top of the script. Pass
+`-ExtraJarDirs tools\work\jars-26x` to union the 26.x compat jars in
+(26.x-only items like Aquaculture 2.9.x's largemouth bass enter the
+bridges; on older lines those entries are required=false and skip). One
+payload ships to every jar.
+
+## 26.x server harnesses (release-jar verification)
+
+Per-line dedicated servers under tools/, all RCON on 25575/pantrywork,
+one at a time: `fabric-server-2612`, `fabric-server-262` (launch:
+`java -Xmx2G -jar fabric-server-<mc>.jar nogui`, JDK 25+), and
+`neo-server-2612` (NeoForge 26.1.2.94 — ATM11's exact build),
+`neo-server-262` (26.2.0.64), installed via the NeoForge installer
+(launch from the dir: `java @user_jvm_args.txt
+@libraries/net/neoforged/neoforge/<ver>/win_args.txt nogui`, use
+jdk-26.0.1). Suites: `tagtest-neo26.txt` (solo boot: vanilla role tags +
+release purity via a powered crafter), `tagtest-neo26-compat.txt`
+(croptopia+epherolib+aquaculture — the ATM11 pair), `tagtest-neo26-compat262.txt`
+(croptopia only; no Aquaculture on 26.2 yet), `tagtest-fabric.txt` (both
+fabric 26.x harnesses, incl. the FD-milk smoothie craft).
+
+**26.x harness gotcha:** dedicated servers pause when empty
+(`pause-when-empty-seconds=60` default) — a paused server still answers
+RCON and passes tag checks, but crafters never tick, so craft asserts
+pass/fail vacuously. All four harnesses set `pause-when-empty-seconds=-1`;
+assert tick flow with two `time query gametime` lines before trusting any
+crafter result. Also: `execute if items ... container.N <item>` takes the
+item predicate directly (no `with` keyword — that's `item replace` syntax).
 
 Conventions used by the suites: chest at `8 -60 8` for membership checks
 (no player needed headless); crafter at `8 -60 12` + redstone block at
