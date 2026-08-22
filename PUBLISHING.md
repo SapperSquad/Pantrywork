@@ -205,8 +205,8 @@ list, re-check it every release — images can't be grepped and go stale invisib
 - Modrinth: **LIVE** — project id `rNg1wypx`, slug `pantrywork`, 1,159 downloads / 8 versions as
   of 2026-08-22 (the 26.x Fabric file is the most-downloaded 0.3.0 artifact: 364). The
   `MODRINTH_PROJECT_ID` env var is set on this machine; `publish.ps1` picks it up.
-- CurseForge project id: numeric, from the About Project sidebar; set `CURSEFORGE_PROJECT_ID`
-  so `publish.ps1` can upload there too (it skips CurseForge when unset).
+- CurseForge: **LIVE** — project id `1617573` (env vars `CURSEFORGE_PROJECT_ID`/`_TOKEN` were
+  setx'd at the 0.2.0 publish; tokens rotated after. publish.ps1 skips CF when unset).
 - Minecraft: 1.21.1 (NeoForge 21.1.241+; FD 1.3.2 needs ≥ 21.1.219, Croptopia ≥ 21.1.80) ·
   26.1–26.2 (NeoForge 26.1+, data-only jar) ·
   Fabric loader 0.14+ (data-only jar; Fabric API NOT required — don't list it as a dependency)
@@ -218,5 +218,5 @@ list, re-check it every release — images can't be grepped and go stale invisib
 - License: split policy (SapperSquad, 2026-07-28) — **All Rights Reserved** on the Modrinth/CurseForge
   listing (`mod_license`/jar metadata match), **MIT** LICENSE in the GitHub repo. Authors who
   want to depend on or extend the taxonomy work from the MIT source.
-- Platforms that received the last release (0.3.0): **Modrinth** (all three files live).
-  CurseForge state: tracked outside this repo — confirm before claiming coverage there.
+- Platforms that received the last release (0.3.0): **Modrinth + CurseForge**, three files each
+  (published 2026-08-09, single clean publish.ps1 run). 0.4.0 upload: pending, four files.
