@@ -1,0 +1,37 @@
+# c:foods/milk deprecation shim. Farmer's Delight invented this tag, then deleted
+# it in 1.21.1-1.3.0; addons still referencing it lose the WHOLE recipe at parse
+# time (an undefined tag fails ingredient decoding). We restore FD's own last
+# definition EXACTLY - bucket + bottle, nothing else.
+#
+# The NEGATIVE checks are the point of this file: c:drinks/milk resolves to six
+# items here (Croptopia's 16-per-bucket milk_bottle, cowless soy_milk, Meadow's
+# wooden bucket, Pam's fresh milk...). Nesting that tag would have handed all six
+# to third-party recipes written against a two-item tag. These assert we didn't.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- positive: FD's historical membership, both forms ---
+item replace block 8 -60 8 container.0 with minecraft:milk_bucket
+execute if items block 8 -60 8 container.0 #c:foods/milk
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute if items block 8 -60 8 container.0 #c:foods/milk
+# --- negative: NO dialect widening ("Test passed" = correctly absent) ---
+item replace block 8 -60 8 container.0 with croptopia:milk_bottle
+execute unless items block 8 -60 8 container.0 #c:foods/milk
+item replace block 8 -60 8 container.0 with croptopia:soy_milk
+execute unless items block 8 -60 8 container.0 #c:foods/milk
+item replace block 8 -60 8 container.0 with meadow:wooden_milk_bucket
+execute unless items block 8 -60 8 container.0 #c:foods/milk
+item replace block 8 -60 8 container.0 with pamhc2foodcore:freshmilkitem
+execute unless items block 8 -60 8 container.0 #c:foods/milk
+# --- negative: never joined to the food parent (milk has no food value) ---
+item replace block 8 -60 8 container.0 with minecraft:milk_bucket
+execute unless items block 8 -60 8 container.0 #c:foods
+# --- regression: c:drinks/milk stays the WIDE bridge, unchanged by the shim ---
+execute if items block 8 -60 8 container.0 #c:drinks/milk
+item replace block 8 -60 8 container.0 with croptopia:milk_bottle
+execute if items block 8 -60 8 container.0 #c:drinks/milk
+item replace block 8 -60 8 container.0 with pamhc2foodcore:freshmilkitem
+execute if items block 8 -60 8 container.0 #c:drinks/milk
+# --- regression: milk still reaches the dairy role via the correct path ---
+item replace block 8 -60 8 container.0 with minecraft:milk_bucket
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy

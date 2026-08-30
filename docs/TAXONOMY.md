@@ -176,3 +176,54 @@ when the ecosystem also files the item under `c:seeds`.
 Tags belonging to another mod are exempt from this rule. If Croptopia keeps a
 seed in its own `c:fruits`, that is its call — the audit reports it as `upstream`
 and moves on. What matters is that nothing of ours reaches it.
+
+### Named exception: `c:foods/milk` (deprecation shim, not taxonomy)
+
+This is the one tag Pantrywork defines that is **not** part of its taxonomy, and
+it breaks rule 3 (naming follows FD/NeoForge precedent) on purpose.
+
+Farmer's Delight invented `c:foods/milk` in 1.2.4, deprecated it in 1.2.10 and
+deleted it in 1.3.0 (Apr 2026), at the ecosystem's request — milk has no food
+value, so it did not belong under `foods`. NeoForge's convention registry never
+defined it; the sanctioned names are `c:drinks/milk` and `c:buckets/milk`.
+
+Addons that still reference it are not merely missing an ingredient: an
+undefined tag fails ingredient decoding, so **the entire recipe is dropped at
+parse time**. Tags cannot be aliased, so defining the tag is the only available
+fix. Four addon jars were opened to confirm this — Arbitrary Delight (16 refs),
+Cultural Delights (4), Pineapple Delight (3), Nature's Delight (2) — none of
+which defines the tag or has migrated.
+
+**Contents are FD's own last definition, item-for-item:**
+
+```json
+{ "values": [ "minecraft:milk_bucket", { "id": "farmersdelight:milk_bottle", "required": false } ] }
+```
+
+**It must NOT be `[{"id": "#c:drinks/milk"}]`**, tempting as that looks. Here
+`c:drinks/milk` resolves to **six** items, because Pantrywork itself bridges
+`c:milk`/`c:milks` into it and generates reverse bridges back into those. Nesting
+would hand all six to third-party recipes written against a two-item tag —
+including `croptopia:milk_bottle` (16 per bucket, a 16x economic dilution) and
+`croptopia:soy_milk` (no cow required). That is the re-classification rule 2
+forbids. Literal items also mean no tag reference, hence no cycle against the FD
+versions whose `c:drinks/milk` still carries a required `#c:foods/milk` entry.
+
+Rules for it: never joined to `#c:foods`, never referenced by a
+`pantrywork:food_component/*` tag (dairy and liquid_base already model milk
+correctly via separate `#c:buckets/milk` + `#c:drinks/milk` refs), and never
+widened. `tools/AuditRoles.ps1` enforces all three and fails the build otherwise.
+
+**Sunset:** this exists only until the addons migrate to `c:drinks/milk`. The
+honest advice to those authors is to change one line — Pantrywork already
+resolves `c:drinks/milk` fully, buckets included. Once packs depend on this shim
+it can never be removed, so do not promote it as the primary fix.
+
+### Footnote: Let's Do Vinery ships its `c:` tags at an unreadable path
+
+TAXONOMY records Vinery as shipping "zero `c:` tags". That is right in effect but
+wrong in cause: it ships twelve of them under `data/*/tags/items/` (PLURAL, the
+1.21.2+ layout), and the 1.21.1 loader reads only the singular `tags/item`. They
+are dead data on this line — which is why Vinery still needs its per-item module.
+Re-check this if Vinery is ever added to a 26.x harness, where the plural path
+does load and those tags would suddenly go live.

@@ -1,9 +1,12 @@
-**0.5.0 - Two correctness fixes.** No new mods bridged; this one is about the bridges already there being right.
+**0.6.0 - Ten more dialect bridges, and life support for a tag Farmer's Delight deleted.**
 
-**Fixed: planting seeds are no longer food.** Croptopia files its seeds *inside* its produce tags, so referencing those tags pulled 13 seeds into `c:foods/vegetable` and the `garnish` role - meaning a lettuce seed could satisfy any recipe asking for a garnish. Produce is now enumerated item-by-item with the seeds dropped. Croptopia's vegetables and fruits still bridge exactly as before; only the seeds are gone.
+**Fixed: recipes that vanished when FD removed `c:foods/milk`.** FD retired that tag in 1.21.1-1.3.0, but a number of Delight addons still reference it - and an undefined tag doesn't just fail to match, it makes Minecraft drop the whole recipe. Four addon jars were opened to count it: Arbitrary Delight (16 recipes), Cultural Delights (4), Pineapple Delight (3), Nature's Delight (2). Pantrywork now restores the tag with Farmer's Delight's own final contents - milk bucket and milk bottle, nothing more - so those dishes are craftable again.
 
-Seeds are identified by the ecosystem's own `c:seeds` classification rather than by name, so plantable *foods* (Farm & Charm's onion) and edible seed foods (Croptopia's roasted pumpkin and sunflower seeds) correctly stay food.
+If you maintain one of those addons, the real fix is to point the recipe at `c:drinks/milk`; Pantrywork already resolves that to every supported mod's milk, buckets included. This shim is for packs that can't patch.
 
-**Fixed: a lone install could refuse to load.** Three references to convention tags (`c:foods/berry`, `c:buckets/milk`) were marked required. On Fabric without Fabric API - a setup the README explicitly invites - those tags are undefined, and a required reference to an undefined tag fails datapack loading outright. They are optional now, as every cross-mod reference should be.
+**Ten more dialect collisions bridged**, found by auditing every common tag the supported mods define:
+- **Cereals.** Croptopia files them one way, Farm & Charm another, Farmer's Delight a third. All three now see each other's barley, oat, corn and rice.
+- **Juices.** Croptopia's `apple_juice` and Pam's `applejuice` are the same drink spelled two ways; same for melon.
+- Croptopia's toast and Pam's toast; Croptopia's ground pork and Pam's; Farmer's Delight's cookies into Pam's cookie tag; Farm & Charm's isolated flour tag.
 
-Both fixes are now guarded by a new audit that resolves every tag the mod asserts and fails the build if either problem reappears.
+Deliberately left alone: caramel, flour, grain, bread, egg and corn are already declared by two or more mods, so they merge on their own and need no help.

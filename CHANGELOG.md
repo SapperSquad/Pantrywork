@@ -1,5 +1,32 @@
 # Changelog
 
+## 0.6.0 — 2026-08-30
+
+**Ten more dialect bridges, and life support for a tag Farmer's Delight deleted.**
+
+- **New: `c:foods/milk` deprecation shim.** FD invented that tag, then deleted it
+  in 1.21.1-1.3.0; addons still referencing it don't just miss an ingredient —
+  an undefined tag fails ingredient decoding and Minecraft drops the whole
+  recipe. Counted first-hand across four addon jars: Arbitrary Delight 16
+  recipes, Cultural Delights 4, Pineapple Delight 3, Nature's Delight 2.
+  Restored with FD's own final contents, item-for-item: milk bucket + milk
+  bottle. Explicitly **not** `#c:drinks/milk`, which resolves to six items here
+  (Pantrywork's own bridges widen it) and would let a 16-per-bucket Croptopia
+  bottle or cowless soy milk satisfy recipes written against a two-item tag.
+  Contained by an `AuditRoles.ps1` check: never joined to `#c:foods`, never
+  referenced by a role tag, never widened. Documented in TAXONOMY.md as a named
+  exception with a sunset note — the real fix is for those addons to move to
+  `c:drinks/milk`, which Pantrywork already resolves fully.
+- **Ten more dialect collisions bridged**, found by auditing every `c:` tag the
+  supported mods define: the cereal family (Croptopia `grain/<crop>`, Farm &
+  Charm `grains/<crop>s`, FD `crops/grain` — none could see the others), the
+  apple and melon juice spellings, `c:toasts`/`c:toast`, `c:ground_pork` vs
+  `c:groundmeats/groundpork`, FD's cookies into `c:cookies`, and F&C's isolated
+  `c:flours`. 38 → 57 generated bridge files.
+  - Deliberately left alone: `c:caramel`, `c:flour`, `c:grain`, `c:bread`,
+    `c:egg` and `c:crops/corn` are each declared by two or more mods already, so
+    they merge at load and need no bridge.
+
 ## 0.5.0 — 2026-08-29
 
 **Two correctness fixes.** No new mods bridged; this one is about the bridges

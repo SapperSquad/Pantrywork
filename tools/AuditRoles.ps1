@@ -144,9 +144,43 @@ foreach ($r in $roles) {
 "=== UPSTREAM SEEDS (another mod's own tags - informational, not ours to fix) ==="
 if ($upstream.Count -eq 0) { "  none" } else { $upstream | ForEach-Object { "  $_" } }
 ""
+# --- containment check for the c:foods/milk deprecation shim ---------------
+# c:foods/milk is life support for a name Farmer's Delight deliberately retired,
+# not part of Pantrywork's taxonomy. It must stay a leaf that only the addons
+# still referencing it can see:
+#   - never reachable from #c:foods - neither milk item has food value, and that
+#     is the exact objection that got the tag deprecated upstream (FD issue #1201)
+#   - never reachable from a pantrywork:* role tag - dairy and liquid_base already
+#     model milk correctly via separate #c:buckets/milk + #c:drinks/milk refs
+#   - never widened past FD's own last definition {milk_bucket, milk_bottle}; a
+#     nested #c:drinks/milk ref would drag in six items including croptopia's
+#     16-per-bucket milk_bottle and cowless soy_milk
+"=== c:foods/milk SHIM CONTAINMENT ==="
+$shimLeak = 0
+if ($tags.ContainsKey('foods/milk')) {
+    $shimMembers = Resolve-Members 'foods/milk' (New-Object System.Collections.Generic.HashSet[string])
+    $allowed = @('minecraft:milk_bucket', 'farmersdelight:milk_bottle')
+    $extra = @($shimMembers | Where-Object { $allowed -notcontains $_ } | Sort-Object)
+    "  c:foods/milk members: $(($shimMembers | Sort-Object) -join ', ')"
+    if ($extra.Count) { $shimLeak += $extra.Count; "  WIDENED BEYOND FD'S DEFINITION: $($extra -join ', ')" }
+    foreach ($parent in @('foods')) {
+        if ((Resolve-Members $parent (New-Object System.Collections.Generic.HashSet[string])) -contains 'minecraft:milk_bucket') {
+            $shimLeak++; "  LEAK: milk is reachable from #c:$parent"
+        }
+    }
+    foreach ($rt in @($tags.Keys | Where-Object { $_ -like 'pantrywork:food_component*' })) {
+        $rm = Resolve-Members $rt (New-Object System.Collections.Generic.HashSet[string])
+        # dairy/liquid_base legitimately contain milk_bucket via c:buckets/milk;
+        # the leak we care about is a path THROUGH the shim tag itself.
+        if ($tags[$rt] | Where-Object { $_.id -eq '#c:foods/milk' }) { $shimLeak++; "  LEAK: $rt references #c:foods/milk directly" }
+    }
+    if ($shimLeak -eq 0) { "  contained: not joined to #c:foods, not referenced by any role tag, not widened" }
+} else { "  (shim not present)" }
+""
 "=== REQUIRED-BUT-UNDEFINED TAG REFERENCES ==="
 if ($missingRequired.Count -eq 0) { "  none" } else { $missingRequired | Sort-Object -Unique | ForEach-Object { "  $_" } }
 ""
 "seed/sapling violations : $violations"
 "missing required refs   : $(($missingRequired | Sort-Object -Unique).Count)"
-if ($violations -gt 0 -or $missingRequired.Count -gt 0) { exit 1 } else { exit 0 }
+"shim containment leaks   : $shimLeak"
+if ($violations -gt 0 -or $missingRequired.Count -gt 0 -or $shimLeak -gt 0) { exit 1 } else { exit 0 }

@@ -1,4 +1,4 @@
-# Pantrywork — publishing kit (current as of v0.5.0)
+# Pantrywork — publishing kit (current as of v0.6.0)
 
 Store copy for the Modrinth / CurseForge project pages. Bump this file in the same pass as
 `CHANGELOG.md` and `README.md` — never one alone.
@@ -7,15 +7,15 @@ Store copy for the Modrinth / CurseForge project pages. Bump this file in the sa
 
 | Upload as version | File | Game version tag | Loader |
 |---|---|---|---|
-| `0.5.0+mc1.21.1` | `dist/0.5.0/pantrywork-0.5.0.jar` | 1.21.1 | neoforge |
-| `0.5.0+mc1.21.x-fabric` | `dist/0.5.0/pantrywork-0.5.0-fabric.jar` | 1.21.1–1.21.11 | fabric |
-| `0.5.0+mc26-fabric` | `dist/0.5.0/pantrywork-0.5.0-fabric-mc26.jar` | 26.1.2, 26.2 | fabric |
-| `0.5.0+mc26` | `dist/0.5.0/pantrywork-0.5.0-neoforge-mc26.jar` | 26.1.2, 26.2 | neoforge |
+| `0.6.0+mc1.21.1` | `dist/0.6.0/pantrywork-0.6.0.jar` | 1.21.1 | neoforge |
+| `0.6.0+mc1.21.x-fabric` | `dist/0.6.0/pantrywork-0.6.0-fabric.jar` | 1.21.1–1.21.11 | fabric |
+| `0.6.0+mc26-fabric` | `dist/0.6.0/pantrywork-0.6.0-fabric-mc26.jar` | 26.1.2, 26.2 | fabric |
+| `0.6.0+mc26` | `dist/0.6.0/pantrywork-0.6.0-neoforge-mc26.jar` | 26.1.2, 26.2 | neoforge |
 
-Publish: `tools\publish.ps1 -Version 0.5.0 -ChangelogFile tools\changelog-current.md` (dry-run first).
+Publish: `tools\publish.ps1 -Version 0.6.0 -ChangelogFile tools\changelog-current.md` (dry-run first).
 
-Build all four with `./gradlew build -Prelease fabricJar fabricJar26 neoJar26`. The 0.5.0 payload
-changed on every loader (seed-leak fix + optional convention refs), so upload all four files.
+Build all four with `./gradlew build -Prelease fabricJar fabricJar26 neoJar26`. The 0.6.0 payload
+changed on every loader (milk shim + ten new dialect bridges), so upload all four files.
 
 Fabric version range verified 2026-08-08: same unmodified jar passed live suites on 1.21.10
 (FD Refabricated + Croptopia Refabricated, incl. cross-mod smoothie craft) and 1.21.11
@@ -56,6 +56,11 @@ content always excluded; each carries the Minecraft range it was actually verifi
   reach `c:foods/vegetable` or `garnish`; plantable-food onion and roasted seed foods
   correctly retained) · all seven 1.21.1 RCON suites 90/90 · GameTests 5/5 ·
   `-PnoCompatMods` boot clean (0 errors, vanilla 4/4).
+- 2026-08-30 (0.6.0): all TEN 1.21.1 RCON suites 126/126 (new tagtest-collisions 15/15 and
+  tagtest-milkshim 11/11, whose negative asserts prove the milk shim does NOT widen to the
+  six-item c:drinks/milk union) · GameTests 5/5 · `-PnoCompatMods` boot clean (0 errors,
+  vanilla 5/5) · AuditRoles green incl. the new shim-containment check, proven non-vacuous by
+  joining the shim to #c:foods and confirming exit 1.
 Version roadmap: no 1.20.x (pre-`c:`-unification). When FD's NeoForge 26.x port lands
 (PR #1374 / Refabricated `neoforge/26.1` branch), boot it on the neo-26 harnesses and add the
 craft-level assert to `tagtest-neo26-compat.txt`.
@@ -102,7 +107,7 @@ ingredient *does*. No blocks, no items, no gameplay changes. Just recipes that f
 **Identity** — `c:foods/*`. Extends the built-in convention and translates the others into it.
 Croptopia's plural dialect (`c:cheeses`), Pam's concatenated dialect (`c:rawpork`), and Farm &
 Charm's underscored dialect (`c:raw_pork`) all resolve to canonical names (`c:foods/cheese`,
-`c:foods/raw_pork`). Bridges run in **both** directions: 36 dialect tags also gain the other mods'
+`c:foods/raw_pork`). Bridges run in **both** directions: 57 dialect tags also gain the other mods'
 equivalent items, so those mods' *own* recipes start accepting foreign ingredients too — Meadow's
 cheese recipes take Croptopia cheese, Pam's fish recipes take an Aquaculture catch.
 
