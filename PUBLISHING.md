@@ -226,3 +226,17 @@ list, re-check it every release — images can't be grepped and go stale invisib
   want to depend on or extend the taxonomy work from the MIT source.
 - Platforms that received the last release (0.3.0): **Modrinth + CurseForge**, three files each
   (published 2026-08-09, single clean publish.ps1 run). 0.4.0 upload: pending, four files.
+
+## Publish-time hazard: the store-id env vars are GLOBAL
+
+`MODRINTH_PROJECT_ID` / `CURSEFORGE_PROJECT_ID` are user-wide on this machine and
+shared by every mod, so whichever project published most recently owns them. At
+the 0.5.0 publish `CURSEFORGE_PROJECT_ID` had drifted to `1616194` — a different
+project — and all four CurseForge uploads were aimed at the wrong mod. They failed
+only because that project rejects the NeoForge loader id (error 1009); had it
+accepted, Pantrywork's jars would have been published onto another mod's page.
+
+`tools/publish.ps1` now bakes in Pantrywork's own ids (Modrinth `rNg1wypx`,
+CurseForge `1617573`, both verified against the live pages) and warns when an env
+var disagrees. Do not "fix" the env var for Pantrywork — that just breaks whichever
+project set it. Pass `-CurseForgeProjectId` / `-ModrinthProjectId` for a one-off.

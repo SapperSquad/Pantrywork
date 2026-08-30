@@ -29,8 +29,24 @@ param(
 )
 $ErrorActionPreference = "Stop"
 
-if (-not $ModrinthProjectId -and $env:MODRINTH_PROJECT_ID) { $ModrinthProjectId = $env:MODRINTH_PROJECT_ID }
-if ($CurseForgeProjectId -eq 0 -and $env:CURSEFORGE_PROJECT_ID) { $CurseForgeProjectId = [int]$env:CURSEFORGE_PROJECT_ID }
+# Pantrywork's own store ids, baked in on purpose. The MODRINTH_PROJECT_ID /
+# CURSEFORGE_PROJECT_ID env vars are GLOBAL and shared by every mod on this
+# machine, so whichever project published last owns them - at the 0.5.0 publish
+# CURSEFORGE_PROJECT_ID had drifted to 1616194 (another project entirely) and
+# all four uploads were aimed at the wrong mod. They failed only because that
+# project rejects the NeoForge loader id; had it accepted, Pantrywork's jars
+# would have landed on someone else's page. Ids verified 2026-08-29 against the
+# live pages. Resolution order: explicit parameter > baked-in id > env var.
+$PANTRYWORK_MODRINTH = 'rNg1wypx'
+$PANTRYWORK_CURSEFORGE = 1617573
+if (-not $ModrinthProjectId) { $ModrinthProjectId = $PANTRYWORK_MODRINTH }
+if ($CurseForgeProjectId -eq 0) { $CurseForgeProjectId = $PANTRYWORK_CURSEFORGE }
+if ($env:MODRINTH_PROJECT_ID -and $env:MODRINTH_PROJECT_ID -ne $ModrinthProjectId) {
+  Write-Warning "MODRINTH_PROJECT_ID env var is '$($env:MODRINTH_PROJECT_ID)' but this script targets '$ModrinthProjectId' - using the latter."
+}
+if ($env:CURSEFORGE_PROJECT_ID -and [int]$env:CURSEFORGE_PROJECT_ID -ne $CurseForgeProjectId) {
+  Write-Warning "CURSEFORGE_PROJECT_ID env var is '$($env:CURSEFORGE_PROJECT_ID)' but this script targets '$CurseForgeProjectId' - using the latter."
+}
 
 $proj = Split-Path $PSScriptRoot -Parent
 $dist = Join-Path $proj ("dist\" + $Version)
