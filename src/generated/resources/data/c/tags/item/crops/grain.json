@@ -1,0 +1,11 @@
+{
+  "values": [
+    { "id": "croptopia:barley", "required": false },
+    { "id": "croptopia:corn", "required": false },
+    { "id": "croptopia:oat", "required": false },
+    { "id": "croptopia:rice", "required": false },
+    { "id": "farm_and_charm:barley", "required": false },
+    { "id": "farm_and_charm:corn", "required": false },
+    { "id": "farm_and_charm:oat", "required": false }
+  ]
+}

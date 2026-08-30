@@ -1,0 +1,40 @@
+# Dialect collisions found by auditing every c: tag the bundled mods define.
+# Each pair is two mods spelling the same ingredient differently, so neither
+# mod's recipes could see the other's item until Pantrywork joined them.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- juices: Croptopia snake_case vs Pam's concatenated ---
+item replace block 8 -60 8 container.0 with croptopia:apple_juice
+execute if items block 8 -60 8 container.0 #c:juices/applejuice
+item replace block 8 -60 8 container.0 with pamhc2foodcore:applejuiceitem
+execute if items block 8 -60 8 container.0 #c:juices/apple_juice
+item replace block 8 -60 8 container.0 with croptopia:melon_juice
+execute if items block 8 -60 8 container.0 #c:juices/melonjuice
+# --- toast: c:toasts vs c:toast ---
+item replace block 8 -60 8 container.0 with croptopia:toast
+execute if items block 8 -60 8 container.0 #c:toast
+item replace block 8 -60 8 container.0 with pamhc2foodcore:toastitem
+execute if items block 8 -60 8 container.0 #c:toasts
+# --- ground pork: flat tag vs nested tag ---
+item replace block 8 -60 8 container.0 with croptopia:ground_pork
+execute if items block 8 -60 8 container.0 #c:groundmeats/groundpork
+item replace block 8 -60 8 container.0 with pamhc2foodcore:groundporkitem
+execute if items block 8 -60 8 container.0 #c:ground_pork
+# --- cereals: three mods, three shapes (grain/x, grains/xs, crops/grain) ---
+item replace block 8 -60 8 container.0 with farm_and_charm:barley
+execute if items block 8 -60 8 container.0 #c:grain/barley
+item replace block 8 -60 8 container.0 with croptopia:barley
+execute if items block 8 -60 8 container.0 #c:grains/barleys
+item replace block 8 -60 8 container.0 with croptopia:oat
+execute if items block 8 -60 8 container.0 #c:crops/grain
+item replace block 8 -60 8 container.0 with farm_and_charm:oat
+execute if items block 8 -60 8 container.0 #c:grain/oat
+# --- cookies (return direction) and F&C's isolated c:flours ---
+item replace block 8 -60 8 container.0 with farmersdelight:honey_cookie
+execute if items block 8 -60 8 container.0 #c:cookies
+item replace block 8 -60 8 container.0 with croptopia:flour
+execute if items block 8 -60 8 container.0 #c:flours
+# --- seeds must not ride along: Croptopia's c:corn holds corn_seed ---
+item replace block 8 -60 8 container.0 with croptopia:corn_seed
+execute unless items block 8 -60 8 container.0 #c:grains/corn
+execute unless items block 8 -60 8 container.0 #c:grain/corn

@@ -1,0 +1,6 @@
+{
+  "values": [
+    { "id": "farmersdelight:honey_cookie", "required": false },
+    { "id": "farmersdelight:sweet_berry_cookie", "required": false }
+  ]
+}

@@ -142,6 +142,29 @@ $categories = @(
   @{ name='onion';          tags=@('onions','crops/onion','foods/onion');             emit=@('onions','crops/onion') },
   @{ name='cabbage';        tags=@('cabbage','crops/cabbage','foods/cabbage');        emit=@('cabbage','crops/cabbage') },
   @{ name='strawberry';     tags=@('strawberries','strawberry');                      emit=@('strawberries','strawberry') },
+
+  # --- collisions found by auditing every c: tag the bundled mods define ---
+  # Note what is deliberately ABSENT: c:caramel, c:flour, c:grain, c:bread, c:egg
+  # and c:crops/corn are each declared by two or more mods already, so they merge
+  # at load and need no bridge. Only the spellings that genuinely miss each other
+  # are listed here.
+  #
+  # Cereals: Croptopia files them under grain/<crop>, Farm & Charm under
+  # grains/<crop>s, Farmer's Delight under crops/grain. All three mean cereal.
+  @{ name='grain';          tags=@('grain','grains','crops/grain');                   emit=@('grain','grains','crops/grain') },
+  @{ name='barley';         tags=@('barley','grain/barley','grains/barleys');         emit=@('grain/barley','grains/barleys') },
+  @{ name='oat';            tags=@('oat','grain/oat','grains/oats');                  emit=@('grain/oat','grains/oats') },
+  @{ name='corn';           tags=@('corn','crops/corn','grain/corn','grains/corn');   emit=@('grain/corn','grains/corn') },
+  # Croptopia writes snake_case where Pam's concatenates - same juice, two names.
+  @{ name='apple_juice';    tags=@('apple_juices','juices/apple_juice','juices/applejuice'); emit=@('juices/apple_juice','juices/applejuice') },
+  @{ name='melon_juice';    tags=@('melon_juices','juices/melon_juice','juices/melonjuice'); emit=@('juices/melon_juice','juices/melonjuice') },
+  # Croptopia c:toasts vs Pam's c:toast; Croptopia c:ground_pork vs Pam's nested tag.
+  @{ name='toast';          tags=@('toast','toasts','toast/toast');                   emit=@('toast','toasts') },
+  @{ name='ground_pork';    tags=@('ground_pork','groundmeats/groundpork');           emit=@('ground_pork','groundmeats/groundpork') },
+  # We already pull c:cookies into c:foods/cookie; this is the return direction.
+  @{ name='cookie';         tags=@('cookies','cookies/cookie','foods/cookie');        emit=@('cookies') },
+  # c:flour already merges three ways; only F&C's private c:flours is isolated.
+  @{ name='flour';          tags=@('flour','flours','flour/flour');                   emit=@('flours') },
   @{ name='rice_grain';     tags=@('rice','crops/rice');                              emit=@('rice') },
   @{ name='vegetables';     tags=@('vegetables','foods/vegetable');                   emit=@('vegetables') },
   @{ name='fruits';         tags=@('fruits','foods/fruit');                           emit=@('fruits') }

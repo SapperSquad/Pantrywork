@@ -1,0 +1,6 @@
+{
+  "values": [
+    { "id": "croptopia:flour", "required": false },
+    { "id": "pamhc2foodcore:flouritem", "required": false }
+  ]
+}
