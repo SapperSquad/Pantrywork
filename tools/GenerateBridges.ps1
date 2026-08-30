@@ -86,11 +86,31 @@ function Resolve-Tag($tagPath, $visited) {
 $blacklist = @('minecraft:pufferfish', 'minecraft:golden_apple',
                'minecraft:enchanted_golden_apple', 'minecraft:golden_carrot')
 
-# Croptopia files its seeds INTO its produce tags (c:strawberries holds both
-# strawberry and strawberry_seed). That is fine inside Croptopia, but pushing a
-# seed into another mod's food tag would let a seed satisfy a food recipe.
-# Seeds never cross a bridge.
-$blacklistPattern = '_seed$|_seeds$|_sapling$'
+# Croptopia files its seeds INTO its produce tags (c:vegetables holds both
+# lettuce and lettuce_seed). That is fine inside Croptopia, but a seed in a food
+# tag would let a seed satisfy a food recipe. Seeds never cross a bridge.
+#
+# Identify planting seeds by what the ecosystem TAGS them as, not by their name:
+# a name rule on "_seeds" wrongly condemns croptopia:roasted_pumpkin_seeds and
+# roasted_sunflower_seeds, which are real edible foods. c:seeds is the mods' own
+# classification and gets this right. The name pattern is kept only for saplings
+# and singular "_seed", which no mod uses for a food item.
+$seedSet = New-Object System.Collections.Generic.HashSet[string]
+foreach ($seedTag in @('seeds', 'seeds/', 'villager_plantable_seeds')) {
+  foreach ($i in (Resolve-Tag $seedTag (New-Object System.Collections.Generic.HashSet[string]))) { [void]$seedSet.Add($i) }
+}
+# Neither signal is sufficient alone, so combine them:
+#   - name ending "_seed"/"_sapling" is unambiguous; no mod ships food named that.
+#   - "_seeds" is ambiguous (roasted_pumpkin_seeds is food), so it only counts as
+#     a seed when the ecosystem ALSO files it under c:seeds.
+#   - c:seeds membership alone is not sufficient either: plantable foods such as
+#     farm_and_charm:onion and vanilla potato/carrot live there and must stay.
+$blacklistPattern = '_seed$|_sapling$'
+function Test-IsSeed($id) {
+  if ($id -match $blacklistPattern) { return $true }
+  if ($id -match '_seeds$' -and $seedSet.Contains($id)) { return $true }
+  return $false
+}
 
 # --- categories: dialect tags that mean the same thing.
 # 'emit' lists the tags that receive injections (dialect tags only —
@@ -139,7 +159,7 @@ foreach ($cat in $categories) {
   }
   if ($cat.extra) { foreach ($i in $cat.extra) { [void]$union.Add($i) } }
   foreach ($b in $blacklist) { [void]$union.Remove($b) }
-  foreach ($s in @($union | Where-Object { $_ -match $blacklistPattern })) { [void]$union.Remove($s) }
+  foreach ($s in @($union | Where-Object { Test-IsSeed $_ })) { [void]$union.Remove($s) }
   [void]$report.AppendLine("[$($cat.name)] union: $(($union | Sort-Object) -join ', ')")
   foreach ($t in $cat.emit) {
     if (-not $tagEntries.ContainsKey($t)) { [void]$report.AppendLine("  $t : tag not defined by any source, skipped"); continue }
@@ -155,6 +175,50 @@ foreach ($cat in $categories) {
   }
   [void]$report.AppendLine("")
 }
+# --- forward sanitization -------------------------------------------------
+# Some upstream produce tags deliberately mix planting seeds in with the food
+# (Croptopia's c:vegetables holds lettuce AND lettuce_seed). Referencing such a
+# tag from one of our canonical tags drags the seeds in with it, and a datapack
+# tag cannot subtract members - so for these categories we enumerate the food
+# item-by-item instead of referencing the tag, dropping the seeds on the way.
+#
+# Cost of doing it this way: a produce item added by a future version of the
+# upstream mod is not picked up until this generator is re-run. That is the
+# accepted trade - a stale entry is invisible, a seed in a food recipe is a bug.
+# The hand-authored canonical files must NOT also reference these source tags,
+# or the seeds come straight back in through that reference.
+#
+# The generated list goes to `pantrywork:bridged/<name>`, NOT straight into the
+# canonical c: tag. Two reasons: the canonical file stays hand-authored (it also
+# carries curated per-item entries, e.g. Vinery's grapes), and two files at the
+# same path inside one jar cannot merge the way two datapacks can - Gradle
+# rightly refuses to package a duplicate. The canonical tag simply references
+# `#pantrywork:bridged/<name>`.
+$bridgedDir = Join-Path $root "src\generated\resources\data\pantrywork\tags\item\bridged"
+if (Test-Path $bridgedDir) { Remove-Item $bridgedDir -Recurse -Force }
+New-Item -ItemType Directory -Force $bridgedDir | Out-Null
+$forwardSanitized = @(
+  @{ target = 'vegetable'; sources = @('vegetables') },
+  @{ target = 'fruit';     sources = @('fruits', 'strawberries') }
+)
+[void]$report.AppendLine("=== forward-sanitized (pantrywork:bridged/*) ===")
+foreach ($fs in $forwardSanitized) {
+  $members = New-Object System.Collections.Generic.HashSet[string]
+  foreach ($s in $fs.sources) {
+    foreach ($i in (Resolve-Tag $s (New-Object System.Collections.Generic.HashSet[string]))) { [void]$members.Add($i) }
+  }
+  $dropped = @($members | Where-Object { Test-IsSeed $_ } | Sort-Object)
+  foreach ($d in $dropped) { [void]$members.Remove($d) }
+  foreach ($b in $blacklist) { [void]$members.Remove($b) }
+  if ($members.Count -eq 0) { [void]$report.AppendLine("  pantrywork:bridged/$($fs.target) : no members resolved, skipped"); continue }
+  $entries = (($members | Sort-Object) | ForEach-Object { "    { ""id"": ""$_"", ""required"": false }" }) -join ",`n"
+  $file = Join-Path $bridgedDir "$($fs.target).json"
+  [IO.File]::WriteAllText($file, "{`n  ""values"": [`n$entries`n  ]`n}`n", $utf8NoBom)
+  $filesWritten++
+  [void]$report.AppendLine("  pantrywork:bridged/$($fs.target) <- $($members.Count) items from $($fs.sources -join ', '); dropped $($dropped.Count) seed(s): $($dropped -join ', ')")
+}
+[void]$report.AppendLine("")
+
 [IO.File]::WriteAllText($reportFile, $report.ToString(), $utf8NoBom)
 "Wrote $filesWritten bridge files to $outDir"
 "Report: $reportFile"

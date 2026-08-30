@@ -1,5 +1,5 @@
 {
   "values": [
-    { "id": "#c:vegetables", "required": false }
+    { "id": "#pantrywork:bridged/vegetable", "required": false }
   ]
 }

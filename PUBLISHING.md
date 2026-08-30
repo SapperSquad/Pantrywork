@@ -1,4 +1,4 @@
-# Pantrywork — publishing kit (current as of v0.4.0)
+# Pantrywork — publishing kit (current as of v0.5.0)
 
 Store copy for the Modrinth / CurseForge project pages. Bump this file in the same pass as
 `CHANGELOG.md` and `README.md` — never one alone.
@@ -7,15 +7,15 @@ Store copy for the Modrinth / CurseForge project pages. Bump this file in the sa
 
 | Upload as version | File | Game version tag | Loader |
 |---|---|---|---|
-| `0.4.0+mc1.21.1` | `dist/0.4.0/pantrywork-0.4.0.jar` | 1.21.1 | neoforge |
-| `0.4.0+mc1.21.x-fabric` | `dist/0.4.0/pantrywork-0.4.0-fabric.jar` | 1.21.1–1.21.11 | fabric |
-| `0.4.0+mc26-fabric` | `dist/0.4.0/pantrywork-0.4.0-fabric-mc26.jar` | 26.1.2, 26.2 | fabric |
-| `0.4.0+mc26` | `dist/0.4.0/pantrywork-0.4.0-neoforge-mc26.jar` | 26.1.2, 26.2 | neoforge |
+| `0.5.0+mc1.21.1` | `dist/0.5.0/pantrywork-0.5.0.jar` | 1.21.1 | neoforge |
+| `0.5.0+mc1.21.x-fabric` | `dist/0.5.0/pantrywork-0.5.0-fabric.jar` | 1.21.1–1.21.11 | fabric |
+| `0.5.0+mc26-fabric` | `dist/0.5.0/pantrywork-0.5.0-fabric-mc26.jar` | 26.1.2, 26.2 | fabric |
+| `0.5.0+mc26` | `dist/0.5.0/pantrywork-0.5.0-neoforge-mc26.jar` | 26.1.2, 26.2 | neoforge |
 
-Publish: `tools\publish.ps1 -Version 0.4.0 -ChangelogFile tools\changelog-current.md` (dry-run first).
+Publish: `tools\publish.ps1 -Version 0.5.0 -ChangelogFile tools\changelog-current.md` (dry-run first).
 
-Build all four with `./gradlew build -Prelease fabricJar fabricJar26 neoJar26`. The 0.4.0 payload
-changed (Aquaculture 2.9.x bass in the fish bridges), so upload all four files.
+Build all four with `./gradlew build -Prelease fabricJar fabricJar26 neoJar26`. The 0.5.0 payload
+changed on every loader (seed-leak fix + optional convention refs), so upload all four files.
 
 Fabric version range verified 2026-08-08: same unmodified jar passed live suites on 1.21.10
 (FD Refabricated + Croptopia Refabricated, incl. cross-mod smoothie craft) and 1.21.11
@@ -50,6 +50,12 @@ content always excluded; each carries the Minecraft range it was actually verifi
   bridge-craft pair exists there yet; tag-level bridging (what RecipeManager consumes) is
   fully exercised. Croptopia's 26.x port dropped its own `c:fishes`; on 26.x that dialect tag
   exists purely through Pantrywork's generated union (asserted live).
+- 2026-08-29 (0.5.0): `tools/AuditRoles.ps1` green in both modes (0 seed violations, 0
+  required-but-undefined refs) and proven non-vacuous by injecting a bogus required ref ·
+  new `tagtest-seedfix.txt` 11/11 live (Croptopia produce still bridges; its seeds no longer
+  reach `c:foods/vegetable` or `garnish`; plantable-food onion and roasted seed foods
+  correctly retained) · all seven 1.21.1 RCON suites 90/90 · GameTests 5/5 ·
+  `-PnoCompatMods` boot clean (0 errors, vanilla 4/4).
 Version roadmap: no 1.20.x (pre-`c:`-unification). When FD's NeoForge 26.x port lands
 (PR #1374 / Refabricated `neoforge/26.1` branch), boot it on the neo-26 harnesses and add the
 craft-level assert to `tagtest-neo26-compat.txt`.

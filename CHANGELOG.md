@@ -1,5 +1,28 @@
 # Changelog
 
+## 0.5.0 — 2026-08-29
+
+**Two correctness fixes.** No new mods bridged; this one is about the bridges
+already there being right.
+
+- **Fixed: planting seeds are no longer food.** Croptopia files its seeds
+  *inside* its produce tags, so referencing those tags pulled 13 seeds into
+  `c:foods/vegetable` and the `garnish` role — a lettuce seed satisfied any
+  recipe asking for a garnish. Produce is now enumerated item-by-item with the
+  seeds dropped. Croptopia's vegetables and fruits still bridge exactly as
+  before; only the seeds are gone.
+  - Seeds are identified by the ecosystem's own `c:seeds` classification rather
+    than by name, so plantable *foods* (Farm & Charm's onion) and edible seed
+    foods (Croptopia's roasted pumpkin and sunflower seeds) correctly stay food.
+- **Fixed: a lone install could refuse to load.** Three references to
+  convention tags (`c:foods/berry`, `c:buckets/milk`) were marked required. On
+  Fabric without Fabric API — a setup the README explicitly invites — those tags
+  are undefined, and a required reference to an undefined tag fails datapack
+  loading outright. Now optional, as every cross-mod reference should be.
+- **New: `tools/AuditRoles.ps1`** resolves every tag this mod asserts and fails
+  the build on either problem, so neither can come back. Its `-Minimal` mode
+  audits the no-Fabric-API case that the previous test matrix never covered.
+
 ## 0.4.0 — 2026-08-22
 
 **NeoForge comes to Minecraft 26.x.**

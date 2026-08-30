@@ -1,0 +1,24 @@
+forceload add 0 0 24 24
+kill @e[type=item]
+time set midnight
+setblock 8 120 10 minecraft:chest replace
+loot insert 8 120 10 loot minecraft:gameplay/fishing/fish
+loot insert 8 120 10 loot minecraft:gameplay/fishing/fish
+loot insert 8 120 10 loot minecraft:gameplay/fishing/fish
+loot insert 8 120 10 loot minecraft:gameplay/fishing/fish
+loot insert 8 120 10 loot minecraft:gameplay/fishing/fish
+loot insert 8 120 10 loot minecraft:gameplay/fishing/fish
+loot insert 8 120 10 loot minecraft:gameplay/fishing/fish
+loot insert 8 120 10 loot minecraft:gameplay/fishing/fish
+loot insert 8 120 10 loot minecraft:gameplay/fishing/fish
+loot insert 8 120 10 loot minecraft:gameplay/fishing/fish
+loot insert 8 120 10 loot minecraft:gameplay/fishing/fish
+loot insert 8 120 10 loot minecraft:gameplay/fishing/fish
+data get block 8 120 10 Items
+setblock 8 120 10 minecraft:air replace
+summon minecraft:item 8 120 8 {NoGravity:1b,Tags:["p1"],Item:{id:"minecraft:cod",count:1,components:{"minecraft:custom_data":{reelrivals:{species:"golden_bass",unweighed:1b}}}}}
+execute positioned 8 120 8 run function reelrivals:catch/process
+data get entity @e[type=item,tag=p1,limit=1] Item.components."minecraft:custom_data"
+data get storage reelrivals:bounty
+kill @e[type=item]
+forceload remove all

@@ -39,6 +39,33 @@ Compat mods come from two places (see `dependencies` in build.gradle):
 Modrinth maven (FD) and local jars in `tools/work/jars/` (CurseForge-only
 mods; re-fetch instructions in `tools/work/jars/SOURCES.md`).
 
+## Tag audit (release gate)
+
+```
+powershell -File tools\AuditRoles.ps1            # with every compat jar loaded
+powershell -File tools\AuditRoles.ps1 -Minimal   # Pantrywork ALONE, no Fabric API
+```
+
+Resolves every tag this mod asserts, transitively, and exits nonzero on either
+failure class it guards:
+
+1. **Seeds in food tags.** Croptopia files planting seeds *inside* its produce
+   tags, so a plain tag reference drags them into our canonical/role tags. Run
+   this after any generator or compat-jar change.
+2. **Required-but-undefined tag references.** A required ref to a tag nobody
+   defines is a hard datapack load failure. `-Minimal` is the case the rest of
+   the harness never covered: the mod installed alone, where convention tags
+   (`c:foods/berry`, `c:buckets/milk`) simply do not exist.
+
+Seed classification deliberately combines two signals — a name rule alone
+condemns `croptopia:roasted_pumpkin_seeds` (real food), and `c:seeds`
+membership alone condemns `farm_and_charm:onion` (plantable food). Keep
+`Test-IsSeed` in this script and in `GenerateBridges.ps1` in step.
+
+Tags we merely inject into (another mod's dialect tag) are reported as
+`upstream` and never fail the build — a datapack cannot subtract members, and
+re-classifying another mod's own choices is against the project's own rules.
+
 ## One-command verification (GameTest)
 
 ```

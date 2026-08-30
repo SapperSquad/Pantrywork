@@ -150,3 +150,29 @@ Not yet bridged: Croptopia's ~600 per-dish plural tags (`hamburgers`,
 `beef_jerkies`…) — most are dish-level, low interop value; revisit with
 the generator. Pam's `c:salt`/`c:batter`/`c:stock`-style ingredient tags are
 bridged only where a role tag consumes them (stock → liquid_base).
+
+### Forward sanitization: `pantrywork:bridged/*`
+
+Some upstream produce tags deliberately mix planting seeds in with the food —
+Croptopia's `c:vegetables` holds both `lettuce` and `lettuce_seed`. Referencing
+such a tag from a canonical tag drags the seeds along, and a datapack tag cannot
+subtract members, so for those categories the generator enumerates the food
+item-by-item into `pantrywork:bridged/<name>` and the canonical `c:foods/*` tag
+references that instead. This is why `c:foods/vegetable` no longer points at
+`#c:vegetables` directly.
+
+The trade: produce added by a future version of an upstream mod is not picked up
+until the generator is re-run. A stale entry is invisible; a seed satisfying a
+food recipe is a bug — so correctness wins. `GenerateBridges.ps1` prints exactly
+what it dropped, and `tools/AuditRoles.ps1` fails the build if any ever gets
+through.
+
+**Identifying a seed needs two signals, not one.** A name rule alone condemns
+`croptopia:roasted_pumpkin_seeds`, which is real food; `c:seeds` membership alone
+condemns `farm_and_charm:onion`, which is plantable *and* edible. So: a trailing
+`_seed`/`_sapling` is decisive on its own, while a trailing `_seeds` only counts
+when the ecosystem also files the item under `c:seeds`.
+
+Tags belonging to another mod are exempt from this rule. If Croptopia keeps a
+seed in its own `c:fruits`, that is its call — the audit reports it as `upstream`
+and moves on. What matters is that nothing of ours reaches it.

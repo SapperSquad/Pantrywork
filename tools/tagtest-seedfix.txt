@@ -1,0 +1,25 @@
+# Regression for the 0.5.0 seed-leak fix. Croptopia files planting seeds inside
+# its produce tags; referencing those tags dragged the seeds into our canonical
+# and role tags. Bridges must still work, seeds must not come with them.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- the bridge still works: Croptopia produce reaches identity + role ---
+item replace block 8 -60 8 container.0 with croptopia:lettuce
+execute if items block 8 -60 8 container.0 #c:foods/vegetable
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+item replace block 8 -60 8 container.0 with croptopia:strawberry
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+# --- THE FIX: planting seeds must NOT be food or garnish ---
+item replace block 8 -60 8 container.0 with croptopia:lettuce_seed
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component
+item replace block 8 -60 8 container.0 with croptopia:zucchini_seed
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+item replace block 8 -60 8 container.0 with croptopia:honeydew_seed
+execute unless items block 8 -60 8 container.0 #c:foods/fruit
+# --- false-positive guards: plantable FOODS and roasted seeds stay food ---
+item replace block 8 -60 8 container.0 with farm_and_charm:onion
+execute if items block 8 -60 8 container.0 #c:foods/vegetable
+item replace block 8 -60 8 container.0 with croptopia:roasted_pumpkin_seeds
+execute if items block 8 -60 8 container.0 #c:foods
