@@ -48,3 +48,11 @@ Docs: [docs/TAXONOMY.md](docs/TAXONOMY.md) (tag design) ·
 
 Status: live on Modrinth ([`pantrywork`](https://modrinth.com/mod/pantrywork)).
 Formerly developed under the working name "FoodTags".
+
+## License
+
+The source code in this repository is MIT-licensed - see [LICENSE](LICENSE).
+The brand assets in [promo/](promo/) (banner, icon, gallery art) and the
+store-page copy in [PUBLISHING.md](PUBLISHING.md) are (c) SapperSquad, all
+rights reserved - see [promo/LICENSE](promo/LICENSE). Store listings on
+Modrinth/CurseForge are published All Rights Reserved by policy.
