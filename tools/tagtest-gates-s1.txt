@@ -1,0 +1,19 @@
+# Gate scenario S1 (tools/neo-server-1211): Pantrywork release jar + Farmer's Delight +
+# Meadow (+ Architectury). NO Pam's, NO Croptopia. See tools/tagtest-gates.txt for setup.
+# Expected: 5 passed / 0 failed.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# FD's 1/4-bucket bottle is 4x below Meadow's bucket floor in both of Meadow's milk tags
+# and no rescuer is loaded: the pamhc2foodcore and croptopia overlays must not apply.
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute unless items block 8 -60 8 container.0 #c:milk
+execute unless items block 8 -60 8 container.0 #c:milks
+# the buckets Meadow balanced those recipes for are still there
+item replace block 8 -60 8 container.0 with minecraft:milk_bucket
+execute if items block 8 -60 8 container.0 #c:milks
+item replace block 8 -60 8 container.0 with meadow:cheese_slice
+execute if items block 8 -60 8 container.0 #c:cheese
+# croptopia gate CLOSED: FD's cabbage leaf is not in c:vegetables. The tag is defined here only
+# by Pantrywork's generated vegetables.json, which has no other path to the leaf (review TV-1)
+item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
+execute unless items block 8 -60 8 container.0 #c:vegetables

@@ -1,0 +1,6 @@
+{
+  "values": [
+    { "id": "refurbished_furniture:sea_salt", "required": false },
+    { "id": "#pantrywork:gated/croptopia/c/salts", "required": false }
+  ]
+}

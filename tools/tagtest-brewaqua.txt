@@ -1,12 +1,24 @@
 # Brewin' & Chewin' (namespaced tags) + Aquaculture 2 (official fish dialect).
 forceload add 0 0
 setblock 8 -60 8 minecraft:chest
-# --- BREWIN cheese: identity + dairy role, both dialects (reverse) ---
-item replace block 8 -60 8 container.0 with brewinandchewin:flaxen_cheese_wheel
+# --- BREWIN cheese: the WEDGE is the food - identity + dairy role, both dialects (reverse) ---
+item replace block 8 -60 8 container.0 with brewinandchewin:flaxen_cheese_wedge
 execute if items block 8 -60 8 container.0 #c:foods/cheese
 execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
 execute if items block 8 -60 8 container.0 #c:cheese
 execute if items block 8 -60 8 container.0 #c:cheeses
+# --- the ripe WHEEL is a food-less block item (BnCItems: new BlockItem, no .food()) ---
+# Non-food blocks never cross a bridge: 0.1.0-0.7.0 put both wheels into c:cheese /
+# c:cheeses and, through a hand ref, into c:foods/cheese and the dairy role.
+item replace block 8 -60 8 container.0 with brewinandchewin:flaxen_cheese_wheel
+execute unless items block 8 -60 8 container.0 #c:foods/cheese
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+execute unless items block 8 -60 8 container.0 #c:cheese
+execute unless items block 8 -60 8 container.0 #c:cheeses
+item replace block 8 -60 8 container.0 with brewinandchewin:scarlet_cheese_wheel
+execute unless items block 8 -60 8 container.0 #c:foods/cheese
+execute unless items block 8 -60 8 container.0 #c:cheese
+execute unless items block 8 -60 8 container.0 #c:cheeses
 # --- BREWIN drinks ---
 item replace block 8 -60 8 container.0 with brewinandchewin:beer
 execute if items block 8 -60 8 container.0 #c:drinks
@@ -25,7 +37,10 @@ execute if items block 8 -60 8 container.0 #c:raw_fishes
 item replace block 8 -60 8 container.0 with aquaculture:fish_fillet_cooked
 execute if items block 8 -60 8 container.0 #c:foods/cooked_fish
 execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
-execute if items block 8 -60 8 container.0 #c:cookedfish
+# a fillet is a share of one fish (Aquaculture 2.7.21: an Atlantic halibut fillets into 14,
+# six species into 1): never a whole cooked fish in Pam's / Farm & Charm's dialects
+execute unless items block 8 -60 8 container.0 #c:cookedfish
+execute unless items block 8 -60 8 container.0 #c:cooked_fishes
 # --- unripe cheese must NOT count as cheese (deliberately excluded) ---
 item replace block 8 -60 8 container.0 with brewinandchewin:unripe_flaxen_cheese_wheel
 execute unless items block 8 -60 8 container.0 #c:foods/cheese

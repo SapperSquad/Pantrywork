@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "farmersdelight:bone_broth", "required": false }
+    { "id": "farmersdelight:bone_broth", "required": false },
+    { "id": "pamhc2foodcore:stockitem", "required": false }
   ]
 }

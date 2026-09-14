@@ -1,0 +1,72 @@
+{
+  "pack": {
+    "description": "Pantrywork",
+    "pack_format": 48,
+    "supported_formats": [48, 1000],
+    "min_format": 48,
+    "max_format": 1000
+  },
+  "neoforge:overlays": {
+    "entries": [
+      {
+        "neoforge:conditions": [ { "type": "neoforge:or", "values": [ { "type": "neoforge:mod_loaded", "modid": "bountifulfares" }, { "type": "neoforge:mod_loaded", "modid": "farm_and_charm" }, { "type": "neoforge:mod_loaded", "modid": "pamhc2foodcore" } ] } ],
+        "formats": [48, 1000],
+        "min_format": 48,
+        "max_format": 1000,
+        "directory": "pantrywork_gate_1"
+      },
+      {
+        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "create" } ],
+        "formats": [48, 1000],
+        "min_format": 48,
+        "max_format": 1000,
+        "directory": "pantrywork_gate_2"
+      },
+      {
+        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "croptopia" } ],
+        "formats": [48, 1000],
+        "min_format": 48,
+        "max_format": 1000,
+        "directory": "pantrywork_gate_3"
+      },
+      {
+        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "farm_and_charm" } ],
+        "formats": [48, 1000],
+        "min_format": 48,
+        "max_format": 1000,
+        "directory": "pantrywork_gate_4"
+      },
+      {
+        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "pamhc2foodcore" } ],
+        "formats": [48, 1000],
+        "min_format": 48,
+        "max_format": 1000,
+        "directory": "pantrywork_gate_5"
+      }
+    ]
+  },
+  "fabric:overlays": {
+    "entries": [
+      {
+        "directory": "pantrywork_gate_1",
+        "condition": { "condition": "fabric:any_mods_loaded", "values": ["bountifulfares", "farm_and_charm", "pamhc2foodcore"] }
+      },
+      {
+        "directory": "pantrywork_gate_2",
+        "condition": { "condition": "fabric:all_mods_loaded", "values": ["create"] }
+      },
+      {
+        "directory": "pantrywork_gate_3",
+        "condition": { "condition": "fabric:any_mods_loaded", "values": ["croptopia", "croptopia-refabricated"] }
+      },
+      {
+        "directory": "pantrywork_gate_4",
+        "condition": { "condition": "fabric:all_mods_loaded", "values": ["farm_and_charm"] }
+      },
+      {
+        "directory": "pantrywork_gate_5",
+        "condition": { "condition": "fabric:all_mods_loaded", "values": ["pamhc2foodcore"] }
+      }
+    ]
+  }
+}

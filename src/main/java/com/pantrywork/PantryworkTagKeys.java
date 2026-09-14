@@ -27,7 +27,7 @@ public final class PantryworkTagKeys {
     public static final TagKey<Item> BUTTER = common("foods/butter");
     public static final TagKey<Item> DOUGH = common("foods/dough");
     public static final TagKey<Item> COOKED_RICE = common("foods/cooked_rice");
-    // both Croptopia and Pam's independently chose c:flour — already shared
+    // c:flour: a name Croptopia, Pam's and Bountiful Fares share; bridged with c:flours since 0.7.0
     public static final TagKey<Item> FLOUR = common("flour");
 
     private static TagKey<Item> own(String path) {

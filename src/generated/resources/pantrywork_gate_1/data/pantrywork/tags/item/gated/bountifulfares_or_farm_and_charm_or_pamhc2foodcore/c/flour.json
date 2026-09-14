@@ -1,0 +1,5 @@
+{
+  "values": [
+    { "id": "create:wheat_flour", "required": false }
+  ]
+}

@@ -40,11 +40,19 @@ public class GenPromo {
     static final Color C_MEADOW  = new Color(0x6FA88C);
     static final Color C_AQUA    = new Color(0x3E7BB8);
     static final Color C_BREW    = new Color(0xB07A35);
+    static final Color C_CREATE  = new Color(0x8C9AA6);
+    static final Color C_BOUNTY  = new Color(0xCFD65A);
+    static final Color C_FOT     = new Color(0x2FB59C);
+    static final Color C_REFURB  = new Color(0xCFC8BC);
 
     // Bumped whenever a compat module ships. Baked into gallery art, so it must
     // be re-checked every release - images can't be grepped when they go stale.
-    static final int FOOD_MOD_COUNT = 10;
+    // galleryRoster() refuses to render when its roster disagrees with this count.
+    static final int FOOD_MOD_COUNT = 14;
     static final int DIALECT_COUNT = 4;
+    static final String[] NUMBER_WORDS = {"Zero", "One", "Two", "Three", "Four", "Five",
+        "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen",
+        "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty"};
 
     static final String TEX = "tools/work/tex/";
 
@@ -216,6 +224,14 @@ public class GenPromo {
         return w;
     }
 
+    /** Stops the render when text in the current font is wider than the space it is given. */
+    static void fitOrFail(Graphics2D g, String text, int maxWidth) {
+        int w = g.getFontMetrics().stringWidth(text);
+        if (w > maxWidth) {
+            throw new IllegalStateException("'" + text + "' is " + w + "px wide; only " + maxWidth + "px available");
+        }
+    }
+
     static void arrow(Graphics2D g, Color c, int x1, int y1, int x2, int y2) {
         g.setColor(c);
         g.setStroke(new BasicStroke(5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
@@ -307,7 +323,7 @@ public class GenPromo {
         int cx = 1180, s = 100;
         int[] ys = {70, 205, 340, 475};
         BufferedImage[] items = {tex("cheese"), tex("cheeseitem"),
-                                 tex("meadow__cheese_slice"), tex("brewinandchewin__flaxen_cheese_wheel")};
+                                 tex("meadow__cheese_slice"), tex("brewinandchewin__flaxen_cheese_wedge")};
         Color[] mods = {C_CROP, C_PAMS, C_MEADOW, C_BREW};
         String[] labels = {"Croptopia", "Pam's HC2", "Meadow", "Brewin' & Chewin'"};
         int labelX = cx + s + 16;
@@ -411,16 +427,24 @@ public class GenPromo {
         Graphics2D g = canvas(img);
         pantryBackground(g, W, H);
         eyebrow(g, "PANTRYWORK", 80, 100);
-        headline(g, "Four mods. One sandwich.", 76, 180, 64);
+        // Vanilla is not a mod: the legend shows three mods (Pam's, Farm & Charm, Brewin')
+        // plus vanilla bread and porkchop. The 0.7.0 draft said "Four mods." (critic CRIT-5).
+        headline(g, "Three mods and vanilla. One sandwich.", 76, 180, 64);
         g.setFont(new Font("Segoe UI", Font.PLAIN, 30));
         g.setColor(BODY);
-        g.drawString("Pam's own Grilled Cheese & Ham recipe - crafted from Croptopia dairy and Farmer's Delight bacon.", 80, 250);
+        // The exact craft verified live in 0.7.0 (tagtest-reverse.txt Craft B and the
+        // pamsRecipeAcceptsForeignIngredients GameTest). Until 0.6.0 this card showed Croptopia
+        // butter/cheese and Farmer's Delight bacon; 0.7.0's cost floor took those out of Pam's
+        // c:butter / c:cheese / c:rawpork, so the card had to change with the data.
+        String sub = "Pam's own Grilled Cheese & Ham recipe - crafted with Farm & Charm butter and Brewin' & Chewin' cheese.";
+        fitOrFail(g, sub, W - 160);
+        g.drawString(sub, 80, 250);
 
         // 3x3 grid
         int s = 150, gx = 240, gy = 330, gap = 14;
-        BufferedImage[] grid = {tex("skilletitem"), tex("bread"), tex("butter"),
-                                tex("cheese"), tex("bacon"), null, null, null, null};
-        Color[] gmods = {C_PAMS, C_VANILLA, C_CROP, C_CROP, C_FD, null, null, null, null};
+        BufferedImage[] grid = {tex("skilletitem"), tex("bread"), tex("farm_and_charm__butter"),
+                                tex("brewinandchewin__flaxen_cheese_wedge"), tex("porkchop"), null, null, null, null};
+        Color[] gmods = {C_PAMS, C_VANILLA, C_FARM, C_BREW, C_VANILLA, null, null, null, null};
         for (int i = 0; i < 9; i++) {
             int x = gx + (i % 3) * (s + gap), y = gy + (i / 3) * (s + gap);
             if (grid[i] == null) slot(g, x, y, s);
@@ -436,10 +460,11 @@ public class GenPromo {
 
         // legend
         Object[][] legend = {{C_PAMS, "Pam's HarvestCraft 2"}, {C_VANILLA, "Vanilla"},
-                             {C_CROP, "Croptopia"}, {C_FD, "Farmer's Delight"}};
+                             {C_FARM, "Farm & Charm"}, {C_BREW, "Brewin' & Chewin'"}};
         int lx = 1250, ly = 350;
         g.setFont(new Font("Segoe UI", Font.BOLD, 30));
         for (Object[] row : legend) {
+            fitOrFail(g, (String) row[1], W - 12 - (lx + 42));
             g.setColor((Color) row[0]);
             g.fillOval(lx, ly - 22, 26, 26);
             g.setColor(BODY);
@@ -448,8 +473,10 @@ public class GenPromo {
         }
         g.setFont(new Font("Segoe UI", Font.ITALIC, 26));
         g.setColor(BODY);
+        // Not "Zero hard dependencies": the Fabric files need Fabric API (without it the mod's
+        // data never loads - measured 2026-09-13). What is true everywhere: no food mod is required.
         g.drawString("Zero config.", lx, ly + 20);
-        g.drawString("Zero hard dependencies.", lx, ly + 56);
+        g.drawString("No food mod required.", lx, ly + 56);
         g.dispose();
         return img;
     }
@@ -462,10 +489,6 @@ public class GenPromo {
         Graphics2D g = canvas(img);
         pantryBackground(g, W, H);
         eyebrow(g, "PANTRYWORK", 80, 100);
-        headline(g, "Ten food mods bridged.", 76, 180, 64);
-        g.setFont(new Font("Segoe UI", Font.PLAIN, 30));
-        g.setColor(BODY);
-        g.drawString("Install all of them, a few of them, or none - Pantrywork bridges whatever it finds.", 80, 250);
 
         String[][] roster = {
             {"cheese",                              "Croptopia"},
@@ -477,39 +500,72 @@ public class GenPromo {
             {"farm_and_charm__butter",              "Let's Do Farm & Charm"},
             {"meadow__cheese_slice",                "Let's Do Meadow"},
             {"aquaculture__atlantic_cod",           "Aquaculture 2"},
-            {"brewinandchewin__flaxen_cheese_wheel","Brewin' & Chewin'"}
+            {"brewinandchewin__flaxen_cheese_wedge","Brewin' & Chewin'"},
+            {"create__dough",                       "Create"},
+            {"bountifulfares__maize",               "Bountiful Fares"},
+            {"fishofthieves__pineapple",            "Fish of Thieves"},
+            {"refurbished_furniture__cheese",       "Refurbished Furniture"}
         };
         Color[] cols = {C_CROP, C_PAMS, C_FD, C_OCEANS, C_ENDS,
-                        C_VINERY, C_FARM, C_MEADOW, C_AQUA, C_BREW};
+                        C_VINERY, C_FARM, C_MEADOW, C_AQUA, C_BREW,
+                        C_CREATE, C_BOUNTY, C_FOT, C_REFURB};
+        // The headline count is derived, never typed: a roster that disagrees with
+        // FOOD_MOD_COUNT stops the render instead of shipping a stale number.
+        if (roster.length != FOOD_MOD_COUNT || cols.length != roster.length) {
+            throw new IllegalStateException("roster lists " + roster.length + " mods (" + cols.length
+                + " colors) but FOOD_MOD_COUNT is " + FOOD_MOD_COUNT);
+        }
+        headline(g, NUMBER_WORDS[FOOD_MOD_COUNT] + " mods bridged.", 76, 180, 64);
+        g.setFont(new Font("Segoe UI", Font.PLAIN, 30));
+        g.setColor(BODY);
+        g.drawString("Install all of them, a few of them, or none - Pantrywork bridges whatever it finds.", 80, 250);
 
-        int cols5 = 5, s = 112, gapX = 300, x0 = 118, y0 = 340, gapY = 250;
+        // Two rows of seven, centered. Every label line must fit its column with a
+        // gutter - measured and enforced here, because a label collision is exactly
+        // the kind of defect that survives when art is only eyeballed.
+        int perRow = 7, s = 104, pitch = 205, y0 = 330, gapY = 240;
+        int x0 = (W - ((perRow - 1) * pitch + s)) / 2;
+        int maxLabel = pitch - 20;
         for (int i = 0; i < roster.length; i++) {
-            int cx = x0 + (i % cols5) * gapX;
-            int cy = y0 + (i / cols5) * gapY;
+            int cx = x0 + (i % perRow) * pitch;
+            int cy = y0 + (i / perRow) * gapY;
             slotItem(g, tex(roster[i][0]), cols[i], cx, cy, s);
-            // name wraps onto a second line when it is too wide for the column
             g.setFont(new Font("Segoe UI", Font.BOLD, 22));
+            FontMetrics fm = g.getFontMetrics();
             String name = roster[i][1];
             java.util.List<String> lines = new java.util.ArrayList<>();
-            if (g.getFontMetrics().stringWidth(name) <= 250) {
+            if (fm.stringWidth(name) <= maxLabel) {
                 lines.add(name);
             } else {
-                int cut = name.lastIndexOf(' ', name.length() / 2 + 4);
-                if (cut < 0) cut = name.indexOf(' ');
-                lines.add(name.substring(0, cut));
-                lines.add(name.substring(cut + 1));
+                // wrap at the space that leaves the narrower widest half, but never
+                // start a line with "&" ("Let's Do Farm / & Charm" splits the name)
+                int best = -1, bestW = Integer.MAX_VALUE;
+                for (int k = name.indexOf(' '); k >= 0; k = name.indexOf(' ', k + 1)) {
+                    if (name.startsWith("&", k + 1)) continue;
+                    int w = Math.max(fm.stringWidth(name.substring(0, k)), fm.stringWidth(name.substring(k + 1)));
+                    if (w < bestW) { bestW = w; best = k; }
+                }
+                if (best < 0) throw new IllegalStateException("label '" + name + "' is too wide and has no space to wrap at");
+                lines.add(name.substring(0, best));
+                lines.add(name.substring(best + 1));
             }
             int ty = cy + s + 34;
             for (String ln : lines) {
+                fitOrFail(g, ln, maxLabel);
                 g.setColor(CREAM);
-                g.drawString(ln, cx + (s - g.getFontMetrics().stringWidth(ln)) / 2, ty);
+                g.drawString(ln, cx + (s - fm.stringWidth(ln)) / 2, ty);
                 ty += 26;
+            }
+            if (ty - 26 + fm.getDescent() >= cy + gapY && i / perRow < (roster.length - 1) / perRow) {
+                throw new IllegalStateException("label '" + name + "' runs into the next row");
             }
         }
 
         g.setFont(new Font("Segoe UI", Font.ITALIC, 26));
         g.setColor(BODY);
-        g.drawString("Plus Origins diet compat - carnivores and vegetarians can finally eat modded food.", 118, 852);
+        String foot = "Plus Origins diet compat - carnivores and vegetarians can finally eat modded food.";
+        fitOrFail(g, foot, W - 2 * 118);
+        g.drawString(foot, 118, 852);
         g.dispose();
         return img;
     }

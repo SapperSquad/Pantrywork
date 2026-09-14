@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "croptopia:toast", "required": false }
+    { "id": "croptopia:toast", "required": false },
+    { "id": "pamhc2foodcore:toastitem", "required": false }
   ]
 }

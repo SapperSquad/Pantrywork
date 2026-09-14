@@ -1,5 +1,5 @@
 {
   "values": [
-    { "id": "#c:pasta", "required": false }
+    { "id": "#pantrywork:bridged/foods_pasta", "required": false }
   ]
 }

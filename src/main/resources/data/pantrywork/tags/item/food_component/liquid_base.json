@@ -3,6 +3,8 @@
     "minecraft:water_bucket",
     { "id": "#c:buckets/milk", "required": false },
     { "id": "#c:drinks/milk", "required": false },
+    { "id": "#c:milk", "required": false },
+    { "id": "#c:milks", "required": false },
     { "id": "#c:stock", "required": false },
     { "id": "farmersdelight:bone_broth", "required": false },
     { "id": "farmersdelight:tomato_sauce", "required": false }

@@ -1,6 +1,6 @@
 {
   "values": [
-    { "id": "farmersdelight:wheat_dough", "required": false },
-    { "id": "pamhc2foodcore:doughitem", "required": false }
+    { "id": "refurbished_furniture:dough", "required": false },
+    { "id": "#pantrywork:gated/farm_and_charm/c/doughs", "required": false }
   ]
 }

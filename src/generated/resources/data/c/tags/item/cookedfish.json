@@ -1,11 +1,19 @@
 {
   "values": [
-    { "id": "aquaculture:fish_fillet_cooked", "required": false },
     { "id": "farm_and_charm:cooked_cod", "required": false },
     { "id": "farm_and_charm:cooked_salmon", "required": false },
-    { "id": "farmersdelight:cooked_cod_slice", "required": false },
-    { "id": "farmersdelight:cooked_salmon_slice", "required": false },
-    { "id": "oceansdelight:cooked_elder_guardian_slice", "required": false },
+    { "id": "fishofthieves:cooked_ancientscale", "required": false },
+    { "id": "fishofthieves:cooked_battlegill", "required": false },
+    { "id": "fishofthieves:cooked_devilfish", "required": false },
+    { "id": "fishofthieves:cooked_islehopper", "required": false },
+    { "id": "fishofthieves:cooked_plentifin", "required": false },
+    { "id": "fishofthieves:cooked_pondie", "required": false },
+    { "id": "fishofthieves:cooked_splashtail", "required": false },
+    { "id": "fishofthieves:cooked_stormfish", "required": false },
+    { "id": "fishofthieves:cooked_wildsplash", "required": false },
+    { "id": "fishofthieves:cooked_wrecker", "required": false },
+    { "id": "minecraft:cooked_cod", "required": false },
+    { "id": "minecraft:cooked_salmon", "required": false },
     { "id": "oceansdelight:cooked_guardian_tail", "required": false },
     { "id": "oceansdelight:kelp_encrusted_cod", "required": false }
   ]

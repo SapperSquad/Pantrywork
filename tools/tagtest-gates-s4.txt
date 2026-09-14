@@ -1,0 +1,32 @@
+# Gate scenario S4 (tools/neo-server-1211): S1 + Croptopia (+ EpheroLib) - Croptopia
+# WITHOUT Pam's. See tools/tagtest-gates.txt for setup. Expected: 7 passed / 0 failed.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# the two milk gates split: croptopia OPEN, pamhc2foodcore CLOSED
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute if items block 8 -60 8 container.0 #c:milks
+execute unless items block 8 -60 8 container.0 #c:milk
+item replace block 8 -60 8 container.0 with croptopia:milk_bottle
+execute unless items block 8 -60 8 container.0 #c:milk
+execute if items block 8 -60 8 container.0 #c:milks
+# the croptopia overlay's own tag holds FD's leaf (the gate proof); #c:vegetables is reachability
+# only - Croptopia's c:vegetables -> #c:cabbage -> FD's #c:crops/cabbage reaches it anyway (TV-1)
+item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/vegetables
+execute if items block 8 -60 8 container.0 #c:vegetables
+# --- CRAFT: Croptopia's banana smoothie with FD milk (the c:milks GATE in a real recipe) ---
+kill @e[type=item]
+setblock 8 -60 12 minecraft:air
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with croptopia:banana
+item replace block 8 -60 12 container.1 with minecraft:ice
+item replace block 8 -60 12 container.2 with farmersdelight:milk_bottle
+item replace block 8 -60 12 container.3 with minecraft:glass_bottle
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if items entity @e[type=minecraft:item] contents croptopia:banana_smoothie
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air

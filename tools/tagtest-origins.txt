@@ -12,6 +12,17 @@ item replace block 8 -60 8 container.0 with pamhc2foodcore:stockitem
 execute if items block 8 -60 8 container.0 #origins:meat
 item replace block 8 -60 8 container.0 with farmersdelight:ham
 execute if items block 8 -60 8 container.0 #origins:meat
+# cuts and cheap dishes that left recipe tags in the 0.7.0 cost-floor pass are still meat
+item replace block 8 -60 8 container.0 with oceansdelight:fugu_slice
+execute if items block 8 -60 8 container.0 #origins:meat
+item replace block 8 -60 8 container.0 with meadow:cooked_buffalo_meat
+execute if items block 8 -60 8 container.0 #origins:meat
+item replace block 8 -60 8 container.0 with farm_and_charm:roasted_chicken
+execute if items block 8 -60 8 container.0 #origins:meat
+# Croptopia's ground pork left Pam's c:groundmeats (cost floor, review CF-3) but is still meat
+# for diets: named directly (final check FC1-3)
+item replace block 8 -60 8 container.0 with croptopia:ground_pork
+execute if items block 8 -60 8 container.0 #origins:meat
 # --- vegetables must NOT be meat ---
 item replace block 8 -60 8 container.0 with croptopia:lettuce
 execute unless items block 8 -60 8 container.0 #origins:meat

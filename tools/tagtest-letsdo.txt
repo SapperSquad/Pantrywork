@@ -16,26 +16,56 @@ execute if items block 8 -60 8 container.0 #c:drinks
 # --- FARM & CHARM: flat-underscored dialect into canonical + roles ---
 item replace block 8 -60 8 container.0 with farm_and_charm:bacon
 execute if items block 8 -60 8 container.0 #c:foods/raw_pork
+# roasted_chicken (pasta + 1/3 chicken + carrot -> 3, ~1/9 chicken) is below FD's half-cut
+# floor: out of c:foods/cooked_chicken (so out of FD's chicken sandwich and barbecue stick)
+# since the 0.7.0 cost-floor pass, but still protein in the role layer
 item replace block 8 -60 8 container.0 with farm_and_charm:roasted_chicken
-execute if items block 8 -60 8 container.0 #c:foods/cooked_chicken
+execute unless items block 8 -60 8 container.0 #c:foods/cooked_chicken
+execute unless items block 8 -60 8 container.0 #c:foods/cooked_meat
 execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+item replace block 8 -60 8 container.0 with farm_and_charm:stuffed_chicken
+execute if items block 8 -60 8 container.0 #c:foods/cooked_chicken
 item replace block 8 -60 8 container.0 with farm_and_charm:butter
 execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+# F&C dough (flour 1/4 wheat + yeast -> 5) is ~1/15 wheat: 7x below Create's dough and 11x
+# below FD's, so it never reaches c:foods/dough (FD dumplings, pasta, Create cake)
 item replace block 8 -60 8 container.0 with farm_and_charm:dough
-execute if items block 8 -60 8 container.0 #c:foods/dough
+execute unless items block 8 -60 8 container.0 #c:foods/dough
+# ...but F&C's own dough is why other doughs may enter Croptopia's c:doughs: the GATE is
+# open on this boot (tagtest-nofandc.txt proves it closed; moved from tagtest-feedback)
+item replace block 8 -60 8 container.0 with create:dough
+execute if items block 8 -60 8 container.0 #c:doughs
+item replace block 8 -60 8 container.0 with farm_and_charm:raw_pasta
+execute unless items block 8 -60 8 container.0 #c:foods/pasta
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/starch
+item replace block 8 -60 8 container.0 with farm_and_charm:farmers_bread
+execute unless items block 8 -60 8 container.0 #c:foods/bread
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/starch
+# bacon_with_eggs (1/3 porkchop + eggs + butter) is below Pam's whole-chop c:cookedpork
+# floor; it still fills FD's c:foods/cooked_pork (floor: half a porkchop)
+item replace block 8 -60 8 container.0 with farm_and_charm:bacon_with_eggs
+execute unless items block 8 -60 8 container.0 #c:cookedpork
+execute if items block 8 -60 8 container.0 #c:foods/cooked_pork
 item replace block 8 -60 8 container.0 with farm_and_charm:tomato
 execute if items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+# F&C corn joins Bountiful Fares' c:foods/corn (moved from tagtest-feedback: on a
+# -PnoFarmAndCharm boot the unknown item left croptopia:corn in the chest)
+item replace block 8 -60 8 container.0 with farm_and_charm:corn
+execute if items block 8 -60 8 container.0 #c:foods/corn
 # --- MEADOW: cheeses + buffalo meat gap-fill ---
 item replace block 8 -60 8 container.0 with meadow:cheese_slice
 execute if items block 8 -60 8 container.0 #c:foods/cheese
 execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+# Meadow's cooking pot makes 4 cooked buffalo meat per raw one: below FD's half-cut floor,
+# so out of c:foods/cooked_meat (FD's barbecue stick) since the 0.7.0 cost-floor pass;
+# still protein, and still meat for Origins
 item replace block 8 -60 8 container.0 with meadow:cooked_buffalo_meat
-execute if items block 8 -60 8 container.0 #c:foods/cooked_meat
+execute unless items block 8 -60 8 container.0 #c:foods/cooked_meat
 execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
 item replace block 8 -60 8 container.0 with meadow:raw_buffalo_meat
 execute if items block 8 -60 8 container.0 #c:foods/raw_meat
 # --- REVERSE: foreign items now satisfy Let's Do dialect tags ---
-item replace block 8 -60 8 container.0 with croptopia:cheese
+item replace block 8 -60 8 container.0 with refurbished_furniture:cheese
 execute if items block 8 -60 8 container.0 #c:cheese
 item replace block 8 -60 8 container.0 with pamhc2foodcore:cheeseitem
 execute if items block 8 -60 8 container.0 #c:cheeses
@@ -43,6 +73,52 @@ item replace block 8 -60 8 container.0 with farmersdelight:bacon
 execute if items block 8 -60 8 container.0 #c:raw_pork
 item replace block 8 -60 8 container.0 with farm_and_charm:butter
 execute if items block 8 -60 8 container.0 #c:butters
+# --- DILUTION FLOORS (0.7.0 review) ---
+# croptopia:cheese is made from Croptopia's 1/16-bucket bottle: below Meadow's 1/4-bucket slice
+item replace block 8 -60 8 container.0 with croptopia:cheese
+execute unless items block 8 -60 8 container.0 #c:cheese
+# F&C's own tags set their own floors. c:raw_pork holds F&C's half-chop bacon and
+# c:raw_chicken its 1/3 chicken_parts, so FD's half cuts clear them; c:raw_beef
+# (1:1 minced beef), c:raw_mutton (1:1 lamb ham), c:cooked_mutton and
+# c:raw_fishes / c:cooked_fishes are whole-item floors.
+item replace block 8 -60 8 container.0 with farmersdelight:chicken_cuts
+execute if items block 8 -60 8 container.0 #c:raw_chicken
+item replace block 8 -60 8 container.0 with farmersdelight:minced_beef
+execute unless items block 8 -60 8 container.0 #c:raw_beef
+item replace block 8 -60 8 container.0 with farmersdelight:mutton_chops
+execute unless items block 8 -60 8 container.0 #c:raw_mutton
+item replace block 8 -60 8 container.0 with farmersdelight:cooked_mutton_chops
+execute unless items block 8 -60 8 container.0 #c:cooked_mutton
+item replace block 8 -60 8 container.0 with farmersdelight:cod_slice
+execute unless items block 8 -60 8 container.0 #c:raw_fishes
+item replace block 8 -60 8 container.0 with oceansdelight:fugu_slice
+execute unless items block 8 -60 8 container.0 #c:raw_fishes
+item replace block 8 -60 8 container.0 with farmersdelight:cooked_salmon_slice
+execute unless items block 8 -60 8 container.0 #c:cooked_fishes
+item replace block 8 -60 8 container.0 with aquaculture:fish_fillet_cooked
+execute unless items block 8 -60 8 container.0 #c:cooked_fishes
+item replace block 8 -60 8 container.0 with farmersdelight:cooked_bacon
+execute if items block 8 -60 8 container.0 #c:cooked_pork
+item replace block 8 -60 8 container.0 with farmersdelight:beef_patty
+execute if items block 8 -60 8 container.0 #c:cooked_beef
+item replace block 8 -60 8 container.0 with farmersdelight:cooked_chicken_cuts
+execute if items block 8 -60 8 container.0 #c:cooked_chicken
+# F&C items in Pam's whole-item dialect: bacon (2 per chop) and chicken_parts (3 per
+# chicken) stay out; the 1:1 minced beef and lamb ham cross
+item replace block 8 -60 8 container.0 with farm_and_charm:bacon
+execute unless items block 8 -60 8 container.0 #c:rawpork
+item replace block 8 -60 8 container.0 with farm_and_charm:chicken_parts
+execute unless items block 8 -60 8 container.0 #c:rawchicken
+item replace block 8 -60 8 container.0 with farm_and_charm:minced_beef
+execute if items block 8 -60 8 container.0 #c:rawbeef
+item replace block 8 -60 8 container.0 with farm_and_charm:lamb_ham
+execute if items block 8 -60 8 container.0 #c:rawmutton
+# F&C dishes are judged by the whole recipe: roasted_chicken is ~1/9 of a chicken
+# (out of Pam's c:cookedchicken), stuffed_chicken a whole bird (in)
+item replace block 8 -60 8 container.0 with farm_and_charm:roasted_chicken
+execute unless items block 8 -60 8 container.0 #c:cookedchicken
+item replace block 8 -60 8 container.0 with farm_and_charm:stuffed_chicken
+execute if items block 8 -60 8 container.0 #c:cookedchicken
 # --- negative control: a seed must NOT be food (regression on the seed bug) ---
 item replace block 8 -60 8 container.0 with croptopia:strawberry_seed
 execute unless items block 8 -60 8 container.0 #c:strawberries

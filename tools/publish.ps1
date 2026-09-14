@@ -39,6 +39,9 @@ $ErrorActionPreference = "Stop"
 # live pages. Resolution order: explicit parameter > baked-in id > env var.
 $PANTRYWORK_MODRINTH = 'rNg1wypx'
 $PANTRYWORK_CURSEFORGE = 1617573
+# Fabric API, required by both Fabric files (see the $files comment below)
+$FABRIC_API_MODRINTH = 'P7dR8mSH'
+$FABRIC_API_CURSEFORGE_SLUG = 'fabric-api'
 if (-not $ModrinthProjectId) { $ModrinthProjectId = $PANTRYWORK_MODRINTH }
 if ($CurseForgeProjectId -eq 0) { $CurseForgeProjectId = $PANTRYWORK_CURSEFORGE }
 if ($env:MODRINTH_PROJECT_ID -and $env:MODRINTH_PROJECT_ID -ne $ModrinthProjectId) {
@@ -121,8 +124,19 @@ function Get-CurseForgeVersionIdByType {
     return $valid[0].id
 }
 
-# The three release artifacts, each carrying the Minecraft versions it was
-# actually verified against (see PUBLISHING.md verification log). Loader names:
+# The four release artifacts and the Minecraft versions each is tagged with on the
+# stores. The versions actually booted are in PUBLISHING.md's verification log: the
+# Fabric 1.21.x file was booted on 1.21.1, 1.21.10 and 1.21.11, and 1.21.2-1.21.9 are
+# tagged from its declared range (>=1.21.1 <1.22). Both Fabric files are sent with
+# Fabric API as a required dependency, and both jars' fabric.mod.json declare
+# "fabric-api": "*" (Fabric API's resource loader is what loads mod data; without it
+# Fabric Loader refuses to start and names the missing dependency - booted 2026-09-13 on
+# the staged 0.7.0 -fabric jar). Modrinth project id P7dR8mSH
+# (api.modrinth.com/v2/project/fabric-api, checked 2026-09-13; the -DryRun output lists it
+# on the two Fabric files only); CurseForge relation by slug 'fabric-api' (not checked
+# against the CurseForge API from here: confirm it on the live file pages after the upload,
+# see PUBLISHING.md release blockers; a rejected upload is reported by the catch below and
+# the other uploads still go). Loader names:
 # Modrinth uses lowercase loader slugs; CurseForge models loaders as
 # game-version entries under the 'modloader' type.
 $fabric121 = @('1.21.1','1.21.2','1.21.3','1.21.4','1.21.5','1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11')
@@ -139,6 +153,13 @@ foreach ($f in $files) {
     if (-not (Test-Path $jar)) { Write-Warning "missing $jar - skipped"; continue }
     $suffix = if ($f.loaderModrinth -eq 'fabric') { "-fabric" } else { "" }
     Write-Host "`n=== $($f.jar)  [$($f.loaderCf) $($f.label): $($f.mc -join ', ')] ==="
+    # assigned outside an if-expression so PS 5.1 never unrolls the one-element arrays
+    $mrDeps = @()
+    $cfRelations = $null
+    if ($f.loaderModrinth -eq 'fabric') {
+        $mrDeps = @(@{ project_id = $FABRIC_API_MODRINTH; dependency_type = "required" })
+        $cfRelations = @{ projects = @(@{ slug = $FABRIC_API_CURSEFORGE_SLUG; type = "requiredDependency" }) }
+    }
 
     if (-not $SkipModrinth) {
         $versionNumber = "$Version+mc$($f.label)$suffix"
@@ -152,7 +173,7 @@ foreach ($f in $files) {
             loaders        = @($f.loaderModrinth)
             version_type   = "release"
             featured       = $false
-            dependencies   = @()
+            dependencies   = $mrDeps
             changelog      = $changelog
         } | ConvertTo-Json -Depth 5
         if ($DryRun) {
@@ -178,6 +199,7 @@ foreach ($f in $files) {
         Write-Host "CurseForge: SKIPPED - no project id. Pass -CurseForgeProjectId <number> or set CURSEFORGE_PROJECT_ID."
     } elseif (-not $CurseForgeToken) {
         Write-Host "[DryRun]   CURSEFORGE_TOKEN not set - cannot verify version ids"
+        if ($cfRelations) { Write-Host "[DryRun]   relations: $($cfRelations | ConvertTo-Json -Depth 5 -Compress)" }
     } else {
         # Resolve the Minecraft versions, the loader id, and the environment
         # ids. CurseForge rejects an upload (error 1021) unless the gameVersions
@@ -200,18 +222,21 @@ foreach ($f in $files) {
             Write-Host "[DryRun]   loader '$($f.loaderCf)' -> $ldId ; environment (Client,Server) -> $($envIds -join ', ')"
             Write-Host "[DryRun]   resolved $($gvIds.Count)/$($f.mc.Count) game versions -> $($gvIds -join ', ')"
             if ($unresolved.Count -gt 0) { Write-Host "[DryRun]   UNRESOLVED (would be dropped): $($unresolved -join ', ')" }
+            if ($cfRelations) { Write-Host "[DryRun]   relations: $($cfRelations | ConvertTo-Json -Depth 5 -Compress)" }
         } else {
             if (-not $ldId -or $gvIds.Count -eq 0 -or $envIds.Count -eq 0) {
                 Write-Warning "Skipping CurseForge upload for $($f.jar) - loader, environment, or all game versions unresolved."
             } else {
                 if ($unresolved.Count -gt 0) { Write-Warning "$($f.jar): dropping unresolved CurseForge versions: $($unresolved -join ', ')" }
-                $metadata = @{
+                $meta = @{
                     changelog     = $changelog
                     changelogType = "markdown"
                     displayName   = "Pantrywork $Version ($($f.loaderCf) $($f.label))"
                     releaseType   = "release"
                     gameVersions  = @($gvIds + $ldId + $envIds)
-                } | ConvertTo-Json -Depth 5
+                }
+                if ($cfRelations) { $meta.relations = $cfRelations }
+                $metadata = $meta | ConvertTo-Json -Depth 6
                 try {
                     $headers = @{ "X-Api-Token" = $CurseForgeToken }
                     $result = Invoke-MultipartPost -Uri "https://minecraft.curseforge.com/api/projects/$CurseForgeProjectId/upload-file" -Headers $headers -JsonFieldName "metadata" -JsonBody $metadata -FileFieldName "file" -FilePath $jar

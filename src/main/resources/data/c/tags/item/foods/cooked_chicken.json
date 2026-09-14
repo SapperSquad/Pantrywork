@@ -1,6 +1,5 @@
 {
   "values": [
-    { "id": "#c:cookedchicken", "required": false },
-    { "id": "#c:cooked_chicken", "required": false }
+    { "id": "#pantrywork:bridged/foods_cooked_chicken", "required": false }
   ]
 }

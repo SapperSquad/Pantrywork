@@ -1,6 +1,5 @@
 {
   "values": [
-    { "id": "#c:doughs", "required": false },
-    { "id": "#c:dough", "required": false }
+    { "id": "#pantrywork:bridged/foods_dough", "required": false }
   ]
 }

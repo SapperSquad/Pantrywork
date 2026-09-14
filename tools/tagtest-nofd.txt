@@ -1,4 +1,10 @@
 # No-FD boot: vanilla items must still resolve role tags; craft must still work.
+# DEV classpath only (runServer -PnoCompatMods): 5 passed / 0 failed. The cake craft uses the
+# dev-only recipe pantrywork:test/universal_sandwich, which -Prelease strips, so on a RELEASE
+# jar (tools/neo-server-1211) this file gives 4 passed / 1 failed - exactly the cake line, with
+# the follow-up kill reporting "No entity was found" - which is the correct release behaviour.
+# On a release jar run tools/tagtest-neo26.txt as well: same role checks plus the purity
+# negative (5/0, measured on neo-server-1211 2026-09-13).
 forceload add 0 0
 setblock 8 -60 8 minecraft:chest
 item replace block 8 -60 8 container.0 with minecraft:bread
@@ -15,6 +21,10 @@ item replace block 8 -60 12 container.0 with minecraft:bread
 item replace block 8 -60 12 container.1 with minecraft:cooked_beef
 item replace block 8 -60 12 container.2 with minecraft:carrot
 setblock 9 -60 12 minecraft:redstone_block
+# tick pad: the contents check intermittently lands before the crafter tick (2026-09-13:
+# first run failed while the follow-up kill still reported Cake; padded runs pass)
+time query gametime
+time query gametime
 execute if items entity @e[type=minecraft:item,limit=1] contents minecraft:cake
 kill @e[type=item]
 setblock 9 -60 12 minecraft:air

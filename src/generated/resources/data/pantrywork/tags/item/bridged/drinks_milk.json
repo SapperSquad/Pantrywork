@@ -1,0 +1,6 @@
+{
+  "values": [
+    { "id": "meadow:wooden_milk_bucket", "required": false },
+    { "id": "minecraft:milk_bucket", "required": false }
+  ]
+}

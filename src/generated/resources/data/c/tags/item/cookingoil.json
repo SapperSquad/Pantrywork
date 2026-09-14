@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "croptopia:olive_oil", "required": false }
+    { "id": "croptopia:olive_oil", "required": false },
+    { "id": "pamhc2foodcore:cookingoilitem", "required": false }
   ]
 }

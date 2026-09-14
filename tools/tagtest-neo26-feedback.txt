@@ -1,0 +1,118 @@
+# NeoForge 26.2 player-feedback boot (0.7.0): Croptopia + EpheroLib + Fish of
+# Thieves 26.2.1.1 (+ Cloth Config 26.2.155) + Refurbished Furniture 1.0.25
+# (+ Framework 0.13.26) on tools/neo-server-262. Every id below was checked
+# against those 26.2 jars. c:milk, c:cheese and c:butter: no mod on this harness
+# defines them natively (Croptopia 26.2 ships only the plural c:milks / c:cheeses /
+# c:butters), so they exist here purely through Pantrywork's own generated files -
+# the negative checks prove we never inject Croptopia's 16-per-bucket bottle, its
+# soy milk, or the cheese/butter made from that bottle into them. The c:drinks/milk
+# negatives prove Pantrywork no longer routes Croptopia's milks there either.
+# Run via tools\rcon.ps1 -File tools\tagtest-neo26-feedback.txt
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- Fish of Thieves fruits reach Croptopia's generic + per-fruit tags ---
+item replace block 8 -60 8 container.0 with fishofthieves:banana
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:bananas
+execute if items block 8 -60 8 container.0 #c:fruits/banana
+item replace block 8 -60 8 container.0 with fishofthieves:coconut
+execute if items block 8 -60 8 container.0 #c:coconuts
+item replace block 8 -60 8 container.0 with fishofthieves:pineapple
+execute if items block 8 -60 8 container.0 #c:pineapples
+item replace block 8 -60 8 container.0 with fishofthieves:crownless_pineapple
+execute if items block 8 -60 8 container.0 #c:pineapples
+item replace block 8 -60 8 container.0 with fishofthieves:mango
+execute if items block 8 -60 8 container.0 #c:mangos
+# --- FoT exclusions: half/raw pieces stay out of per-fruit tags ---
+# The mango_pit lines are a future-upstream guard, not proof of the blacklist: FoT
+# files the pit only under c:seeds, so there is no current tag path and removing the
+# blacklist entry still passes them. The live proof is tools\GenerateBridges.ps1 -SelfTest.
+item replace block 8 -60 8 container.0 with fishofthieves:mango_pit
+execute unless items block 8 -60 8 container.0 #c:fruits/mango
+execute unless items block 8 -60 8 container.0 #c:mangos
+execute unless items block 8 -60 8 container.0 #c:fruits
+item replace block 8 -60 8 container.0 with fishofthieves:half_pineapple
+execute unless items block 8 -60 8 container.0 #c:fruits/pineapple
+item replace block 8 -60 8 container.0 with fishofthieves:raw_mango
+execute unless items block 8 -60 8 container.0 #c:fruits/mango
+# --- Refurbished Furniture ingredients join the dialect tags ---
+item replace block 8 -60 8 container.0 with refurbished_furniture:cheese
+execute if items block 8 -60 8 container.0 #c:cheeses
+execute if items block 8 -60 8 container.0 #c:cheese
+item replace block 8 -60 8 container.0 with refurbished_furniture:dough
+execute if items block 8 -60 8 container.0 #c:doughs
+item replace block 8 -60 8 container.0 with refurbished_furniture:wheat_flour
+execute if items block 8 -60 8 container.0 #c:flour
+execute if items block 8 -60 8 container.0 #c:flours
+item replace block 8 -60 8 container.0 with refurbished_furniture:sea_salt
+execute if items block 8 -60 8 container.0 #c:salts
+# --- Refurbished exclusions: toast/slice (6 per bread) and 1-berry jam never bridged ---
+item replace block 8 -60 8 container.0 with refurbished_furniture:toast
+execute unless items block 8 -60 8 container.0 #c:toasts
+execute unless items block 8 -60 8 container.0 #c:toast
+item replace block 8 -60 8 container.0 with refurbished_furniture:bread_slice
+execute unless items block 8 -60 8 container.0 #c:toasts
+item replace block 8 -60 8 container.0 with refurbished_furniture:sweet_berry_jam
+execute unless items block 8 -60 8 container.0 #c:jellies/sweetberryjelly
+# --- c:milk dilution (B1): Croptopia bottle/soy stay out of c:milk, native c:milks intact ---
+item replace block 8 -60 8 container.0 with croptopia:milk_bottle
+execute unless items block 8 -60 8 container.0 #c:milk
+execute if items block 8 -60 8 container.0 #c:milks
+# --- c:drinks/milk dilution (0.7.0 review): out of the recipe tag, still in the dairy role ---
+execute unless items block 8 -60 8 container.0 #c:drinks/milk
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+item replace block 8 -60 8 container.0 with croptopia:soy_milk
+execute unless items block 8 -60 8 container.0 #c:milk
+execute unless items block 8 -60 8 container.0 #c:drinks/milk
+item replace block 8 -60 8 container.0 with minecraft:milk_bucket
+execute if items block 8 -60 8 container.0 #c:drinks/milk
+# --- c:cheese / c:butter dilution (0.7.0 review): bottle-made Croptopia cheese/butter keep their own plural tags only ---
+item replace block 8 -60 8 container.0 with croptopia:cheese
+execute unless items block 8 -60 8 container.0 #c:cheese
+execute if items block 8 -60 8 container.0 #c:cheeses
+item replace block 8 -60 8 container.0 with croptopia:butter
+execute unless items block 8 -60 8 container.0 #c:butter
+execute if items block 8 -60 8 container.0 #c:butters
+# --- negative control ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+execute unless items block 8 -60 8 container.0 #c:fruits
+# --- CRAFT 1 (shaped): Croptopia pineapple_chicken ("#c:pineapples" + chicken) with a FoT pineapple ---
+kill @e[type=item]
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with fishofthieves:pineapple
+item replace block 8 -60 12 container.1 with minecraft:chicken
+setblock 9 -60 12 minecraft:redstone_block
+# two gametime queries = tick flow proof + crafter result lands before the check
+time query gametime
+time query gametime
+execute if items entity @e[type=minecraft:item] contents croptopia:pineapple_chicken
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air
+# --- CRAFT 2 (shapeless): Croptopia banana_smoothie with a FoT banana ---
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with fishofthieves:banana
+item replace block 8 -60 12 container.1 with minecraft:ice
+item replace block 8 -60 12 container.2 with croptopia:milk_bottle
+item replace block 8 -60 12 container.3 with minecraft:glass_bottle
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if items entity @e[type=minecraft:item] contents croptopia:banana_smoothie
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air
+# --- CRAFT 3 (negative): half_pineapple must NOT stand in for #c:pineapples ---
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with fishofthieves:half_pineapple
+item replace block 8 -60 12 container.1 with minecraft:chicken
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if items block 8 -60 12 container.0 fishofthieves:half_pineapple
+# No "execute unless items entity @e[...]" here: on 26.2 an empty selector ERRORS
+# ("No entity was found") instead of passing. The unconsumed input above plus this
+# kill reporting "No entity was found" is the negative proof (ticks shown above).
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air

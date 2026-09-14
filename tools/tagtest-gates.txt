@@ -1,0 +1,55 @@
+# Cost-floor GATE scenarios on the NeoForge 1.21.1 RELEASE jar (tools/neo-server-1211,
+# NeoForge 21.1.241, JDK 21). GATEd entries live in pack overlays
+# (src/generated/resources/pantrywork_gate_<n>/, declared in pack.mcmeta) that apply
+# only while one of <mods> is loaded, so a gate is proven only by booting WITH and
+# WITHOUT its mods. One clean boot per scenario (stop, confirm java exited, swap jars).
+#
+# mods/ holds pantrywork-<version>.jar (the -Prelease build, not a dev jar) plus exactly
+# these jars from tools/work/jars:
+#   S1  FarmersDelight-1.21.1-1.3.2.jar, letsdo-meadow-neoforge-1.4.8.jar,
+#       architectury-13.0.11-neoforge.jar                      (no Pam's, no Croptopia)
+#   S2  S1 + pamhc2foodcore-NEOFORGE-1.21.1-1.0.4.jar          (Pam's, no Croptopia)
+#   S3  S2 + croptopia-neoforge-1.21.1-4.2.4.jar + EpheroLib-1.21.1-NEO-FORGE-1.2.0.jar
+#                                                              (Pam's AND Croptopia)
+#   S4  S1 + croptopia-neoforge-1.21.1-4.2.4.jar + EpheroLib-1.21.1-NEO-FORGE-1.2.0.jar
+#                                                              (Croptopia, no Pam's)
+#   S5  create-1.21.1-6.0.10.jar ONLY (bundles Flywheel, Ponder, Registrate): the one boot
+#       where the flour gate (Bountiful Fares | Farm & Charm | Pam's) is closed while its
+#       item exists. Run ONLY tagtest-gates-s5.txt there (this file needs FD and Meadow).
+# Farm & Charm and Bountiful Fares are never loaded, so their gates stay closed.
+#
+# On S1-S4 run THIS file (checks true in all four scenarios), then
+# tagtest-gates-s<N>.txt for that scenario, and classify each output with CountSuite:
+#   tools\rcon.ps1 -File tools\tagtest-gates.txt > gates.out
+#   powershell -File tools\CountSuite.ps1 -Suite tools\tagtest-gates.txt -Output gates.out
+# Expected: this file 12 passed / 0 failed on each boot; s1 5/0, s2 12/0, s3 16/0 (incl.
+# one craft), s4 7/0 (incl. one craft); s5 6/0 + 1 expected. Every negative below targets a tag that IS
+# defined in that scenario (by Meadow, FD, NeoForge or Pantrywork's own generated file):
+# an undefined tag prints "Unknown item tag" instead of "Test passed" - a failure, never a
+# silent pass. Wipe world/ between scenarios if a chest ever holds an item from a removed
+# mod (spurious "Tried to load invalid item" log line).
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- native members, unaffected by any gate ---
+item replace block 8 -60 8 container.0 with minecraft:milk_bucket
+execute if items block 8 -60 8 container.0 #c:milk
+item replace block 8 -60 8 container.0 with meadow:wooden_milk_bucket
+execute if items block 8 -60 8 container.0 #c:milks
+execute if items block 8 -60 8 container.0 #c:drinks/milk
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute if items block 8 -60 8 container.0 #c:drinks/milk
+# the c:foods/milk shim holds the bucket only (review CF-1); the tag is still defined here
+execute unless items block 8 -60 8 container.0 #c:foods/milk
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+# --- Farm & Charm gate always CLOSED here: FD dough out of Croptopia's c:doughs dialect ---
+# (c:doughs is defined by Pantrywork's own doughs.json even without Croptopia)
+item replace block 8 -60 8 container.0 with farmersdelight:wheat_dough
+execute unless items block 8 -60 8 container.0 #c:doughs
+execute if items block 8 -60 8 container.0 #c:dough
+execute if items block 8 -60 8 container.0 #c:foods/dough
+# --- EXCLUDEs, no gate at all ---
+item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+item replace block 8 -60 8 container.0 with meadow:cooked_buffalo_meat
+execute unless items block 8 -60 8 container.0 #c:foods/cooked_meat

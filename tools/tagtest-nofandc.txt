@@ -1,0 +1,87 @@
+# F&C-INDEPENDENCE suite. Run on `./gradlew runServer -PnoFarmAndCharm` (every
+# compat jar EXCEPT Let's Do Farm & Charm). Wipe run/world first (see CLAUDE.md).
+#
+# 0.6.0's generator skipped injecting an item whenever the target tag already
+# reached it through ANY reference - including a third mod's. Farm & Charm's
+# c:dough -> #c:doughs and c:flour -> #c:flours were such references, so without
+# F&C croptopia:dough never reached Pam's c:dough and Create's flour never
+# reached c:flour. Expected on `runServer -PnoFarmAndCharm`: 21 passed, 0 failed.
+#
+# On a FULL boot (F&C loaded) this suite is NOT vacuous any more: the three
+# `execute unless ... #c:doughs` lines in the cost-floor GATE block below (create:dough,
+# farmersdelight:wheat_dough, pamhc2foodcore:doughitem) must report "Test failed,
+# count: 1", because Farm & Charm opens that gate (its own 1/15-wheat dough is in
+# c:doughs). Measured 2026-09-13 on the full dev boot: 18 passed, exactly those 3 failed,
+# while tagtest-letsdo.txt's `create:dough in #c:doughs` passed on the same boot. Any
+# other failure on a full boot is a real bug.
+#
+# No farm_and_charm ids appear below: on this boot they do not exist, and
+# `item replace ... with farm_and_charm:x` would be a command error, not a test.
+# Absent-safety of Pantrywork's own farm_and_charm entries (all required:false)
+# is proven by the boot itself: no tag-load errors in run/logs/latest.log.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- dough: Croptopia / Create / Refurbished into Pam's c:dough without F&C ---
+item replace block 8 -60 8 container.0 with croptopia:dough
+execute if items block 8 -60 8 container.0 #c:dough
+item replace block 8 -60 8 container.0 with create:dough
+execute if items block 8 -60 8 container.0 #c:dough
+item replace block 8 -60 8 container.0 with refurbished_furniture:dough
+execute if items block 8 -60 8 container.0 #c:dough
+execute if items block 8 -60 8 container.0 #c:doughs
+# --- cost-floor GATE, live with its gate mod ABSENT (0.7.0 cost-floor pass) ---
+# Croptopia's c:doughs floor is its own 2-grain dough. Create's (2/3 wheat), FD's
+# (1 wheat + 1/3 egg) and Pam's (0.6 wheat) doughs enter it only while Farm & Charm,
+# whose own 1/15-wheat dough is already there, is loaded. This boot has no F&C, so all
+# three must be out of c:doughs and still in Pam's c:dough (whose floor they clear).
+item replace block 8 -60 8 container.0 with create:dough
+execute unless items block 8 -60 8 container.0 #c:doughs
+item replace block 8 -60 8 container.0 with farmersdelight:wheat_dough
+execute unless items block 8 -60 8 container.0 #c:doughs
+execute if items block 8 -60 8 container.0 #c:dough
+item replace block 8 -60 8 container.0 with pamhc2foodcore:doughitem
+execute unless items block 8 -60 8 container.0 #c:doughs
+execute if items block 8 -60 8 container.0 #c:dough
+# --- flour: Create / Refurbished into c:flour (Pam's + Croptopia + BF) without F&C ---
+# Create's flour is GATEd on Bountiful Fares, Farm & Charm or Pam's (it is 3x below
+# Croptopia's 2-grain flour); BF and Pam's are loaded here, so it stays.
+item replace block 8 -60 8 container.0 with create:wheat_flour
+execute if items block 8 -60 8 container.0 #c:flour
+item replace block 8 -60 8 container.0 with refurbished_furniture:wheat_flour
+execute if items block 8 -60 8 container.0 #c:flour
+# and the other way: c:flours is Create's tag on this boot
+item replace block 8 -60 8 container.0 with croptopia:flour
+execute if items block 8 -60 8 container.0 #c:flours
+item replace block 8 -60 8 container.0 with bountifulfares:flour
+execute if items block 8 -60 8 container.0 #c:flours
+# --- tags F&C also defines still load and still behave without it ---
+item replace block 8 -60 8 container.0 with croptopia:strawberry
+execute if items block 8 -60 8 container.0 #c:fruits
+item replace block 8 -60 8 container.0 with minecraft:milk_bucket
+execute if items block 8 -60 8 container.0 #c:milk
+item replace block 8 -60 8 container.0 with croptopia:milk_bottle
+execute unless items block 8 -60 8 container.0 #c:milk
+# FD bacon (half a porkchop) stays out of Pam's whole-chop c:rawpork (0.7.0 dilution
+# floor) but still reaches Farm & Charm's c:raw_pork, which on this boot exists only
+# through Pantrywork's own generated file
+item replace block 8 -60 8 container.0 with farmersdelight:bacon
+execute unless items block 8 -60 8 container.0 #c:rawpork
+execute if items block 8 -60 8 container.0 #c:raw_pork
+item replace block 8 -60 8 container.0 with minecraft:porkchop
+execute if items block 8 -60 8 container.0 #c:rawpork
+#
+# ===== CRAFT: Pam's bread_dough from Croptopia dough - the exact path 0.6.0 broke without F&C =====
+kill @e[type=item]
+setblock 8 -60 12 minecraft:air
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with pamhc2foodcore:bakewareitem
+item replace block 8 -60 12 container.1 with croptopia:dough
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if entity @e[type=minecraft:item]
+execute if items entity @e[type=minecraft:item] contents minecraft:bread
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air

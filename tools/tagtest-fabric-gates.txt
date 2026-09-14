@@ -1,0 +1,45 @@
+# Fabric cost-floor gate overlays, on any Fabric harness WITH a Croptopia build and FD
+# Refabricated: fabric-server (1.21.1, Croptopia 4.2.4), fabric-server-12110 (1.21.10, Croptopia
+# REFABRICATED - mod id croptopia-refabricated, the review CF-2 case), fabric-server-2612 and
+# fabric-server-262 (Croptopia 4.3.1). Not for fabric-server-12111 (FD only: tagtest-fabric-fd.txt).
+# Promoted from the release pass's scratch probe (review TV-3), same shape as tagtest-neo26-gates.txt:
+# - OPEN lines use `unless` with stone: an applied overlay defines its tag -> "Test passed"; an
+#   overlay that did not apply answers "Unknown item tag", unannotated, so a FAILURE.
+# - CLOSED lines use `if` and carry `# expect: Unknown item tag`; a leaked overlay answers
+#   "Test failed", a counted failure.
+# Run:      tools\rcon.ps1 -File tools\tagtest-fabric-gates.txt > fabric-gates.out
+# Classify: powershell -File tools\CountSuite.ps1 -Suite tools\tagtest-fabric-gates.txt -Output fabric-gates.out
+# Expected: 12 passed, 0 failed, 4 expected.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+item replace block 8 -60 8 container.0 with minecraft:stone
+# --- croptopia overlay OPEN (Fabric condition: any of croptopia, croptopia-refabricated) ---
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/milks
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/cheeses
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/salts
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/vegetables
+# --- CLOSED overlays ---
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/bountifulfares_or_farm_and_charm_or_pamhc2foodcore/c/flour
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/create/bridged/foods_dough
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farm_and_charm/c/doughs
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/pamhc2foodcore/c/milk
+# --- item level: FD bottle through the open croptopia gate, NOT through the closed Pam's gate ---
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/milks
+execute if items block 8 -60 8 container.0 #c:milks
+execute unless items block 8 -60 8 container.0 #c:milk
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+# --- FD cabbage leaf: the overlay tag is the gate proof; #c:vegetables is reachability only
+# (Croptopia's own c:vegetables -> #c:cabbage -> FD's #c:crops/cabbage reaches it anyway) ---
+item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/vegetables
+execute if items block 8 -60 8 container.0 #c:vegetables
+# --- Croptopia's own members intact ---
+item replace block 8 -60 8 container.0 with croptopia:milk_bottle
+execute if items block 8 -60 8 container.0 #c:milks
+item replace block 8 -60 8 container.0 with croptopia:cheese
+execute if items block 8 -60 8 container.0 #c:cheeses

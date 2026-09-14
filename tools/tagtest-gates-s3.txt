@@ -1,0 +1,55 @@
+# Gate scenario S3 (tools/neo-server-1211): S2 + Croptopia (+ EpheroLib) - Pam's AND
+# Croptopia. See tools/tagtest-gates.txt for setup. Expected: 16 passed / 0 failed.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# both milk gates OPEN
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute if items block 8 -60 8 container.0 #c:milk
+execute if items block 8 -60 8 container.0 #c:milks
+item replace block 8 -60 8 container.0 with pamhc2foodcore:freshmilkitem
+execute if items block 8 -60 8 container.0 #c:milks
+# croptopia gate OPEN for Pam's cheese and salt in the plural tags. Croptopia's c:cheeses has no
+# other path to Pam's cheese, so that line proves the gate. Pam's salt ALSO reaches c:salts
+# without the overlay (Croptopia's c:salts -> #c:salt -> Pam's #c:salt/salt), so the salt gate is
+# proven on the overlay's own tag and the #c:salts line is reachability only (review TV-1)
+item replace block 8 -60 8 container.0 with pamhc2foodcore:cheeseitem
+execute if items block 8 -60 8 container.0 #c:cheeses
+item replace block 8 -60 8 container.0 with pamhc2foodcore:saltitem
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/salts
+execute if items block 8 -60 8 container.0 #c:salts
+# EXCLUDEs with both mods present: no rescuer exists, whatever is loaded
+item replace block 8 -60 8 container.0 with pamhc2foodcore:toastitem
+execute unless items block 8 -60 8 container.0 #c:toasts
+item replace block 8 -60 8 container.0 with croptopia:toast
+execute if items block 8 -60 8 container.0 #c:toast
+item replace block 8 -60 8 container.0 with pamhc2foodcore:cookingoilitem
+execute unless items block 8 -60 8 container.0 #c:olive_oils
+item replace block 8 -60 8 container.0 with croptopia:apple_juice
+execute unless items block 8 -60 8 container.0 #c:juices/applejuice
+# Croptopia's melon juice: 1 slice, bottle returned (craft remainder), 2x below Pam's (FC1-1)
+item replace block 8 -60 8 container.0 with croptopia:melon_juice
+execute unless items block 8 -60 8 container.0 #c:juices/melonjuice
+item replace block 8 -60 8 container.0 with croptopia:milk_bottle
+execute unless items block 8 -60 8 container.0 #c:milk
+item replace block 8 -60 8 container.0 with croptopia:cheese
+execute unless items block 8 -60 8 container.0 #c:cheese
+# croptopia gate OPEN: the overlay's own tag holds FD's leaf. #c:vegetables is reachability only:
+# Croptopia's c:vegetables -> #c:cabbage -> #c:crops/cabbage (FD's own) reaches the leaf anyway
+item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/vegetables
+execute if items block 8 -60 8 container.0 #c:vegetables
+# --- CRAFT: Croptopia's grilled cheese with Pam's cheese - a GATEd entry in a real recipe ---
+kill @e[type=item]
+setblock 8 -60 12 minecraft:air
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with minecraft:bread
+item replace block 8 -60 12 container.1 with pamhc2foodcore:cheeseitem
+item replace block 8 -60 12 container.2 with croptopia:frying_pan
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if items entity @e[type=minecraft:item] contents croptopia:grilled_cheese
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air

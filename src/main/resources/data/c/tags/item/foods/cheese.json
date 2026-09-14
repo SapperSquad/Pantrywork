@@ -2,7 +2,6 @@
   "values": [
     { "id": "#c:cheeses", "required": false },
     { "id": "#c:cheese", "required": false },
-    { "id": "#brewinandchewin:foods/cheese_wedge", "required": false },
-    { "id": "#brewinandchewin:cheese_wheels/ripe", "required": false }
+    { "id": "#brewinandchewin:foods/cheese_wedge", "required": false }
   ]
 }

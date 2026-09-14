@@ -1,20 +1,22 @@
 # c:foods/milk deprecation shim. Farmer's Delight invented this tag, then deleted
 # it in 1.21.1-1.3.0; addons still referencing it lose the WHOLE recipe at parse
-# time (an undefined tag fails ingredient decoding). We restore FD's own last
-# definition EXACTLY - bucket + bottle, nothing else.
+# time (an undefined tag fails ingredient decoding). We keep the tag defined with the
+# milk BUCKET only. FD's own last definition also held its 1/4-bucket bottle; the cost
+# floor removed it (review CF-1, 2026-09-13: 4x below the bucket Bountiful Fares' cakes,
+# the only scanned reader, are balanced for).
 #
-# The NEGATIVE checks are the point of this file: c:drinks/milk resolves to six
-# items here (Croptopia's 16-per-bucket milk_bottle, cowless soy_milk, Meadow's
-# wooden bucket, Pam's fresh milk...). Nesting that tag would have handed all six
-# to third-party recipes written against a two-item tag. These assert we didn't.
+# The NEGATIVE checks are the point of this file: cheaper milks (FD's 1/4 bottle,
+# Croptopia's 16-per-bucket milk_bottle, cowless soy_milk, Pam's 1/8 fresh milk) and
+# Meadow's wooden bucket must never reach recipes written against this tag through
+# Pantrywork. These assert we didn't widen it. Expected: 15 passed / 0 failed.
 forceload add 0 0
 setblock 8 -60 8 minecraft:chest
-# --- positive: FD's historical membership, both forms ---
+# --- positive: the bucket keeps the tag defined and useful ---
 item replace block 8 -60 8 container.0 with minecraft:milk_bucket
 execute if items block 8 -60 8 container.0 #c:foods/milk
+# --- negative: NO widening below the bucket ("Test passed" = correctly absent) ---
 item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
-execute if items block 8 -60 8 container.0 #c:foods/milk
-# --- negative: NO dialect widening ("Test passed" = correctly absent) ---
+execute unless items block 8 -60 8 container.0 #c:foods/milk
 item replace block 8 -60 8 container.0 with croptopia:milk_bottle
 execute unless items block 8 -60 8 container.0 #c:foods/milk
 item replace block 8 -60 8 container.0 with croptopia:soy_milk
@@ -26,12 +28,21 @@ execute unless items block 8 -60 8 container.0 #c:foods/milk
 # --- negative: never joined to the food parent (milk has no food value) ---
 item replace block 8 -60 8 container.0 with minecraft:milk_bucket
 execute unless items block 8 -60 8 container.0 #c:foods
-# --- regression: c:drinks/milk stays the WIDE bridge, unchanged by the shim ---
+# --- regression: c:drinks/milk takes bucket-class milk but no cheaper milks (0.7.0) ---
+# Its own floor is FD's 1/4-bucket bottle. Croptopia's 1/16 bottle, cowless soy milk
+# and Pam's 1/8 fresh milk used to arrive through Pantrywork's #c:milks / #c:milk
+# refs; now they reach only the dairy role, which references those tags directly.
+execute if items block 8 -60 8 container.0 #c:drinks/milk
+item replace block 8 -60 8 container.0 with meadow:wooden_milk_bucket
 execute if items block 8 -60 8 container.0 #c:drinks/milk
 item replace block 8 -60 8 container.0 with croptopia:milk_bottle
-execute if items block 8 -60 8 container.0 #c:drinks/milk
+execute unless items block 8 -60 8 container.0 #c:drinks/milk
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+item replace block 8 -60 8 container.0 with croptopia:soy_milk
+execute unless items block 8 -60 8 container.0 #c:drinks/milk
 item replace block 8 -60 8 container.0 with pamhc2foodcore:freshmilkitem
-execute if items block 8 -60 8 container.0 #c:drinks/milk
+execute unless items block 8 -60 8 container.0 #c:drinks/milk
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
 # --- regression: milk still reaches the dairy role via the correct path ---
 item replace block 8 -60 8 container.0 with minecraft:milk_bucket
 execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy

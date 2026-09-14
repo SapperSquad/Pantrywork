@@ -6,7 +6,19 @@ item replace block 8 -60 8 container.0 with farmersdelight:cooked_bacon
 execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
 item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
 execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+# Cost-floor gates (0.7.0): FD's 1/4-bucket bottle enters Pam's c:milk only while Pam's is
+# loaded and Croptopia's c:milks only while Croptopia is loaded (pack overlays). This
+# harness has neither. Both tags are still DEFINED here - Pantrywork's own generated
+# milk.json / milks.json create them - so these lines report "Test passed" when the
+# bottle is absent. An undefined tag would print "Unknown item tag" instead, which is a
+# failure to count, never a pass. Expected on this suite: 9 passed, 0 failed.
+execute unless items block 8 -60 8 container.0 #c:milk
+execute unless items block 8 -60 8 container.0 #c:milks
+# FD bacon is half a porkchop: kept out of Pam's whole-chop c:rawpork since 0.7.0.
+# The tag exists here only through Pantrywork's own file, which still lists the chop.
 item replace block 8 -60 8 container.0 with farmersdelight:bacon
+execute unless items block 8 -60 8 container.0 #c:rawpork
+item replace block 8 -60 8 container.0 with minecraft:porkchop
 execute if items block 8 -60 8 container.0 #c:rawpork
 item replace block 8 -60 8 container.0 with farmersdelight:bone_broth
 execute if items block 8 -60 8 container.0 #c:stock

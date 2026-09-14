@@ -1,0 +1,29 @@
+# Gate scenario S2 (tools/neo-server-1211): S1 + Pam's HarvestCraft 2 Food Core.
+# NO Croptopia. See tools/tagtest-gates.txt for setup. Expected: 12 passed / 0 failed.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# pamhc2foodcore gate OPEN: Pam's own 1/8 fresh milk is in c:milk, so FD's bottle may be
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute if items block 8 -60 8 container.0 #c:milk
+# croptopia gate CLOSED: Meadow's c:milks keeps its bucket floor
+execute unless items block 8 -60 8 container.0 #c:milks
+item replace block 8 -60 8 container.0 with pamhc2foodcore:freshmilkitem
+execute if items block 8 -60 8 container.0 #c:milk
+execute unless items block 8 -60 8 container.0 #c:milks
+execute unless items block 8 -60 8 container.0 #c:drinks/milk
+# Pam's cheese and salt: native to Pam's own tags, GATEd on Croptopia in Meadow's plural ones
+item replace block 8 -60 8 container.0 with pamhc2foodcore:cheeseitem
+execute if items block 8 -60 8 container.0 #c:cheese
+execute unless items block 8 -60 8 container.0 #c:cheeses
+item replace block 8 -60 8 container.0 with pamhc2foodcore:saltitem
+execute if items block 8 -60 8 container.0 #c:salt
+execute unless items block 8 -60 8 container.0 #c:salts
+# Pam's dough: GATEd on Create in c:foods/dough (closed here), EXCLUDEd pasta
+item replace block 8 -60 8 container.0 with pamhc2foodcore:doughitem
+execute unless items block 8 -60 8 container.0 #c:foods/dough
+item replace block 8 -60 8 container.0 with pamhc2foodcore:pastaitem
+execute unless items block 8 -60 8 container.0 #c:foods/pasta
+# croptopia gate CLOSED: FD's cabbage leaf is not in c:vegetables (Pam's c:vegetables/* hold
+# beetroot, carrot, potato and pumpkin only; no path to the leaf without the overlay, TV-1)
+item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
+execute unless items block 8 -60 8 container.0 #c:vegetables

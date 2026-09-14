@@ -35,12 +35,10 @@
     { "id": "farm_and_charm:strawberry", "required": false },
     { "id": "farm_and_charm:tomato", "required": false },
     { "id": "farmersdelight:cabbage", "required": false },
-    { "id": "farmersdelight:cabbage_leaf", "required": false },
     { "id": "farmersdelight:onion", "required": false },
     { "id": "farmersdelight:tomato", "required": false },
     { "id": "minecraft:beetroot", "required": false },
     { "id": "minecraft:carrot", "required": false },
-    { "id": "minecraft:potato", "required": false },
-    { "id": "minecraft:pumpkin", "required": false }
+    { "id": "minecraft:potato", "required": false }
   ]
 }

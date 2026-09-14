@@ -4,20 +4,33 @@
 forceload add 0 0
 setblock 8 -60 8 minecraft:chest
 # --- juices: Croptopia snake_case vs Pam's concatenated ---
-item replace block 8 -60 8 container.0 with croptopia:apple_juice
-execute if items block 8 -60 8 container.0 #c:juices/applejuice
+# Pam's apple juice is two apples, Croptopia's one: Pam's reaches Croptopia's name, but
+# Croptopia's apple juice stays out of Pam's tag (cost floor, 2x below). Melon juice is
+# slices: Pam's 2 slices (2) vs Croptopia's 1 slice (1; its glass bottle is the juice's craft
+# remainder and comes back) is also 2x, so only Pam's crosses (final check FC1-1; a slice is one
+# gathered unit since FC2-4)
 item replace block 8 -60 8 container.0 with pamhc2foodcore:applejuiceitem
 execute if items block 8 -60 8 container.0 #c:juices/apple_juice
+item replace block 8 -60 8 container.0 with croptopia:apple_juice
+execute unless items block 8 -60 8 container.0 #c:juices/applejuice
+item replace block 8 -60 8 container.0 with pamhc2foodcore:melonjuiceitem
+execute if items block 8 -60 8 container.0 #c:juices/melon_juice
 item replace block 8 -60 8 container.0 with croptopia:melon_juice
-execute if items block 8 -60 8 container.0 #c:juices/melonjuice
+execute unless items block 8 -60 8 container.0 #c:juices/melonjuice
 # --- toast: c:toasts vs c:toast ---
+# Croptopia's toast is a whole bread and fills Pam's c:toast; Pam's is half a bread +
+# half a butter and stays out of Croptopia's c:toasts (SapperSquad, 2026-09-13)
 item replace block 8 -60 8 container.0 with croptopia:toast
 execute if items block 8 -60 8 container.0 #c:toast
 item replace block 8 -60 8 container.0 with pamhc2foodcore:toastitem
-execute if items block 8 -60 8 container.0 #c:toasts
+execute unless items block 8 -60 8 container.0 #c:toasts
 # --- ground pork: flat tag vs nested tag ---
+# Croptopia's ground pork presses tofu as readily as a porkchop (cheapest route: no meat), so
+# it stays out of Pam's whole-meat c:groundmeats/groundpork (review CF-3); Pam's (grinder +
+# porkchop -> 2) still fills Croptopia's c:ground_pork
 item replace block 8 -60 8 container.0 with croptopia:ground_pork
-execute if items block 8 -60 8 container.0 #c:groundmeats/groundpork
+execute unless items block 8 -60 8 container.0 #c:groundmeats/groundpork
+execute unless items block 8 -60 8 container.0 #c:groundmeats
 item replace block 8 -60 8 container.0 with pamhc2foodcore:groundporkitem
 execute if items block 8 -60 8 container.0 #c:ground_pork
 # --- cereals: three mods, three shapes (grain/x, grains/xs, crops/grain) ---

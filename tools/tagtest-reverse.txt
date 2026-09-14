@@ -3,23 +3,37 @@
 forceload add 0 0
 setblock 8 -60 8 minecraft:chest
 # --- foreign members in dialect tags ---
+# (Pam's cheese in c:cheeses is GATEd on Croptopia and FD dough in c:doughs on Farm &
+# Charm - cost-floor pass - both loaded on the full boot this suite runs on)
 item replace block 8 -60 8 container.0 with pamhc2foodcore:cheeseitem
 execute if items block 8 -60 8 container.0 #c:cheeses
-item replace block 8 -60 8 container.0 with croptopia:cheese
+item replace block 8 -60 8 container.0 with brewinandchewin:flaxen_cheese_wedge
 execute if items block 8 -60 8 container.0 #c:cheese
 item replace block 8 -60 8 container.0 with farmersdelight:wheat_dough
 execute if items block 8 -60 8 container.0 #c:dough
 execute if items block 8 -60 8 container.0 #c:doughs
-item replace block 8 -60 8 container.0 with croptopia:butter
-execute if items block 8 -60 8 container.0 #c:butter
+item replace block 8 -60 8 container.0 with pamhc2foodcore:butteritem
+execute if items block 8 -60 8 container.0 #c:butters
 item replace block 8 -60 8 container.0 with farmersdelight:bacon
-execute if items block 8 -60 8 container.0 #c:rawpork
+execute if items block 8 -60 8 container.0 #c:raw_pork
+# --- dilution floors (0.7.0 review): these used to cross and must not any more ---
+# Croptopia's cheese/butter are made from its 1/16-bucket bottle (Pam's own cost 1/8);
+# FD bacon is half a porkchop (Pam's c:rawpork is whole chops only).
+item replace block 8 -60 8 container.0 with croptopia:cheese
+execute unless items block 8 -60 8 container.0 #c:cheese
+item replace block 8 -60 8 container.0 with croptopia:butter
+execute unless items block 8 -60 8 container.0 #c:butter
+item replace block 8 -60 8 container.0 with farmersdelight:bacon
+execute unless items block 8 -60 8 container.0 #c:rawpork
 item replace block 8 -60 8 container.0 with farmersdelight:bone_broth
 execute if items block 8 -60 8 container.0 #c:stock
 item replace block 8 -60 8 container.0 with farmersdelight:raw_pasta
 execute if items block 8 -60 8 container.0 #c:pasta
 item replace block 8 -60 8 container.0 with croptopia:olive_oil
 execute if items block 8 -60 8 container.0 #c:cookingoil
+# the other direction is below the floor: Pam's oil is half a vegetable, Croptopia's 2 olives
+item replace block 8 -60 8 container.0 with pamhc2foodcore:cookingoilitem
+execute unless items block 8 -60 8 container.0 #c:olive_oils
 # --- pre-existing convergence sanity (no Pantrywork involvement) ---
 item replace block 8 -60 8 container.0 with croptopia:salt
 execute if items block 8 -60 8 container.0 #c:salt
@@ -30,20 +44,48 @@ item replace block 8 -60 12 container.0 with minecraft:bread
 item replace block 8 -60 12 container.1 with pamhc2foodcore:cheeseitem
 item replace block 8 -60 12 container.2 with croptopia:frying_pan
 setblock 9 -60 12 minecraft:redstone_block
+# tick pad: with Create/BF/FoT/Refurbished loaded (0.7.0) the crafter tick lands after the
+# next RCON command, so an unpadded contents check races it (proven 2026-09-13: fails
+# unpadded, the follow-up kill still reports result + tool remainder; passes padded)
+time query gametime
+time query gametime
 execute if items entity @e[type=minecraft:item] contents croptopia:grilled_cheese
 kill @e[type=item]
 setblock 9 -60 12 minecraft:air
 setblock 8 -60 12 minecraft:air
-# --- CRAFT B: Pam's grilledcheeseandham with Croptopia butter+cheese and FD bacon (4 mods) ---
+# --- CRAFT B: Pam's grilledcheeseandham with F&C butter, a B&C cheese wedge and a porkchop (4 mods) ---
+# (0.7.0: Croptopia's butter/cheese and FD bacon fall below these slots' cost floors)
 kill @e[type=item]
 setblock 8 -60 12 minecraft:crafter[orientation=up_north]
 item replace block 8 -60 12 container.0 with pamhc2foodcore:skilletitem
 item replace block 8 -60 12 container.1 with minecraft:bread
-item replace block 8 -60 12 container.2 with croptopia:butter
-item replace block 8 -60 12 container.3 with croptopia:cheese
-item replace block 8 -60 12 container.4 with farmersdelight:bacon
+item replace block 8 -60 12 container.2 with farm_and_charm:butter
+item replace block 8 -60 12 container.3 with brewinandchewin:flaxen_cheese_wedge
+item replace block 8 -60 12 container.4 with minecraft:porkchop
 setblock 9 -60 12 minecraft:redstone_block
+# tick pad: with Create/BF/FoT/Refurbished loaded (0.7.0) the crafter tick lands after the
+# next RCON command, so an unpadded contents check races it (proven 2026-09-13: fails
+# unpadded, the follow-up kill still reports result + tool remainder; passes padded)
+time query gametime
+time query gametime
 execute if items entity @e[type=minecraft:item] contents pamhc2foodcore:grilledcheeseandhamitem
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air
+# --- CRAFT C (negative): the same recipe must refuse Croptopia's bottle-made cheese ---
+# Asserted on the unconsumed input slot, never on an empty entity selector; the
+# follow-up kill must report no entity.
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with pamhc2foodcore:skilletitem
+item replace block 8 -60 12 container.1 with minecraft:bread
+item replace block 8 -60 12 container.2 with farm_and_charm:butter
+item replace block 8 -60 12 container.3 with croptopia:cheese
+item replace block 8 -60 12 container.4 with minecraft:porkchop
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if items block 8 -60 12 container.3 croptopia:cheese
+execute if items block 8 -60 12 container.4 minecraft:porkchop
 kill @e[type=item]
 setblock 9 -60 12 minecraft:air
 setblock 8 -60 12 minecraft:air

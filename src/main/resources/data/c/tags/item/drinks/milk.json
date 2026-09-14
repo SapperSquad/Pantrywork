@@ -1,6 +1,5 @@
 {
   "values": [
-    { "id": "#c:milks", "required": false },
-    { "id": "#c:milk", "required": false }
+    { "id": "#pantrywork:bridged/drinks_milk", "required": false }
   ]
 }

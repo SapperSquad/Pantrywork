@@ -1,0 +1,8 @@
+{
+  "values": [
+    { "id": "farm_and_charm:flour", "required": false },
+    { "id": "pamhc2foodcore:flouritem", "required": false },
+    { "id": "refurbished_furniture:wheat_flour", "required": false },
+    { "id": "#pantrywork:gated/bountifulfares_or_farm_and_charm_or_pamhc2foodcore/c/flour", "required": false }
+  ]
+}

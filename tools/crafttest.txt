@@ -9,6 +9,11 @@ item replace block 8 -60 12 container.0 with minecraft:bread
 item replace block 8 -60 12 container.1 with farmersdelight:cooked_bacon
 item replace block 8 -60 12 container.2 with farmersdelight:cabbage_leaf
 setblock 9 -60 12 minecraft:redstone_block
+# tick pad: with Create/BF/FoT/Refurbished loaded (0.7.0) the crafter tick lands after the
+# next RCON command, so an unpadded `if entity` check races it (proven 2026-09-13: fails
+# unpadded, the follow-up kill still reports Cake; passes padded)
+time query gametime
+time query gametime
 execute if entity @e[type=minecraft:item]
 execute if items entity @e[type=minecraft:item,limit=1] contents minecraft:cake
 kill @e[type=item]
@@ -20,6 +25,11 @@ item replace block 8 -60 12 container.0 with minecraft:bread
 item replace block 8 -60 12 container.1 with minecraft:cooked_beef
 item replace block 8 -60 12 container.2 with minecraft:carrot
 setblock 9 -60 12 minecraft:redstone_block
+# tick pad: with Create/BF/FoT/Refurbished loaded (0.7.0) the crafter tick lands after the
+# next RCON command, so an unpadded `if entity` check races it (proven 2026-09-13: fails
+# unpadded, the follow-up kill still reports Cake; passes padded)
+time query gametime
+time query gametime
 execute if entity @e[type=minecraft:item]
 execute if items entity @e[type=minecraft:item,limit=1] contents minecraft:cake
 kill @e[type=item]

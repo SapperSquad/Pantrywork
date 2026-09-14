@@ -2,6 +2,9 @@
   "values": [
     "#c:foods/cooked_meat",
     "#c:foods/cooked_fish",
-    { "id": "#c:foods/cooked_egg", "required": false }
+    { "id": "#c:foods/cooked_egg", "required": false },
+    { "id": "meadow:cooked_buffalo_meat", "required": false },
+    { "id": "farm_and_charm:roasted_chicken", "required": false },
+    { "id": "oceansdelight:cooked_elder_guardian_slice", "required": false }
   ]
 }

@@ -1,0 +1,435 @@
+# 0.7.0 player-feedback bridges: Refurbished Furniture, Create, Bountiful Fares,
+# Fish of Thieves, Pam's fried egg - plus the three bugs 0.6.0 shipped (c:milk
+# dilution, melon/pumpkin BLOCKS in canonical food tags, bridges that silently
+# depended on a third mod being installed).
+# Run on the full `./gradlew runServer` boot (every compat jar loaded).
+# "Test passed" on an `unless` line means the item is correctly ABSENT. Each
+# `unless` guards a real hazard (dilution, a seed, a block), so a failure there
+# is a bug, not a missing feature.
+#
+# NOT checkable in game: aquaculture:largemouth_bass is 26.x-only (Aquaculture
+# 2.9.x; the 1.21.1 dev server has 2.7.21), so check the generated FILES instead.
+# Expect 3 matches (rawfish, fishes, raw_fishes):
+#   Select-String -Path src\generated\resources\data\c\tags\item\rawfish.json,src\generated\resources\data\c\tags\item\fishes.json,src\generated\resources\data\c\tags\item\raw_fishes.json -Pattern largemouth_bass
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- REFURBISHED: identity-safe ingredients bridged (Refurbished tags none of them) ---
+item replace block 8 -60 8 container.0 with refurbished_furniture:cheese
+execute if items block 8 -60 8 container.0 #c:cheese
+execute if items block 8 -60 8 container.0 #c:cheeses
+execute if items block 8 -60 8 container.0 #c:foods/cheese
+item replace block 8 -60 8 container.0 with refurbished_furniture:wheat_flour
+execute if items block 8 -60 8 container.0 #c:flour
+execute if items block 8 -60 8 container.0 #c:flours
+item replace block 8 -60 8 container.0 with refurbished_furniture:sea_salt
+execute if items block 8 -60 8 container.0 #c:salt
+execute if items block 8 -60 8 container.0 #c:salts
+item replace block 8 -60 8 container.0 with refurbished_furniture:dough
+execute if items block 8 -60 8 container.0 #c:dough
+execute if items block 8 -60 8 container.0 #c:doughs
+execute if items block 8 -60 8 container.0 #c:foods/dough
+# --- REFURBISHED: dilution guards (1 bread -> 6 slices -> 6 toast; jam = 1 berry, no sugar) ---
+# Refurbished itself files bread_slice and toast in c:foods/bread - its call, not
+# asserted here. What must never happen is a Pantrywork bridge handing them to
+# recipes balanced for a whole-bread toast or a sugared jelly.
+item replace block 8 -60 8 container.0 with refurbished_furniture:toast
+execute unless items block 8 -60 8 container.0 #c:toast
+execute unless items block 8 -60 8 container.0 #c:toasts
+item replace block 8 -60 8 container.0 with refurbished_furniture:bread_slice
+execute unless items block 8 -60 8 container.0 #c:toast
+execute unless items block 8 -60 8 container.0 #c:toasts
+item replace block 8 -60 8 container.0 with refurbished_furniture:sweet_berry_jam
+execute unless items block 8 -60 8 container.0 #c:jams
+execute unless items block 8 -60 8 container.0 #c:jellies/sweetberryjelly
+execute unless items block 8 -60 8 container.0 #c:jellies/glowberryjelly
+execute unless items block 8 -60 8 container.0 #c:jellies/applejelly
+execute unless items block 8 -60 8 container.0 #c:jellies/melonjelly
+execute unless items block 8 -60 8 container.0 #c:jellies/chorusjelly
+item replace block 8 -60 8 container.0 with refurbished_furniture:glow_berry_jam
+execute unless items block 8 -60 8 container.0 #c:jams
+execute unless items block 8 -60 8 container.0 #c:jellies/glowberryjelly
+execute unless items block 8 -60 8 container.0 #c:jellies/sweetberryjelly
+execute unless items block 8 -60 8 container.0 #c:jellies/applejelly
+execute unless items block 8 -60 8 container.0 #c:jellies/melonjelly
+execute unless items block 8 -60 8 container.0 #c:jellies/chorusjelly
+# --- CREATE: dough (c:foods/dough) and flour (c:flours) reach Pam's + Croptopia names ---
+# (create:dough in Croptopia's c:doughs is GATEd on Farm & Charm since the cost-floor pass:
+# asserted IN by tagtest-letsdo.txt and OUT by tagtest-nofandc.txt, never here, because
+# this file runs on both boots)
+item replace block 8 -60 8 container.0 with create:dough
+execute if items block 8 -60 8 container.0 #c:dough
+execute if items block 8 -60 8 container.0 #c:foods/dough
+item replace block 8 -60 8 container.0 with create:wheat_flour
+execute if items block 8 -60 8 container.0 #c:flour
+execute if items block 8 -60 8 container.0 #c:flours
+# cinder flour is netherrack dust, not food
+item replace block 8 -60 8 container.0 with create:cinder_flour
+execute unless items block 8 -60 8 container.0 #c:flour
+execute unless items block 8 -60 8 container.0 #c:flours
+# honeyed apple is a processed treat (golden_apple precedent), not a raw fruit
+item replace block 8 -60 8 container.0 with create:honeyed_apple
+execute unless items block 8 -60 8 container.0 #c:fruits
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/fruit
+# --- BOUNTIFUL FARES: maize (c:foods/corn only) <-> Croptopia / F&C corn ---
+item replace block 8 -60 8 container.0 with bountifulfares:maize
+execute if items block 8 -60 8 container.0 #c:corn
+execute if items block 8 -60 8 container.0 #c:crops/corn
+execute if items block 8 -60 8 container.0 #c:grain/corn
+execute if items block 8 -60 8 container.0 #c:grains/corn
+execute if items block 8 -60 8 container.0 #c:grain
+execute if items block 8 -60 8 container.0 #c:foods/corn
+item replace block 8 -60 8 container.0 with croptopia:corn
+execute if items block 8 -60 8 container.0 #c:foods/corn
+# seeds never cross a bridge (croptopia:corn_seed IS in Croptopia's own c:corn - upstream, not asserted)
+# The maize_seeds lines are a future-upstream guard: BF files the seed in no corn tag, so
+# there is no current tag path and removing the seed rule still passes them. The
+# croptopia:corn_seed lines below are the live proof (they fail if Test-IsSeed is disabled).
+item replace block 8 -60 8 container.0 with bountifulfares:maize_seeds
+execute unless items block 8 -60 8 container.0 #c:corn
+execute unless items block 8 -60 8 container.0 #c:crops/corn
+execute unless items block 8 -60 8 container.0 #c:grain/corn
+execute unless items block 8 -60 8 container.0 #c:grains/corn
+execute unless items block 8 -60 8 container.0 #c:foods/corn
+item replace block 8 -60 8 container.0 with croptopia:corn_seed
+execute unless items block 8 -60 8 container.0 #c:crops/corn
+execute unless items block 8 -60 8 container.0 #c:grain/corn
+execute unless items block 8 -60 8 container.0 #c:grains/corn
+execute unless items block 8 -60 8 container.0 #c:foods/corn
+# --- BOUNTIFUL FARES <-> CROPTOPIA: orange / lemon / plum / elderberry / walnut, both directions ---
+item replace block 8 -60 8 container.0 with bountifulfares:orange
+execute if items block 8 -60 8 container.0 #c:oranges
+execute if items block 8 -60 8 container.0 #c:fruits/orange
+execute if items block 8 -60 8 container.0 #c:fruits
+item replace block 8 -60 8 container.0 with croptopia:orange
+execute if items block 8 -60 8 container.0 #c:foods/oranges
+item replace block 8 -60 8 container.0 with bountifulfares:lemon
+execute if items block 8 -60 8 container.0 #c:lemons
+execute if items block 8 -60 8 container.0 #c:fruits/lemon
+item replace block 8 -60 8 container.0 with croptopia:lemon
+execute if items block 8 -60 8 container.0 #c:foods/lemons
+item replace block 8 -60 8 container.0 with bountifulfares:plum
+execute if items block 8 -60 8 container.0 #c:plums
+execute if items block 8 -60 8 container.0 #c:fruits/plum
+item replace block 8 -60 8 container.0 with croptopia:plum
+execute if items block 8 -60 8 container.0 #c:foods/plums
+item replace block 8 -60 8 container.0 with bountifulfares:elderberries
+execute if items block 8 -60 8 container.0 #c:elderberries
+execute if items block 8 -60 8 container.0 #c:fruits/elderberry
+item replace block 8 -60 8 container.0 with croptopia:elderberry
+execute if items block 8 -60 8 container.0 #c:foods/elderberries
+item replace block 8 -60 8 container.0 with bountifulfares:walnut
+execute if items block 8 -60 8 container.0 #c:walnuts
+execute if items block 8 -60 8 container.0 #c:nuts/walnut
+execute if items block 8 -60 8 container.0 #c:nuts
+item replace block 8 -60 8 container.0 with croptopia:walnut
+execute if items block 8 -60 8 container.0 #c:foods/walnuts
+item replace block 8 -60 8 container.0 with bountifulfares:hoary_apple
+execute if items block 8 -60 8 container.0 #c:fruits
+# --- BOUNTIFUL FARES: "coconut" is the palm SAPLING item (no food) - never spread by us ---
+# Do NOT assert it absent from #c:fruits: Croptopia's own c:fruits -> #c:coconuts pulls it in upstream.
+item replace block 8 -60 8 container.0 with bountifulfares:coconut
+execute unless items block 8 -60 8 container.0 #c:foods/fruit
+execute unless items block 8 -60 8 container.0 #c:fruits/coconut
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/fruit
+# --- COOKED EGG: BF + Pam's + Croptopia into FD's c:foods/cooked_egg (each = 1 egg) ---
+item replace block 8 -60 8 container.0 with bountifulfares:cooked_egg
+execute if items block 8 -60 8 container.0 #c:foods/cooked_egg
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+item replace block 8 -60 8 container.0 with pamhc2foodcore:friedeggitem
+execute if items block 8 -60 8 container.0 #c:foods/cooked_egg
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+item replace block 8 -60 8 container.0 with croptopia:sunny_side_eggs
+execute if items block 8 -60 8 container.0 #c:foods/cooked_egg
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+# scrambled / boiled are dishes, not a fried-egg ingredient; a raw egg is not cooked
+item replace block 8 -60 8 container.0 with pamhc2foodcore:scrambledeggitem
+execute unless items block 8 -60 8 container.0 #c:foods/cooked_egg
+item replace block 8 -60 8 container.0 with pamhc2foodcore:boiledeggitem
+execute unless items block 8 -60 8 container.0 #c:foods/cooked_egg
+item replace block 8 -60 8 container.0 with croptopia:scrambled_eggs
+execute unless items block 8 -60 8 container.0 #c:foods/cooked_egg
+item replace block 8 -60 8 container.0 with minecraft:egg
+execute unless items block 8 -60 8 container.0 #c:foods/cooked_egg
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component/protein
+# --- FISH OF THIEVES: generic c:fruits + Croptopia per-fruit tags, whole fruit only ---
+item replace block 8 -60 8 container.0 with fishofthieves:banana
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:fruits/banana
+execute if items block 8 -60 8 container.0 #c:bananas
+item replace block 8 -60 8 container.0 with fishofthieves:coconut
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:fruits/coconut
+execute if items block 8 -60 8 container.0 #c:coconuts
+item replace block 8 -60 8 container.0 with fishofthieves:mango
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:fruits/mango
+execute if items block 8 -60 8 container.0 #c:mangos
+item replace block 8 -60 8 container.0 with fishofthieves:pineapple
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:fruits/pineapple
+execute if items block 8 -60 8 container.0 #c:pineapples
+item replace block 8 -60 8 container.0 with fishofthieves:crownless_pineapple
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:fruits/pineapple
+execute if items block 8 -60 8 container.0 #c:pineapples
+item replace block 8 -60 8 container.0 with fishofthieves:pomegranate
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+item replace block 8 -60 8 container.0 with fishofthieves:guardian_fruit
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+# raw (unripe) mango: generic fruit per FoT's own tag, but never a Croptopia mango
+item replace block 8 -60 8 container.0 with fishofthieves:raw_mango
+execute if items block 8 -60 8 container.0 #c:fruits
+execute unless items block 8 -60 8 container.0 #c:fruits/mango
+execute unless items block 8 -60 8 container.0 #c:mangos
+# a half pineapple is a portion, not a pineapple
+item replace block 8 -60 8 container.0 with fishofthieves:half_pineapple
+execute unless items block 8 -60 8 container.0 #c:fruits/pineapple
+execute unless items block 8 -60 8 container.0 #c:pineapples
+# seeds and the mango pit (a seed Test-IsSeed cannot see by name) stay out.
+# Future-upstream guard, not proof of the rules: FoT files the pit and both seeds
+# only under c:seeds, so there is no current tag path and removing the blacklist
+# entry or the seed rule still passes these lines. The live proof is
+# tools\GenerateBridges.ps1 -SelfTest, which plants them in the fruit tags.
+item replace block 8 -60 8 container.0 with fishofthieves:mango_pit
+execute unless items block 8 -60 8 container.0 #c:fruits
+execute unless items block 8 -60 8 container.0 #c:fruits/mango
+execute unless items block 8 -60 8 container.0 #c:mangos
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/fruit
+item replace block 8 -60 8 container.0 with fishofthieves:pineapple_seeds
+execute unless items block 8 -60 8 container.0 #c:fruits
+execute unless items block 8 -60 8 container.0 #c:fruits/pineapple
+execute unless items block 8 -60 8 container.0 #c:pineapples
+item replace block 8 -60 8 container.0 with fishofthieves:pomegranate_seeds
+execute unless items block 8 -60 8 container.0 #c:fruits
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/fruit
+# fish follow FoT's own raw/cooked classification into Pam's / Ocean's dialects
+item replace block 8 -60 8 container.0 with fishofthieves:splashtail
+execute if items block 8 -60 8 container.0 #c:rawfish
+execute if items block 8 -60 8 container.0 #c:fishes
+execute if items block 8 -60 8 container.0 #c:raw_fishes
+item replace block 8 -60 8 container.0 with fishofthieves:cooked_splashtail
+execute if items block 8 -60 8 container.0 #c:cookedfish
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+# --- BREWIN' & CHEWIN' preserves into Pam's per-flavour jelly slots (B&C costs more) ---
+item replace block 8 -60 8 container.0 with brewinandchewin:sweet_berry_jam
+execute if items block 8 -60 8 container.0 #c:jellies/sweetberryjelly
+item replace block 8 -60 8 container.0 with brewinandchewin:glow_berry_marmalade
+execute if items block 8 -60 8 container.0 #c:jellies/glowberryjelly
+item replace block 8 -60 8 container.0 with brewinandchewin:apple_jelly
+execute if items block 8 -60 8 container.0 #c:jellies/applejelly
+# --- 0.6.0 BUG: BLOCKS in canonical food tags (Pam's melon / pumpkin blocks) ---
+item replace block 8 -60 8 container.0 with minecraft:melon
+execute unless items block 8 -60 8 container.0 #c:foods/fruit
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/fruit
+item replace block 8 -60 8 container.0 with minecraft:melon_slice
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+item replace block 8 -60 8 container.0 with minecraft:pumpkin
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/vegetable
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+item replace block 8 -60 8 container.0 with minecraft:carrot
+execute if items block 8 -60 8 container.0 #c:foods/vegetable
+# --- 0.6.0 BUG: c:milk DILUTION (floor = Pam's 1/8-bucket fresh milk) ---
+item replace block 8 -60 8 container.0 with croptopia:milk_bottle
+execute unless items block 8 -60 8 container.0 #c:milk
+# regression: Croptopia's OWN c:milks still holds its bottle
+execute if items block 8 -60 8 container.0 #c:milks
+item replace block 8 -60 8 container.0 with croptopia:soy_milk
+execute unless items block 8 -60 8 container.0 #c:milk
+item replace block 8 -60 8 container.0 with minecraft:milk_bucket
+execute if items block 8 -60 8 container.0 #c:milk
+item replace block 8 -60 8 container.0 with meadow:wooden_milk_bucket
+execute if items block 8 -60 8 container.0 #c:milk
+item replace block 8 -60 8 container.0 with pamhc2foodcore:freshmilkitem
+execute if items block 8 -60 8 container.0 #c:milk
+# FD's 1/4 bottle is 4x below F&C's and Meadow's bucket floors, but Pam's own 1/8 fresh
+# milk is already in c:milk: GATEd on Pam's (cost-floor pass), open on both dev boots.
+# The gate-closed case is proven on the release jar by tools/tagtest-gates-s1.txt.
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute if items block 8 -60 8 container.0 #c:milk
+# ...and into Croptopia's c:milks only while Croptopia (its own 1/16 bottle) is loaded
+execute if items block 8 -60 8 container.0 #c:milks
+item replace block 8 -60 8 container.0 with pamhc2foodcore:freshmilkitem
+execute if items block 8 -60 8 container.0 #c:milks
+# (The "bridges that depended on a third mod" bug is proven on a -PnoFarmAndCharm boot by
+# tagtest-nofandc.txt and offline by AuditRoles.ps1 check 6; on this full boot such lines
+# could never fail, so none live here.)
+# --- 0.7.0 REVIEW: c:drinks/milk floor = FD's 1/4-bucket bottle ---
+# Pantrywork's own c:drinks/milk used to reference #c:milks + #c:milk outright.
+item replace block 8 -60 8 container.0 with croptopia:milk_bottle
+execute unless items block 8 -60 8 container.0 #c:drinks/milk
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+item replace block 8 -60 8 container.0 with croptopia:soy_milk
+execute unless items block 8 -60 8 container.0 #c:drinks/milk
+item replace block 8 -60 8 container.0 with pamhc2foodcore:freshmilkitem
+execute unless items block 8 -60 8 container.0 #c:drinks/milk
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute if items block 8 -60 8 container.0 #c:drinks/milk
+item replace block 8 -60 8 container.0 with meadow:wooden_milk_bucket
+execute if items block 8 -60 8 container.0 #c:drinks/milk
+# --- 0.7.0 REVIEW: Croptopia cheese/butter (made from its 1/16 bottle) only in Croptopia's own tags ---
+item replace block 8 -60 8 container.0 with croptopia:cheese
+execute unless items block 8 -60 8 container.0 #c:cheese
+execute if items block 8 -60 8 container.0 #c:cheeses
+execute if items block 8 -60 8 container.0 #c:foods/cheese
+item replace block 8 -60 8 container.0 with croptopia:butter
+execute unless items block 8 -60 8 container.0 #c:butter
+execute if items block 8 -60 8 container.0 #c:butters
+execute if items block 8 -60 8 container.0 #c:foods/butter
+item replace block 8 -60 8 container.0 with brewinandchewin:flaxen_cheese_wedge
+execute if items block 8 -60 8 container.0 #c:cheese
+# --- 0.7.0 REVIEW: half-portion cuts never enter Pam's whole-item meat/fish tags ---
+# (Farm & Charm items and F&C-only tags are asserted in tagtest-letsdo.txt, so this file
+# stays free of ids that do not exist on a -PnoFarmAndCharm boot.)
+item replace block 8 -60 8 container.0 with farmersdelight:bacon
+execute unless items block 8 -60 8 container.0 #c:rawpork
+execute if items block 8 -60 8 container.0 #c:foods/raw_pork
+item replace block 8 -60 8 container.0 with minecraft:porkchop
+execute if items block 8 -60 8 container.0 #c:rawpork
+item replace block 8 -60 8 container.0 with farmersdelight:minced_beef
+execute unless items block 8 -60 8 container.0 #c:rawbeef
+item replace block 8 -60 8 container.0 with farmersdelight:chicken_cuts
+execute unless items block 8 -60 8 container.0 #c:rawchicken
+item replace block 8 -60 8 container.0 with farmersdelight:mutton_chops
+execute unless items block 8 -60 8 container.0 #c:rawmutton
+item replace block 8 -60 8 container.0 with farmersdelight:cod_slice
+execute unless items block 8 -60 8 container.0 #c:rawfish
+execute unless items block 8 -60 8 container.0 #c:fishes
+item replace block 8 -60 8 container.0 with oceansdelight:fugu_slice
+execute unless items block 8 -60 8 container.0 #c:rawfish
+execute unless items block 8 -60 8 container.0 #c:fishes
+item replace block 8 -60 8 container.0 with oceansdelight:elder_guardian_slice
+execute unless items block 8 -60 8 container.0 #c:rawfish
+item replace block 8 -60 8 container.0 with farmersdelight:cooked_salmon_slice
+execute unless items block 8 -60 8 container.0 #c:cookedfish
+item replace block 8 -60 8 container.0 with oceansdelight:cooked_elder_guardian_slice
+execute unless items block 8 -60 8 container.0 #c:cookedfish
+item replace block 8 -60 8 container.0 with aquaculture:fish_fillet_cooked
+execute unless items block 8 -60 8 container.0 #c:cookedfish
+execute if items block 8 -60 8 container.0 #c:foods/cooked_fish
+item replace block 8 -60 8 container.0 with farmersdelight:cooked_chicken_cuts
+execute unless items block 8 -60 8 container.0 #c:cookedchicken
+item replace block 8 -60 8 container.0 with farmersdelight:cooked_mutton_chops
+execute unless items block 8 -60 8 container.0 #c:cookedmutton
+item replace block 8 -60 8 container.0 with farmersdelight:cooked_bacon
+execute unless items block 8 -60 8 container.0 #c:cookedpork
+item replace block 8 -60 8 container.0 with farmersdelight:beef_patty
+execute unless items block 8 -60 8 container.0 #c:cookedbeef
+# whole fish still cross
+item replace block 8 -60 8 container.0 with aquaculture:atlantic_cod
+execute if items block 8 -60 8 container.0 #c:rawfish
+item replace block 8 -60 8 container.0 with oceansdelight:guardian_tail
+execute if items block 8 -60 8 container.0 #c:rawfish
+# --- 0.7.0 COST-FLOOR PASS (SapperSquad 2026-09-13: the floor, strictly, everywhere) ---
+# Every EXCLUDE that needs no Farm & Charm id (those live in tagtest-letsdo.txt), plus the
+# GATEs whose gate mods are loaded on BOTH dev boots. Each negative names the floor it breaks.
+# Pam's toast = half a bread + half a butter; Croptopia's c:toasts floor is a whole bread
+item replace block 8 -60 8 container.0 with pamhc2foodcore:toastitem
+execute unless items block 8 -60 8 container.0 #c:toasts
+# Pam's cooking oil = half a vegetable; Croptopia's c:olive_oils floor is 2 olives
+item replace block 8 -60 8 container.0 with pamhc2foodcore:cookingoilitem
+execute unless items block 8 -60 8 container.0 #c:olive_oils
+execute if items block 8 -60 8 container.0 #c:cookingoil
+# Croptopia's one-apple juice against Pam's two-apple juice (x2.00). Melon juice is slices on
+# both sides - Pam's 2 slices (2), Croptopia's 1 slice (1; the glass bottle is its craft
+# remainder and comes back), x2.00 - so it stays out too (FC1-1; slice = 1 unit since FC2-4)
+item replace block 8 -60 8 container.0 with croptopia:apple_juice
+execute unless items block 8 -60 8 container.0 #c:juices/applejuice
+item replace block 8 -60 8 container.0 with croptopia:melon_juice
+execute unless items block 8 -60 8 container.0 #c:juices/melonjuice
+# Croptopia's ground pork presses tofu as readily as a porkchop (no meat on its cheapest route):
+# out of Pam's c:groundmeats/groundpork, and so out of Pam's meatloaf's #c:groundmeats (review CF-3)
+item replace block 8 -60 8 container.0 with croptopia:ground_pork
+execute unless items block 8 -60 8 container.0 #c:groundmeats/groundpork
+# Pam's pasta (0.6 wheat) against FD's raw pasta (a whole FD dough) in c:foods/pasta
+item replace block 8 -60 8 container.0 with pamhc2foodcore:pastaitem
+execute unless items block 8 -60 8 container.0 #c:foods/pasta
+execute if items block 8 -60 8 container.0 #c:pasta
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/starch
+# Pam's dough (0.6 wheat) is 1.8x below FD's dough but Create's own dough rescues it
+item replace block 8 -60 8 container.0 with pamhc2foodcore:doughitem
+execute if items block 8 -60 8 container.0 #c:foods/dough
+# FD's cabbage leaf is half a cabbage: not a whole vegetable for FD's and B&C's recipes,
+# still a leafy green (FD's own tag) and garnish; in c:vegetables only with Croptopia,
+# whose own c:vegetables already pulls the leaf in
+item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+execute if items block 8 -60 8 container.0 #c:vegetables
+# Ocean's Delight cuts (6 fugu slices per pufferfish, 9 elder guardian slices per slab) left
+# c:foods/raw_fish, which also routed pufferfish meat past FD's c:foods/safe_raw_fish;
+# still meat for Origins
+item replace block 8 -60 8 container.0 with oceansdelight:fugu_slice
+execute unless items block 8 -60 8 container.0 #c:foods/raw_fish
+execute unless items block 8 -60 8 container.0 #c:foods/safe_raw_fish
+execute if items block 8 -60 8 container.0 #origins:meat
+item replace block 8 -60 8 container.0 with oceansdelight:elder_guardian_slice
+execute unless items block 8 -60 8 container.0 #c:foods/raw_fish
+execute unless items block 8 -60 8 container.0 #c:foods/safe_raw_fish
+item replace block 8 -60 8 container.0 with oceansdelight:cooked_elder_guardian_slice
+execute unless items block 8 -60 8 container.0 #c:foods/cooked_fish
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+# a melon slice is raw gathered produce, the melon block's drop: 1 unit (SapperSquad, FC2-4), so
+# it is a fruit for Croptopia's and Pam's generic fruit recipes as well as in c:foods/fruit
+item replace block 8 -60 8 container.0 with minecraft:melon_slice
+execute if items block 8 -60 8 container.0 #c:fruits
+# Pam's salt (1/8 water bucket) is 2x below Meadow's alpine salt; Croptopia's 1/16 salt rescues
+# (GATE croptopia). Reachability only, NOT gate proof: Croptopia's own c:salts -> #c:salt -> Pam's
+# #c:salt/salt reaches saltitem with or without the overlay (tagtest-gates-s3 and the GameTest
+# assert the overlay's own tag; review TV-1)
+item replace block 8 -60 8 container.0 with pamhc2foodcore:saltitem
+execute if items block 8 -60 8 container.0 #c:salts
+# Pam's cheese (1/8 bucket) is 2x below Meadow's slice; Croptopia's 1/16 cheese rescues
+item replace block 8 -60 8 container.0 with pamhc2foodcore:cheeseitem
+execute if items block 8 -60 8 container.0 #c:cheeses
+#
+# ===== CRAFTS (crafter at 8 -60 12, redstone at 9 -60 12) =====
+# Results race the 150ms RCON cadence: two gametime queries pad the crafter tick,
+# and the authoritative signal is what the follow-up `kill @e[type=item]` reports.
+kill @e[type=item]
+setblock 8 -60 12 minecraft:air
+setblock 9 -60 12 minecraft:air
+# --- CRAFT A: FD egg_sandwich (bread + 2x c:foods/cooked_egg) from Pam's fried egg + BF cooked egg ---
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with minecraft:bread
+item replace block 8 -60 12 container.1 with pamhc2foodcore:friedeggitem
+item replace block 8 -60 12 container.2 with bountifulfares:cooked_egg
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if entity @e[type=minecraft:item]
+execute if items entity @e[type=minecraft:item] contents farmersdelight:egg_sandwich
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air
+# --- CRAFT B: Pam's bread_dough (c:tool_bakeware + c:dough) from Create dough ---
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with pamhc2foodcore:bakewareitem
+item replace block 8 -60 12 container.1 with create:dough
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if entity @e[type=minecraft:item]
+execute if items entity @e[type=minecraft:item] contents minecraft:bread
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air
+# --- CRAFT C: Croptopia banana_nut_bread (cinnamon + sugar + c:flour + c:bananas + c:nuts) ---
+# three bridges at once: Create flour -> c:flour, FoT banana -> c:fruits/banana, BF walnut -> c:nuts/walnut
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with croptopia:cinnamon
+item replace block 8 -60 12 container.1 with minecraft:sugar
+item replace block 8 -60 12 container.2 with create:wheat_flour
+item replace block 8 -60 12 container.3 with fishofthieves:banana
+item replace block 8 -60 12 container.4 with bountifulfares:walnut
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if entity @e[type=minecraft:item]
+execute if items entity @e[type=minecraft:item] contents croptopia:banana_nut_bread
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air
