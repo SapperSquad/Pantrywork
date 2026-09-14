@@ -374,10 +374,13 @@ every release — images can't be grepped and go stale invisibly.
   listing (`mod_license`/jar metadata match), **MIT** LICENSE in the GitHub repo. Authors who
   want to depend on or extend the taxonomy work from the MIT source.
 - Platforms that received the 0.3.0 release: **Modrinth + CurseForge**, three files each
-  (published 2026-08-09, single clean publish.ps1 run). 0.7.0 upload: pending (SapperSquad), four
-  files plus the Fabric API dependency on the two Fabric files, the new store copy, and the banner,
-  gallery 2 and gallery 4 on both stores. Check the live pages for which of 0.4.0–0.6.0 went up
-  before uploading.
+  (published 2026-08-09, single clean publish.ps1 run). **0.7.0 published 2026-09-14 to both stores**
+  (commit `33ac9ff`): four files each via one clean `publish.ps1` run; Modrinth verified live (four
+  versions, SHA-1s match `dist/0.7.0`, Fabric API `P7dR8mSH` required on both Fabric files). Same pass:
+  summary + description replaced on both stores (Modrinth via the API, CurseForge via the authors
+  portal), banner / gallery 2 / gallery 4 replaced on both, the old three deleted, and every gallery
+  image titled and captioned identically on both stores (Modrinth's two-layers card had carried the
+  banner's caption; fixed).
 
 ## Publish-time hazard: the store-id env vars are GLOBAL
 
