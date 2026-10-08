@@ -340,6 +340,23 @@ in the log below.
     1.21.10 and 4.3.x/4.4.x for 1.21.11) and **no 26.x build on any loader**, so on the two 26.x files
     the blueberry entries are simply inert. Only the 1.21.1 Fabric build is the same 2.6.2 whose tags
     were read here; the 4.x builds were not inspected.
+- **2026-10-08 — 0.8.0 PUBLISHED to both stores.** `tools\publish.ps1 -Version 0.8.0
+  -ChangelogFile tools\changelog-current.md` exit 0: four files to Modrinth (`0.8.0+mc1.21.1`,
+  `+mc1.21.x-fabric`, `+mc26-fabric`, `+mc26`) and four to CurseForge, all eight in one run, no
+  duplicates — the Modrinth version list reads exactly four 0.8.0 rows whose SHA-1s are E61935B3 /
+  0728AF65 / EB67143E / 1E2615AF, and all four CurseForge files show **Approved**. Store copy moved
+  in the same pass per the mirror rule: Summary and Project description via
+  `PATCH /v2/project/rNg1wypx` (204) on Modrinth and the General + Description tabs on CurseForge,
+  gallery 4 replaced on both. Both public pages read back correct.
+  **Three gotchas worth keeping:**
+  1. **The Modrinth summary field is capped at 256 characters** and the first 0.8.0 draft was 295.
+     CurseForge's is also 256 (its field shows a live counter; the final line measures 246).
+  2. **PS 5.1 `Invoke-RestMethod` decodes Modrinth's JSON as Latin-1** (Modrinth sends
+     `application/json` with no charset), so em dashes and the 🍞 come back as `â€”` / `ðŸž` and the
+     page looks corrupted when it is not. Verify with an explicit UTF-8 decode of the raw bytes
+     before "fixing" anything — the live text was correct both times this looked wrong.
+  3. Modrinth's project GET is cached ~20s after a write; a read-back straight after a gallery POST
+     will show the old list.
 Version roadmap: no 1.20.x (pre-`c:`-unification). When FD's NeoForge 26.x port lands
 (PR #1374 / Refabricated `neoforge/26.1` branch), boot it on the neo-26 harnesses and add the
 craft-level assert to `tagtest-neo26-compat.txt`.
@@ -352,16 +369,29 @@ craft-level assert to `tagtest-neo26-compat.txt`.
       2026-10-07 (0.8.0, the staged SHA-1s above): all four jars hold the same 146 payload files (129
       data files + `pack.mcmeta` + 16 conditional-overlay tag files), with no test recipe, structure
       template or gametest class. (0.7.0 block, superseded: 126 payload files, same result.)
-- [ ] **Fabric API is a required dependency of both Fabric files, on BOTH stores (from 0.7.0).**
+- [x] **Fabric API is a required dependency of both Fabric files, on BOTH stores (from 0.7.0).**
       `publish.ps1` sends it (Modrinth project `P7dR8mSH`, `required`; CurseForge relation slug
       `fabric-api`, `requiredDependency`) and both Fabric jars declare `"fabric-api": "*"` in
-      `fabric.mod.json` — re-read out of the staged 0.8.0 jars in this pass. After the upload, open the
-      two Fabric files on Modrinth and on CurseForge and confirm Fabric API is listed as required; add
-      it by hand where a store dropped it. Tick only after looking at the live pages. **Re-open this
-      for every release**: it was ticked for no version yet, and 0.8.0 ships four new files.
-- [ ] **Gallery 4 is replaced on BOTH stores.** It is the only image that changed at 0.8.0, and it
+      `fabric.mod.json` — re-read out of the staged 0.8.0 jars in this pass.
+      **Confirmed live 2026-10-08, and the earlier doubt is now explained.** Modrinth: the version
+      API shows `P7dR8mSH / required` on `0.8.0+mc1.21.x-fabric` and `0.8.0+mc26-fabric`, and on
+      neither NeoForge file. CurseForge: **it is there, but no public page renders it.** The file
+      page shows only name/uploader/size/loader/versions, and *Relations → Dependencies* on the
+      project page says "Dependencies (0)" because that tab is **project-level only**. Per-file
+      relations live in the authors UI at
+      `authors.curseforge.com/#/projects/1617573/files/<fileId>` → *Related Projects (Dependencies)*,
+      which reads **Fabric API / Required Dependency** on file 9095774 (Fabric 1.21.x) and 9095775
+      (Fabric 26), and "There are no relations for this project" on 9095773 (NeoForge 1.21.1) —
+      exactly the right scoping. **Do not "fix" this by adding a project-level relation:** that would
+      apply to the NeoForge files too and tell NeoForge users to install Fabric API. Re-check the
+      same three author pages each release.
+- [x] **Gallery 4 is replaced on BOTH stores.** It is the only image that changed at 0.8.0, and it
       carries the mod count (now twenty-one). The banner and gallery 2 regenerate byte-identical, so leave
-      them alone. Tick after looking at both live galleries.
+      them alone. Done 2026-10-08: Modrinth via the gallery API (new card featured, the old
+      "Fourteen mods bridged" deleted — note `DELETE ?url=` wants the **`_350.webp`** url from the
+      listing, not `raw_url`, which 400s); CurseForge via the Media tab (uploaded, retitled
+      "Twenty-one mods bridged", Feature Media starred, description set, old card deleted). Both
+      galleries read back as five images with the twenty-one-mod card present.
 - [x] **Branding: DECIDED — Pantrywork** (SapperSquad, 2026-07-19). Mod id `pantrywork` locked and carried
       through code/data/tools/docs the same day; GameTests re-verified green under the new id.
 - [x] Confirm the `-PnoCompatMods` boot is green — it is the regression test proving every cross-mod
@@ -373,9 +403,12 @@ craft-level assert to `tagtest-neo26-compat.txt`.
 
 ## Summary (the short-description field)
 
+**HARD LIMIT 256 CHARACTERS on Modrinth** — the API rejects a longer one. Measure before pasting;
+the first 0.8.0 draft was 295 and would have failed. The line below is **246**.
+
 > The ore dictionary that food mods never got. Bridges twenty-one mods — Farmer's Delight, Croptopia,
-> Pam's, the Let's Do series, Create, Kaleidoscope Cookery and more — into one shared tag vocabulary,
-> so one mod's cheese, salt, cooking oil or blueberry works in another's recipes at a fair price.
+> Pam's, the Let's Do series and more — into one shared tag vocabulary, so one mod's cheese, salt or
+> oil works in another's recipes at a fair price.
 
 ---
 
