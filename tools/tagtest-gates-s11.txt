@@ -1,0 +1,61 @@
+# Gate scenario S11 (tools/neo-server-1211), NEW in 0.8.0.
+# Pantrywork release jar + Let's Do Farm & Charm 1.1.23 + Architectury + Farmer's Delight
+# 1.3.2 + Hearth and Harvest 1.3.4. NO Kaleidoscope Cookery, no Pam's, no Croptopia, no Cook's.
+# S10 with Kaleidoscope Cookery swapped for Farmer's Delight + Hearth and Harvest.
+# Do NOT run tagtest-gates.txt here. Expected: 17 passed / 0 failed / 3 expected.
+#
+# What this boot proves:
+#   gate _10 (farmersdelight) OPEN - Farm & Charm's 1/3 chicken_parts into c:foods/raw_chicken,
+#            rescued by FD's own 1/2 chicken cuts. The OPEN half of S10's assertion.
+#   gate _1  (bountifulfares|farm_and_charm) OPEN at item level - Hearth and Harvest's 1/2
+#            flour and corn meal into c:flour, rescued by Farm & Charm's 1/4 flour. S6 is the
+#            same two items with that gate CLOSED.
+#   gate _9  OPEN at item level with FD's wheat dough.
+#   gate _3  CLOSED with H&H's 1/32 salt present and no Cook's Collection to rescue it: it
+#            reaches the new c:dusts/salt dialect (H&H defines that tag itself) but neither
+#            c:salt nor c:salts.
+#   gates _7, _8, _13, _14 CLOSED.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- gate _10 OPEN ---
+item replace block 8 -60 8 container.0 with farm_and_charm:chicken_parts
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight/bridged/foods_raw_chicken
+execute if items block 8 -60 8 container.0 #c:foods/raw_chicken
+# ...but Pam's whole-bird c:rawchicken dialect still refuses it (EXCLUDE, no gate anywhere)
+execute unless items block 8 -60 8 container.0 #c:rawchicken
+item replace block 8 -60 8 container.0 with minecraft:chicken
+execute if items block 8 -60 8 container.0 #c:foods/raw_chicken
+# --- gate _9 OPEN with Farmer's Delight's dough ---
+item replace block 8 -60 8 container.0 with farmersdelight:wheat_dough
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farm_and_charm/c/doughs
+execute if items block 8 -60 8 container.0 #c:doughs
+# --- gate _1 OPEN with Farm & Charm as the rescuer ---
+item replace block 8 -60 8 container.0 with hearthandharvest:flour
+execute if items block 8 -60 8 container.0 #pantrywork:gated/bountifulfares_or_farm_and_charm/c/flour
+execute if items block 8 -60 8 container.0 #c:flour
+item replace block 8 -60 8 container.0 with hearthandharvest:corn_meal
+execute if items block 8 -60 8 container.0 #c:flour
+# --- gate _3 CLOSED: H&H's 1/32 salt is in its own c:dusts/salt but in neither salt dialect ---
+item replace block 8 -60 8 container.0 with hearthandharvest:salt
+execute if items block 8 -60 8 container.0 #c:dusts/salt
+execute unless items block 8 -60 8 container.0 #c:salt
+execute unless items block 8 -60 8 container.0 #c:salts
+# --- 0.8.0 item 6 and gate _14 CLOSED: H&H's butter crosses, its goat bottle does not ---
+item replace block 8 -60 8 container.0 with hearthandharvest:butter
+execute if items block 8 -60 8 container.0 #c:butters
+item replace block 8 -60 8 container.0 with hearthandharvest:goat_milk_bottle
+execute unless items block 8 -60 8 container.0 #c:milk
+# --- gates _7, _8 and _13 CLOSED ---
+item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
+execute unless items block 8 -60 8 container.0 #c:vegetables
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+item replace block 8 -60 8 container.0 with farmersdelight:cod_slice
+execute unless items block 8 -60 8 container.0 #c:raw_fishes
+# --- overlay level ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/kaleidoscope_cookery/c/raw_fishes
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection/c/salt
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/culturaldelights_or_rusticdelight/bridged/vegetable

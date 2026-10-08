@@ -1,24 +1,35 @@
 # Gate scenario S5 (tools/neo-server-1211): Pantrywork release jar + Create 6.0.10 ONLY
-# (create-1.21.1-6.0.10.jar bundles Flywheel, Ponder and Registrate). No Bountiful Fares, Farm &
-# Charm, Pam's, FD or Meadow. The only boot where the flour gate (pantrywork_gate_1: Bountiful
-# Fares | Farm & Charm | Pam's) is CLOSED while its item exists (review TV-2): every dev boot
-# carries BF and Pam's, and S1-S4 carry no Create. Do NOT run tagtest-gates.txt here.
-# Classify with tools\CountSuite.ps1. Expected: 6 passed / 0 failed / 1 expected.
+# (create-1.21.1-6.0.10.jar bundles Flywheel, Ponder and Registrate). No Bountiful Fares,
+# Farm & Charm, Kaleidoscope Cookery, Pam's, FD or Meadow. The only boot where gate _2
+# (Bountiful Fares | Farm & Charm | Kaleidoscope Cookery | Pam's) is CLOSED while its item
+# exists (review TV-2); S7 is its OPEN counterpart, with Kaleidoscope Cookery as the only
+# rescuer. Do NOT run tagtest-gates.txt here. Classify with tools\CountSuite.ps1.
+# Expected: 6 passed / 0 failed / 5 expected.
 forceload add 0 0
 setblock 8 -60 8 minecraft:chest
 item replace block 8 -60 8 container.0 with create:wheat_flour
 # Create is loaded (its own c:flours holds the flour), or the negatives below prove nothing
 execute if items block 8 -60 8 container.0 #c:flours
-# flour gate CLOSED: c:flour exists here only through Pantrywork's generated flour.json
+# gate _2 CLOSED: c:flour exists here only through Pantrywork's generated flour.json
 execute unless items block 8 -60 8 container.0 #c:flour
 # ...and the overlay's own tag is undefined (a leaked overlay answers "Test failed")
 # expect: Unknown item tag
-execute if items block 8 -60 8 container.0 #pantrywork:gated/bountifulfares_or_farm_and_charm_or_pamhc2foodcore/c/flour
+execute if items block 8 -60 8 container.0 #pantrywork:gated/bountifulfares_or_farm_and_charm_or_kaleidoscope_cookery_or_pamhc2foodcore/c/flour
 item replace block 8 -60 8 container.0 with create:dough
 # Create's own c:foods/dough, and Pam's c:dough name (ungated PASS; defined by our dough.json)
 execute if items block 8 -60 8 container.0 #c:foods/dough
 execute if items block 8 -60 8 container.0 #c:dough
-# Farm & Charm gate CLOSED: Create dough out of Croptopia's c:doughs (defined by our doughs.json)
+# gate _9 (Farm & Charm) CLOSED: Create dough out of Croptopia's c:doughs (our doughs.json)
 execute unless items block 8 -60 8 container.0 #c:doughs
-# create gate OPEN: its overlay tag exists (it lists Pam's dough, absent here, so it is empty)
+# gate _5 OPEN: its overlay tag exists (it lists Pam's dough, absent here, so it is empty)
 execute unless items block 8 -60 8 container.0 #pantrywork:gated/create/bridged/foods_dough
+# --- the other 0.8.0 overlays are all closed on a Create-only boot ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/bountifulfares_or_farm_and_charm/c/flour
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight/bridged/foods_raw_chicken
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight_or_rusticdelight/bridged/raw_fishes
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/kaleidoscope_cookery/c/raw_fishes

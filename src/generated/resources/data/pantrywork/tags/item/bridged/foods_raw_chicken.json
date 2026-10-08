@@ -1,0 +1,6 @@
+{
+  "values": [
+    { "id": "minecraft:chicken", "required": false },
+    { "id": "#pantrywork:gated/farmersdelight/bridged/foods_raw_chicken", "required": false }
+  ]
+}

@@ -92,7 +92,18 @@ $vettedNs = New-Object System.Collections.Generic.HashSet[string]
 [void]$vettedNs.Add('minecraft')
 function Test-IsUnvetted($id) { return -not $vettedNs.Contains(($id -split ':')[0]) }
 
-$neoforgeJar = Get-ChildItem "$env:USERPROFILE\.gradle\caches\modules-2\files-2.1\net.neoforged\neoforge\21.1.241" -Recurse -Filter "neoforge-21.1.241-universal.jar" | Select-Object -First 1 -ExpandProperty FullName
+# Own-mod seed/food filing, for Test-IsSeed's third rule (0.8.0 blocker B1). Filled by
+# Add-OwnFiledEntries (CostFloor.ps1, shared with AuditRoles.ps1) while the jars are scanned:
+# an item lands in $ownSeedFiled when the jar that OWNS its namespace lists it directly in a
+# planting tag, and in $ownFoodFiled when that jar lists it directly in a food-evidence c: tag.
+$ownSeedFiled = New-Object System.Collections.Generic.HashSet[string]
+$ownFoodFiled = New-Object System.Collections.Generic.HashSet[string]
+
+# The platform convention tags come from the NeoForge build gradle.properties pins
+# (Resolve-PlatformNeoJar in CostFloor.ps1, shared with AuditRoles.ps1 so the two can never
+# read different platform jars). Until 0.8.0 this was a hardcoded 21.1.241 path.
+$platformNeo = Resolve-PlatformNeoJar $root
+$neoforgeJar = $platformNeo.path
 $sources = @($neoforgeJar) + (Get-ChildItem $jarsDir -Filter "*.jar" | ForEach-Object FullName)
 # tools/work/jars-12110 (the Fabric 1.21.10 / 1.21.11 harness compat jars: Croptopia Refabricated,
 # FD Refabricated 3.4.2 and 3.6.13) is ALWAYS scanned, so the documented command
@@ -113,21 +124,29 @@ foreach ($jar in $sources) {
   $modIds = @(Get-JarModIds $zip)
   # definers use the canonical id (an alias such as croptopia-refabricated counts as croptopia)
   $primaryMod = if ($modIds.Count) { Resolve-ModAlias $costData $modIds[0] } else { [IO.Path]::GetFileNameWithoutExtension($jar) }
+  # the namespaces THIS jar owns: its [[mods]] ids (canonical and alias) plus every
+  # assets/<ns>/lang it ships. Add-OwnFiledEntries uses it to ignore any tag entry naming
+  # another mod's item, so only a mod's own classification of its own item counts.
+  $jarNs = New-Object System.Collections.Generic.HashSet[string]
+  foreach ($m in $modIds) { [void]$jarNs.Add($m); [void]$jarNs.Add((Resolve-ModAlias $costData $m)) }
   foreach ($e in $zip.Entries) {
-    if ($e.FullName -match '^assets/([^/]+)/lang/[^/]+\.json$') { [void]$vettedNs.Add($matches[1]) }
+    if ($e.FullName -match '^assets/([^/]+)/lang/[^/]+\.json$') { [void]$vettedNs.Add($matches[1]); [void]$jarNs.Add($matches[1]) }
   }
   # c: tags keyed by bare path ("foods/cheese"); every other namespace keyed
   # "ns:path" ("brewinandchewin:foods/cheese_wedge") so a food mod that files
   # its items behind its own tag (not a c: tag) can still be followed by a
-  # canonical tag that references it. minecraft: tags are skipped as noise.
+  # canonical tag that references it. minecraft: tags are skipped as noise for the
+  # unions, but they are still read for the own-mod seed/food filing above
+  # (minecraft:villager_plantable_seeds is one of the planting signals).
   foreach ($e in ($zip.Entries | Where-Object { $_.FullName -match '^data/[^/]+/tags/item/.+\.json$' })) {
     $ns = ($e.FullName -split '/')[1]
-    if ($ns -eq 'minecraft') { continue }
     $r = New-Object IO.StreamReader($e.Open()); $json = $r.ReadToEnd(); $r.Close()
     $path = $e.FullName -replace "^data/$ns/tags/item/",'' -replace '\.json$',''
-    $key = if ($ns -eq 'c') { $path } else { "${ns}:$path" }
-    Add-TagFile $key $json
     $tid = "${ns}:$path"
+    Add-OwnFiledEntries $tid (ConvertFrom-Json $json).values $jarNs $ownSeedFiled $ownFoodFiled
+    if ($ns -eq 'minecraft') { continue }
+    $key = if ($ns -eq 'c') { $path } else { $tid }
+    Add-TagFile $key $json
     if (-not $definers.ContainsKey($tid)) { $definers[$tid] = New-Object System.Collections.Generic.HashSet[string] }
     [void]$definers[$tid].Add($primaryMod)
   }
@@ -173,8 +192,35 @@ function Resolve-Tag($tagPath, $visited) {
 #     further. BF's edible coconut_half has no counterpart in any other mod.
 #   - create:honeyed_apple: a processed treat Create files as c:foods/fruit, same
 #     precedent as golden_apple - not a raw fruit for another mod's recipe.
-#   - fishofthieves:mango_pit: a planting seed that Test-IsSeed misses (FoT files
-#     it under c:seeds, but the name is neither "_seed" nor "_seeds").
+#   - create:chocolate_glazed_berries (0.8.0 review M3): the same item class as
+#     honeyed_apple - a candied treat Create files in its own c:foods/berry - and it
+#     reached Croptopia's c:fruits only because Rustic Delight's c:foods/fruit
+#     references #c:foods/berry. Blacklisted for the same reason as its sibling.
+#   - biomeswevegone:soul_fruit (0.8.0, SapperSquad's decision): a DEBUFF food. Its
+#     FoodProperties are nutrition 4 / saturation 0.35 plus
+#     effect(new MobEffectInstance(MobEffects.BLINDNESS, 40), 1.0f) - read out of
+#     BWGItems.lambda$static$16 in the 2.6.2 NeoForge jar, with the invokedynamic ->
+#     BootstrapMethods -> lambda mapping checked (soul_fruit is BSM #17, i.e.
+#     lambda$static$16; baobab_fruit, green_apple and yucca_fruit were read the same way
+#     and carry NO effect). BYG files it in its own c:foods/fruit, which the 'fruits'
+#     category reads, so without this line it would be emitted into Croptopia's c:fruits
+#     and from there satisfy Pam's fruit punch / fruit salad / trail mix, Croptopia's
+#     fruit smoothie / fruit cake and Rustic Delight's beignet / sweet salad - 7 recipes
+#     into which a cost floor cannot see, because the floor measures PROCESSING EFFORT and
+#     has no concept of a debuff (soul_fruit is a gathered drop, so it costs exactly the
+#     1 produce the c:fruits floor wants: x1.00 PASS). Measured, not assumed: BWGItems
+#     builds its FoodProperties with a MobEffectInstance of MobEffects.BLINDNESS, and
+#     BWGMiscConfig$SOUL_FRUIT exposes ALLOW_SOUL_FRUIT_BLINDNESS / SOUL_FRUIT_BLINDNESS /
+#     SOUL_FRUIT_BLINDNESS_RANGE, so a player can configure the debuff away - this denial
+#     is written for the default, the same way the cost model is. Same precedent as
+#     minecraft:golden_apple and create:honeyed_apple above: bridges widen ingredient
+#     pools, they do not re-litigate another mod's exclusions - and no other mod put a
+#     blindness food in its fruit slots. BYG's own blueberry_pie / green_apple_pie name
+#     their fruit by exact item id, so nothing of BYG's own is affected either way.
+#   - fishofthieves:mango_pit: a planting seed. Test-IsSeed's third rule now also
+#     catches it (FoT files it in its own c:seeds and in no food tag of its own), but
+#     the entry stays: it is the one id -SelfTest plants to prove the blacklist itself
+#     is live, and the blacklist is checked before the seed rule in every category.
 #   - Brewin' & Chewin' ripe cheese WHEELS: food-less BlockItems (BnCItems builds
 #     them as new BlockItem(..., stacksTo(16)) with no .food()). 0.1.0-0.7.0 copied
 #     them into c:cheese / c:cheeses and reached c:foods/cheese through a hand ref.
@@ -183,6 +229,8 @@ $blacklist = @('minecraft:pufferfish', 'minecraft:golden_apple',
                'minecraft:enchanted_golden_apple', 'minecraft:golden_carrot',
                'minecraft:melon', 'minecraft:pumpkin',
                'bountifulfares:coconut', 'create:honeyed_apple',
+               'create:chocolate_glazed_berries',
+               'biomeswevegone:soul_fruit',
                'fishofthieves:mango_pit',
                'brewinandchewin:flaxen_cheese_wheel', 'brewinandchewin:scarlet_cheese_wheel')
 
@@ -199,18 +247,32 @@ $seedSet = New-Object System.Collections.Generic.HashSet[string]
 foreach ($seedTag in @('seeds', 'seeds/', 'villager_plantable_seeds')) {
   foreach ($i in (Resolve-Tag $seedTag (New-Object System.Collections.Generic.HashSet[string]))) { [void]$seedSet.Add($i) }
 }
-# Neither signal is sufficient alone, so combine them:
-#   - name ending "_seed"/"_sapling" is unambiguous; no mod ships food named that.
-#   - "_seeds" is ambiguous (roasted_pumpkin_seeds is food), so it only counts as
-#     a seed when the ecosystem ALSO files it under c:seeds.
-#   - c:seeds membership alone is not sufficient either: plantable foods such as
-#     farm_and_charm:onion and vanilla potato/carrot live there and must stay.
-$blacklistPattern = '_seed$|_sapling$'
+# ===== Test-IsSeed: KEEP THIS BLOCK BYTE-IDENTICAL IN GenerateBridges.ps1 AND AuditRoles.ps1 =====
+# No single signal is sufficient, so three rules are combined:
+#   1. a name ending "_seed"/"_sapling" is unambiguous; no mod ships food named that.
+#   2. "_seeds" is ambiguous (croptopia:roasted_pumpkin_seeds and roasted_sunflower_seeds
+#      are real food), so it only counts as a seed when the ecosystem ALSO files it in c:seeds.
+#   3. 0.8.0 (blocker B1): a name rule cannot see "corn_kernels", "avocado_pit", "kernels",
+#      "wild_rice" or "sweet_berry_pips" at all, and culturaldelights:corn_kernels and
+#      hearthandharvest:corn_kernels shipped inside c:crops/corn, c:foods/corn and the whole
+#      grain family because of it. For those the item's OWN mod is the authority: a mod that
+#      files its own item in a planting tag (c:seeds, c:seeds/<crop>,
+#      minecraft:villager_plantable_seeds) and in NO food tag of its own has called it seed
+#      stock. Both halves are measured from the jars - Add-OwnFiledEntries,
+#      Test-IsPlantingTag and Test-IsFoodEvidenceTag in CostFloor.ps1.
+# Plain c:seeds membership is still not sufficient on its own, and rule 3's second half is what
+# keeps every plantable FOOD bridging, out of its own mod's own files: farm_and_charm:onion
+# (c:vegetables + c:crops/onion), farmersdelight:rice and kaleidoscope_cookery:rice
+# (c:crops/rice, c:crops/grain, c:grain/rice), hearthandharvest:peanut and its red/green grapes
+# (c:foods, c:foods/fruit, c:foods/berry, c:nuts, c:fruits/grape), rusticdelight:coffee_beans
+# (c:crops/coffee). Croptopia's roasted seeds are in no planting tag at all, so no rule sees them.
 function Test-IsSeed($id) {
-  if ($id -match $blacklistPattern) { return $true }
+  if ($id -match '_seed$|_sapling$') { return $true }
   if ($id -match '_seeds$' -and $seedSet.Contains($id)) { return $true }
+  if ($ownSeedFiled.Contains($id) -and -not $ownFoodFiled.Contains($id)) { return $true }
   return $false
 }
+# ===== end of the shared Test-IsSeed block =====
 
 # -SelfTest plants: each of the first four is caught by exactly one rule - the
 # blacklist (mango_pit), the c:seeds half of Test-IsSeed (pineapple_seeds), the name
@@ -270,8 +332,24 @@ $categories = @(
   @{ name='dough';          tags=@('doughs','dough','foods/dough');                   extra=@('refurbished_furniture:dough');       emit=@('doughs','dough') },
   @{ name='butter';         tags=@('butters','butter','foods/butter');                emit=@('butters','butter') },
   @{ name='milk';           tags=@('milks','milk','drinks/milk');                     emit=@('milks','milk') },
-  @{ name='salt';           tags=@('salts','salt');                                   extra=@('refurbished_furniture:sea_salt');    emit=@('salts','salt') },
-  @{ name='oil';            tags=@('olive_oils','cookingoil');                        emit=@('olive_oils','cookingoil') },
+  # hybrid_delights:salt is in NO tag at all (that jar ships only c:tools/knife), so it is named here;
+  # the jar itself is staged in tools/work/jars because Test-IsUnvetted applies to 'extra' ids too.
+  #
+  # c:dusts/salt (0.8.0 item 7) is the third salt dialect and the one with the most readers: 36
+  # recipes (Hearth and Harvest 25, Cultural Delights 7, Cook's Collection 4) against c:salt's 17
+  # (Pam's) and c:salts' 46-63 (Croptopia + Meadow). It is defined by Cook's (cookscollection:salt),
+  # CD (the same id, optional) and H&H (its own 1/32 salt). THE TRAP: Cook's c:salt and c:salts are
+  # literally "#c:dusts/salt", so every entry here is also reachable from those two tags and has to
+  # survive their floors - the audit's check 7 judges it there as well. It does survive, and not by
+  # luck: the only route in is through Cook's OWN "#c:dusts/salt" reference, which puts
+  # cookscollection on the path, and cookscollection's chased floor in both tags is H&H's 1/32 -
+  # the cheapest salt in the scanned set - so cookscollection rescues anything this tag can hold.
+  @{ name='salt';           tags=@('salts','salt','dusts/salt');                      extra=@('refurbished_furniture:sea_salt','hybrid_delights:salt');    emit=@('salts','salt','dusts/salt') },
+  # c:cooking_oil (Cook's Collection / Cultural Delights) joins the UNION but is never an emit target:
+  # it has 2 readers and already references Rustic Delight's own tag, so an injection there is a no-op.
+  # Reading it is how hearthandharvest / cookscollection / rusticdelight oils reach Pam's c:cookingoil
+  # (all three PASS) and c:olive_oils (only Cook's 4-sunflower oil passes Croptopia's 2-olive floor).
+  @{ name='oil';            tags=@('olive_oils','cookingoil','cooking_oil');          emit=@('olive_oils','cookingoil') },
   @{ name='stock';          tags=@('stock');  extra=@('farmersdelight:bone_broth');   emit=@('stock') },
   @{ name='pasta';          tags=@('pasta','foods/pasta');                            emit=@('pasta') },
   # Three dialects collide on the meats: FD/official `foods/raw_pork`, Pam's
@@ -290,9 +368,16 @@ $categories = @(
   @{ name='cooked_mutton';  tags=@('cookedmutton','cooked_mutton','foods/cooked_mutton'); emit=@('cookedmutton','cooked_mutton') },
   @{ name='raw_fish';       tags=@('rawfish','fishes','raw_fishes','foods/raw_fish'); emit=@('rawfish','fishes','raw_fishes') },
   @{ name='cooked_fish';    tags=@('cookedfish','cooked_fishes','foods/cooked_fish'); emit=@('cookedfish','cooked_fishes') },
-  @{ name='tomato';         tags=@('tomatoes','crops/tomato','foods/tomato');         emit=@('tomatoes','crops/tomato') },
-  @{ name='onion';          tags=@('onions','crops/onion','foods/onion');             emit=@('onions','crops/onion') },
-  @{ name='cabbage';        tags=@('cabbage','crops/cabbage','foods/cabbage');        emit=@('cabbage','crops/cabbage') },
+  # c:foods/tomato and c:foods/onion became emit targets in 0.8.0: Rustic Delight overrides Farmer's
+  # Delight's baked_cod_stew and fried_rice and narrows their tomato/onion slots to those two FD tags,
+  # which nothing but FD ever fills, so Croptopia's and Farm & Charm's tomato and onion were invisible.
+  @{ name='tomato';         tags=@('tomatoes','crops/tomato','foods/tomato');         emit=@('tomatoes','crops/tomato','foods/tomato') },
+  @{ name='onion';          tags=@('onions','crops/onion','foods/onion');             emit=@('onions','crops/onion','foods/onion') },
+  # c:foods/cabbage and c:foods/leafy_green (0.8.0) are Farmer's Delight's own canonical names and are
+  # filled by FD alone - its leafy_green is literally #c:foods/cabbage - so no reference carried
+  # Croptopia / Farm & Charm cabbage and lettuce into them. Emitting both makes the bridge independent
+  # of FD's own chain, the same reason c:flour became an emit target in 0.7.0.
+  @{ name='cabbage';        tags=@('cabbage','crops/cabbage','foods/cabbage','foods/leafy_green'); emit=@('cabbage','crops/cabbage','foods/cabbage','foods/leafy_green') },
   @{ name='strawberry';     tags=@('strawberries','strawberry');                      emit=@('strawberries','strawberry') },
 
   # --- collisions found by auditing every c: tag the bundled mods define ---
@@ -346,6 +431,28 @@ $categories = @(
   @{ name='lemon';          tags=@('lemons','fruits/lemon','foods/lemons');           emit=@('fruits/lemon','foods/lemons') },
   @{ name='plum';           tags=@('plums','fruits/plum','foods/plums');              emit=@('fruits/plum','foods/plums') },
   @{ name='elderberry';     tags=@('elderberries','fruits/elderberry','foods/elderberries'); emit=@('fruits/elderberry','foods/elderberries') },
+  # --- blueberry (0.8.0, sixth player report) ---
+  # Croptopia and Hearth and Harvest ALREADY interoperate both ways and nothing here changes
+  # that: Croptopia's own c:blueberries references #c:fruits/blueberry, which H&H fills with
+  # its own blueberries, so each mod's berry is already in the other's recipes. The mod that
+  # is missing is Oh The Biomes We've Gone: its blueberries sit in its OWN c:foods/berry
+  # (sole member), minecraft:fox_food, biomeswevegone:dye/makes_blue and
+  # sereneseasons:summer_crops, and in no blueberry dialect at all. Named via 'extra' for
+  # exactly that reason, like Fish of Thieves' fruit.
+  # THE REAL FIX IS `c:fruits/blueberry` - 5 Hearth and Harvest readers (blueberry_muffin,
+  # blueberry_pie, cooking/blueberry_jam, stomping/blueberry_juice, blueberry_crate) plus,
+  # through Croptopia's own ref above, its 3 c:blueberries readers (blueberry_jam,
+  # blueberry_seed, shaped_scones). The `blueberries` emit is BELT AND BRACES, not a recipe
+  # fix: every Croptopia build that reads c:blueberries also carries that #c:fruits/blueberry
+  # reference, so nothing new is unlocked by it - it only stops the bridge depending on
+  # Croptopia's own reference, the same reason c:flour and c:foods/cabbage became emit targets.
+  # DO NOT ADD `c:blueberry` (SINGULAR). It is Croptopia's SEED tag - its file is
+  # [croptopia:blueberry_seed, #c:seeds/blueberry] - exactly like c:strawberry. It has zero
+  # recipe readers, and so do c:crops/blueberry, c:seeds/blueberry, c:blueberry_seeds,
+  # c:blueberry_jams, c:jams/blueberry_jam and c:storage_blocks/blueberry (measured over all
+  # 38 scanned jars), so an injection into any of them would be a no-op. c:crops/blueberry is
+  # read here only as a union SOURCE, for the same reason crops/banana and crops/mango are.
+  @{ name='blueberry';      tags=@('blueberries','fruits/blueberry','crops/blueberry'); extra=@('biomeswevegone:blueberries'); emit=@('fruits/blueberry','blueberries') },
   # A walnut is a nut to Croptopia (c:nuts/walnut) - follow that, not a fruit tag.
   @{ name='walnut';         tags=@('walnuts','nuts/walnut','foods/walnuts');          emit=@('nuts/walnut','foods/walnuts') },
 
@@ -394,7 +501,20 @@ $forwardSanitized = @(
   @{ target = 'foods_dough';          sources = @('doughs', 'dough');                judgeAs = 'c:foods/dough'; extra = @('refurbished_furniture:dough') },
   @{ target = 'foods_pasta';          sources = @('pasta');                          judgeAs = 'c:foods/pasta' },
   @{ target = 'foods_bread';          sources = @('bread');                          judgeAs = 'c:foods/bread' },
-  @{ target = 'foods_cooked_chicken'; sources = @('cookedchicken', 'cooked_chicken'); judgeAs = 'c:foods/cooked_chicken' }
+  @{ target = 'foods_cooked_chicken'; sources = @('cookedchicken', 'cooked_chicken'); judgeAs = 'c:foods/cooked_chicken' },
+  # 0.8.0: the raw side of the chicken, for the same reason - Kaleidoscope Cookery lists ONLY the whole
+  # vanilla chicken in its own c:foods/raw_chicken (its 1/3 cut small meats live in c:raw_meats), so that
+  # tag's floor is a whole chicken and Farm & Charm's 1/3 chicken_parts has to be gated on Farmer's Delight.
+  @{ target = 'foods_raw_chicken'; sources = @('rawchicken', 'raw_chicken', 'chicken_replacements'); judgeAs = 'c:foods/raw_chicken' },
+  # 0.8.0, PARTIAL on purpose: only the c:raw_fishes dialect is enumerated. Kaleidoscope Cookery's sashimi
+  # is 1/3 of a fish (chopping board, 1 cod -> 3) and reaches c:raw_fishes through KC's own ref to its
+  # c:foods/tropical_fish, so a hand ref from c:foods/raw_fish straight to #c:raw_fishes delivered it
+  # unconditionally, below the platform's own whole-cod floor. The hand file keeps its LIVE #c:rawfish and
+  # #c:fishes refs (so minecraft:pufferfish and any unscanned mod's fish still reach the canonical tag) and
+  # routes only #c:raw_fishes through this enumeration. Invariant: nothing dropped here may come back via
+  # those two refs - sashimi is EXCLUDEd from c:rawfish and c:fishes by their own floors and KC defines
+  # neither tag, so it cannot (re-check this line if a future jar moves a cheap cut into c:rawfish/c:fishes).
+  @{ target = 'raw_fishes'; sources = @('raw_fishes'); judgeAs = 'c:foods/raw_fish' }
 )
 
 # ============================================================================
@@ -447,6 +567,10 @@ function Add-PlannedTag([string]$baseRel, [string]$gatedPathPrefix, $split) {
   return $true
 }
 
+[void]$report.AppendLine("=== platform convention tags ===")
+[void]$report.AppendLine("  neoforge $($platformNeo.version)$(if ($platformNeo.exact) { " (the gradle.properties pin)" } else { " (gradle.properties pins $($platformNeo.pinned); that build is not in the gradle cache, so the newest cached build on the same line was used)" })")
+[void]$report.AppendLine("")
+
 foreach ($cat in $categories) {
   $union = New-Object System.Collections.Generic.HashSet[string]
   foreach ($t in $cat.tags) {
@@ -455,11 +579,16 @@ foreach ($cat in $categories) {
   if ($cat.extra) { foreach ($i in $cat.extra) { [void]$union.Add($i) } }
   $blocked = @($blacklist | Where-Object { $union.Contains($_) })
   foreach ($b in $blacklist) { [void]$union.Remove($b) }
-  foreach ($s in @($union | Where-Object { Test-IsSeed $_ })) { [void]$union.Remove($s) }
+  # Seeds removed from a CATEGORY union used to be invisible in the report (only the
+  # forward-sanitized section logged them), which is how 0.8.0's two corn kernels could
+  # ship without anyone reading a line about them. Logged per category since the B1 fix.
+  $seedsDropped = @($union | Where-Object { Test-IsSeed $_ } | Sort-Object)
+  foreach ($s in $seedsDropped) { [void]$union.Remove($s) }
   $unvetted = @($union | Where-Object { Test-IsUnvetted $_ } | Sort-Object)
   foreach ($u in $unvetted) { [void]$union.Remove($u); [void]$unvettedTotal.Add($u) }
   [void]$report.AppendLine("[$($cat.name)] union: $(($union | Sort-Object) -join ', ')")
   if ($blocked.Count) { [void]$report.AppendLine("  blacklisted: $($blocked -join ', ')") }
+  if ($seedsDropped.Count) { [void]$report.AppendLine("  dropped seeds: $($seedsDropped -join ', ')") }
   if ($unvetted.Count) { [void]$report.AppendLine("  dropped unvetted: $($unvetted -join ', ')") }
   foreach ($t in $cat.emit) {
     if (-not $tagEntries.ContainsKey($t)) { [void]$report.AppendLine("  $t : tag not defined by any source, skipped"); continue }

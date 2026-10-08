@@ -1,0 +1,10 @@
+{
+  "values": [
+    { "id": "farmersdelight:cod_slice", "required": false },
+    { "id": "farmersdelight:salmon_slice", "required": false },
+    { "id": "minecraft:cod", "required": false },
+    { "id": "minecraft:salmon", "required": false },
+    { "id": "minecraft:tropical_fish", "required": false },
+    { "id": "#pantrywork:gated/farmersdelight_or_rusticdelight/bridged/raw_fishes", "required": false }
+  ]
+}

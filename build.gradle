@@ -112,13 +112,78 @@ dependencies {
             'tools/work/jars/cloth-config-15.0.140-neoforge.jar',
             // Refurbished Furniture + its required lib Framework
             'tools/work/jars/refurbished_furniture-neoforge-1.21.1-1.0.22.jar',
-            'tools/work/jars/framework-neoforge-1.21.1-0.13.11.jar')
+            'tools/work/jars/framework-neoforge-1.21.1-0.13.11.jar',
+            // --- 0.8.0 Farmer's Delight addons (player report) ---
+            // Kaleidoscope Cookery: no libs; neoforge + minecraft only (KubeJS
+            // optional). Ships mixins, an access transformer and enumExtensions.
+            'tools/work/jars/kaleidoscopecookery-1.6.0-neoforge+mc1.21.1.jar',
+            // Hearth and Harvest: no libs; hard dep farmersdelight >= 1.3.0 only.
+            'tools/work/jars/hearthandharvest-1.21.1-1.3.4.jar',
+            // Cultural Delights + Cook's Collection (CD's HARD dep since 0.18.0,
+            // and the owner of cookscollection:cooking_oil). Both need only FD.
+            // HEADS UP: Cultural Delights 0.18.x declares neoforge "[21.1.247,)"
+            // and gradle.properties pins neo_version=21.1.241, so this jar makes
+            // runServer/runClient fail mod loading until that pin is raised to
+            // 21.1.247+ (the SHIPPED jar is unaffected — neo_version_range stays
+            // "[21.1.0,)"). Downgrading CD is not a fix: 0.17.8 has floor
+            // "[21.1.0,)" but no Cook's dep and a different tag/item set.
+            'tools/work/jars/culturaldelights-1.21.1-0.18.1.jar',
+            'tools/work/jars/cookscollection-0.6.1.jar',
+            // Rustic Delight: no libs on NeoForge; hard dep farmersdelight >= 1.3.1.
+            'tools/work/jars/rusticdelight-neoforge-1.21-1.7.1.jar')
         // `gradlew runServer -PnoFarmAndCharm` drops ONLY Farm & Charm, to prove
         // bridges that would otherwise resolve through F&C's own tags (e.g.
         // croptopia:dough -> c:dough) stand on their own. Meadow and Vinery do
         // not require farm_and_charm (checked their mods.toml), so they stay.
         if (!project.hasProperty('noFarmAndCharm')) {
             runtimeOnly files('tools/work/jars/letsdo-farm_and_charm-neoforge-1.1.23.jar')
+        }
+        // `gradlew runServer -PnoHybridDelights` drops ONLY the Hybrid Delights
+        // stack. It is on its own flag because it is the one compat target whose
+        // dependencies are not plain javafml mods:
+        //   hybrid_delights -> modLoader "kotlinforforge" + hapi >= 1.0.0
+        //   hapi            -> modLoader "kotlinforforge" + geckolib >= 4.7.4
+        //   kotlinforforge  -> FMLModType: LIBRARY, NO neoforge.mods.toml at all;
+        //                      kfflang (the LANGPROVIDER), kfflib, kffmod and the
+        //                      Kotlin stdlib are all nested in META-INF/jarjar/.
+        // A language provider has to reach FML's plugin layer, which a dev-run
+        // `runtimeOnly files(...)` classpath entry is not guaranteed to do, so if
+        // the dev boot dies on "kotlinforforge" / a missing kfflang, run with
+        // -PnoHybridDelights and keep going: Pantrywork bridges
+        // hybrid_delights:salt by literal item id, so the bridge data needs no HD
+        // jar at runtime, and HD defines no judged c: tag (only c:tools/knife), so
+        // the generator and AuditRoles do not need it on the classpath either —
+        // they scan tools/work/jars from disk.
+        if (!project.hasProperty('noHybridDelights')) {
+            runtimeOnly files(
+                'tools/work/jars/hybrid_delights-neoforge-1.21.1-1.3.1.jar',
+                'tools/work/jars/hapi-neoforge-1.21.1-1.1.3.jar',
+                'tools/work/jars/kotlinforforge-5.12.0-all.jar')
+        }
+        // `gradlew runServer -PnoByg` drops ONLY the Oh The Biomes We've Gone stack
+        // (0.8.0 blueberry pass). Same reasoning as -PnoHybridDelights, different
+        // cause: BYG is a 20.5 MB WORLDGEN mod with mixins — by far the heaviest
+        // thing on this classpath — and it drags in three more libs. If the dev boot
+        // gets slow, runs out of memory, or dies anywhere inside TerraBlender /
+        // CorgiLib / Oh The Trees You'll Grow, boot with -PnoByg and keep going:
+        // Pantrywork bridges biomeswevegone:blueberries by literal item id, so the
+        // DATA needs no BYG jar at runtime, and the generator and AuditRoles scan
+        // tools/work/jars from disk, not the boot classpath. What IS lost on a
+        // -PnoByg boot is live proof: every `biomeswevegone:` assertion in
+        // tools/tagtest-kaleido.txt becomes unanswerable there.
+        if (!project.hasProperty('noByg')) {
+            runtimeOnly files(
+                'tools/work/jars/Oh-The-Biomes-Weve-Gone-NeoForge-2.6.2.jar',
+                'tools/work/jars/TerraBlender-neoforge-1.21.1-4.1.0.8.jar',
+                'tools/work/jars/Corgilib-NeoForge-1.21.1-5.0.0.9.jar',
+                'tools/work/jars/Oh-The-Trees-Youll-Grow-neoforge-1.21.1-5.3.4.jar')
+        }
+        // GeckoLib is a HARD dep of BOTH optional stacks (HAPI requires >= 4.7.4,
+        // BYG requires >= 4.6), so it is declared outside either flag and dropped
+        // only when both are off. Leaving it inside the Hybrid Delights block would
+        // have meant `-PnoHybridDelights` alone silently broke the BYG stack.
+        if (!project.hasProperty('noHybridDelights') || !project.hasProperty('noByg')) {
+            runtimeOnly files('tools/work/jars/geckolib-neoforge-1.21.1-4.9.3.jar')
         }
     }
 }

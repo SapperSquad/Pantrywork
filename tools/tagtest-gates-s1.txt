@@ -1,10 +1,10 @@
 # Gate scenario S1 (tools/neo-server-1211): Pantrywork release jar + Farmer's Delight +
 # Meadow (+ Architectury). NO Pam's, NO Croptopia. See tools/tagtest-gates.txt for setup.
-# Expected: 5 passed / 0 failed.
+# Expected: 7 passed / 0 failed / 4 expected.
 forceload add 0 0
 setblock 8 -60 8 minecraft:chest
 # FD's 1/4-bucket bottle is 4x below Meadow's bucket floor in both of Meadow's milk tags
-# and no rescuer is loaded: the pamhc2foodcore and croptopia overlays must not apply.
+# and no rescuer is loaded: gates _14 (Pam's) and _6 (Croptopia) must not apply.
 item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
 execute unless items block 8 -60 8 container.0 #c:milk
 execute unless items block 8 -60 8 container.0 #c:milks
@@ -13,7 +13,21 @@ item replace block 8 -60 8 container.0 with minecraft:milk_bucket
 execute if items block 8 -60 8 container.0 #c:milks
 item replace block 8 -60 8 container.0 with meadow:cheese_slice
 execute if items block 8 -60 8 container.0 #c:cheese
-# croptopia gate CLOSED: FD's cabbage leaf is not in c:vegetables. The tag is defined here only
+# Meadow's own salt in all three salt dialects (c:dusts/salt is checked in tagtest-gates.txt)
+item replace block 8 -60 8 container.0 with meadow:alpine_salt
+execute if items block 8 -60 8 container.0 #c:salt
+execute if items block 8 -60 8 container.0 #c:salts
+# gate _7 CLOSED: FD's cabbage leaf is not in c:vegetables. The tag is defined here only
 # by Pantrywork's generated vegetables.json, which has no other path to the leaf (review TV-1)
 item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
 execute unless items block 8 -60 8 container.0 #c:vegetables
+# --- overlay level: the four gates whose rescuers are absent leave their tags undefined ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/pamhc2foodcore/c/milk
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/milks
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia_or_kaleidoscope_cookery/c/vegetables
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection_or_croptopia/c/salts

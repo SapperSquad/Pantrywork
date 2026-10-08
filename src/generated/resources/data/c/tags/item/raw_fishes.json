@@ -28,6 +28,8 @@
     { "id": "aquaculture:synodontis", "required": false },
     { "id": "aquaculture:tambaqui", "required": false },
     { "id": "aquaculture:tuna", "required": false },
+    { "id": "culturaldelights:glow_squid", "required": false },
+    { "id": "culturaldelights:squid", "required": false },
     { "id": "fishofthieves:ancientscale", "required": false },
     { "id": "fishofthieves:battlegill", "required": false },
     { "id": "fishofthieves:devilfish", "required": false },
@@ -38,7 +40,10 @@
     { "id": "fishofthieves:stormfish", "required": false },
     { "id": "fishofthieves:wildsplash", "required": false },
     { "id": "fishofthieves:wrecker", "required": false },
+    { "id": "kaleidoscope_cookery:sashimi", "required": false },
     { "id": "oceansdelight:guardian", "required": false },
-    { "id": "oceansdelight:guardian_tail", "required": false }
+    { "id": "oceansdelight:guardian_tail", "required": false },
+    { "id": "rusticdelight:calamari", "required": false },
+    { "id": "#pantrywork:gated/kaleidoscope_cookery/c/raw_fishes", "required": false }
   ]
 }

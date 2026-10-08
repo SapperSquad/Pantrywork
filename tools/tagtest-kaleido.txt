@@ -1,0 +1,546 @@
+# 0.8.0 - the five Farmer's Delight addons from the player report (Kaleidoscope Cookery,
+# Hearth and Harvest, Cultural Delights + its hard dep Cook's Collection, Rustic Delight
+# and Hybrid Delights), and since the second 0.8.0 wave the SIXTH report: Oh The Biomes
+# We've Gone blueberries (see the blueberry block near the end).
+#
+# FULL BOOT ONLY: `./gradlew runServer` with every compat jar loaded (Farm & Charm, Hybrid
+# Delights and Oh The Biomes We've Gone included). Several assertions below sit behind a
+# cost-floor gate that is OPEN only because its mod is on that boot, and every
+# `biomeswevegone:` line needs the BYG jar, so this file is NOT meaningful on
+# `-PnoFarmAndCharm`, `-PnoHybridDelights`, `-PnoByg` or `-PnoCompatMods`:
+#   farm_and_charm        KC's raw dough in Croptopia's c:doughs, and every farm_and_charm: id
+#   cookscollection       Hearth & Harvest's 1/32 salt in c:salt / c:salts
+#   croptopia | kaleidoscope_cookery   Rustic Delight's bell-pepper slices in c:vegetables
+#   culturaldelights | rusticdelight   FD's cabbage leaf in pantrywork:bridged/vegetable
+#   kaleidoscope_cookery  FD's cod/salmon slices in Farm & Charm's c:raw_fishes
+#   farmersdelight        Farm & Charm's chicken parts in c:foods/raw_chicken
+#   farmersdelight | rusticdelight     KC's sashimi in c:foods/raw_fish
+#
+#   tools\rcon.ps1 -File tools\tagtest-kaleido.txt > kaleido.out
+#   powershell -File tools\CountSuite.ps1 -Suite tools\tagtest-kaleido.txt -Output kaleido.out
+# Expected on the full boot: 212 passed / 0 failed / 5 expected (127 `if` and 85 `unless`
+# assertions; the 5 expected ones are the gate-identity probes at the end). 0.8.0 phase C
+# flipped the c:dusts/salt line from `unless` to `if` and added six lines for that new emit
+# target (101/0/5); the BLOCKER B1 fix then added 54 more - the two corn kernels out of the
+# whole corn and grain family and the role tags, the real corn still in, and
+# create:chocolate_glazed_berries out of c:fruits (101 -> 155); the BLUEBERRY wave added the
+# last 57 (155 -> 212). The five gate-identity probes still name ids that do not exist. Every
+# membership claim here was also checked statically against the jars + src/main + src/generated
+# before the first boot, so a live failure means the pack did not load what the files say.
+#
+# "Test passed" on an `unless` line means the item is correctly ABSENT; every one of them
+# guards a real hazard (a seed, a dilution, a tag nobody reads, a bridge the plan rejected),
+# so a failure there is a bug and not a missing feature. The five `# expect: Unknown item tag`
+# lines are gate-IDENTITY probes: they name a pantrywork:gated/* tag that must NOT exist with
+# the current rescuer sets, so an answer of "Test failed" means an overlay leaked and
+# "Test passed" means the gate set changed and this file needs re-cutting.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+
+# ============================== PHASE A ==============================
+# --- item 10: c:foods/cabbage + c:foods/leafy_green are Farmer's Delight-only names,
+# --- and its leafy_green is literally #c:foods/cabbage, so nothing reached them before.
+item replace block 8 -60 8 container.0 with croptopia:cabbage
+execute if items block 8 -60 8 container.0 #c:foods/cabbage
+execute if items block 8 -60 8 container.0 #c:foods/leafy_green
+item replace block 8 -60 8 container.0 with farm_and_charm:lettuce
+execute if items block 8 -60 8 container.0 #c:foods/cabbage
+execute if items block 8 -60 8 container.0 #c:foods/leafy_green
+# FD's own members stay reachable (its cabbage is direct, its leaf we also emit into leafy_green)
+item replace block 8 -60 8 container.0 with farmersdelight:cabbage
+execute if items block 8 -60 8 container.0 #c:foods/cabbage
+execute if items block 8 -60 8 container.0 #c:foods/leafy_green
+item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
+execute if items block 8 -60 8 container.0 #c:foods/cabbage
+# NEGATIVE: a cabbage bridge must not pour the whole vegetable union into FD's cabbage slots
+item replace block 8 -60 8 container.0 with croptopia:tomato
+execute unless items block 8 -60 8 container.0 #c:foods/cabbage
+execute unless items block 8 -60 8 container.0 #c:foods/leafy_green
+# NEGATIVE: Croptopia files its planting seeds inside its own produce tags - never bridged
+item replace block 8 -60 8 container.0 with croptopia:cabbage_seed
+execute unless items block 8 -60 8 container.0 #c:foods/cabbage
+execute unless items block 8 -60 8 container.0 #c:foods/leafy_green
+
+# --- item 9: c:foods/onion + c:foods/tomato (Rustic Delight overrides FD's fried_rice and
+# --- baked_cod_stew and narrows their onion/tomato slots to exactly these two FD tags)
+item replace block 8 -60 8 container.0 with croptopia:onion
+execute if items block 8 -60 8 container.0 #c:foods/onion
+item replace block 8 -60 8 container.0 with farm_and_charm:onion
+execute if items block 8 -60 8 container.0 #c:foods/onion
+item replace block 8 -60 8 container.0 with croptopia:tomato
+execute if items block 8 -60 8 container.0 #c:foods/tomato
+item replace block 8 -60 8 container.0 with farm_and_charm:tomato
+execute if items block 8 -60 8 container.0 #c:foods/tomato
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:tomato
+execute if items block 8 -60 8 container.0 #c:foods/tomato
+execute if items block 8 -60 8 container.0 #c:tomatoes
+execute if items block 8 -60 8 container.0 #c:crops/tomato
+# NEGATIVE: the two new targets must not cross-contaminate
+item replace block 8 -60 8 container.0 with croptopia:onion
+execute unless items block 8 -60 8 container.0 #c:foods/tomato
+item replace block 8 -60 8 container.0 with croptopia:tomato
+execute unless items block 8 -60 8 container.0 #c:foods/onion
+
+# --- item 2: Kaleidoscope Cookery's fried egg. Its own tag is c:foods/cooked_eggS (plural),
+# --- which NOTHING anywhere reads; the fix is our hand-authored singular c:foods/cooked_egg.
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:fried_egg
+execute if items block 8 -60 8 container.0 #c:foods/cooked_egg
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/protein
+# NEGATIVE: nothing of ours may land in the plural dead tag (KC's own fried egg is in it,
+# so these three foreign cooked eggs prove we wrote nothing there). The tag IS defined by
+# KC's jar on this boot, so an "Unknown item tag" answer here would be a failure, not a pass.
+item replace block 8 -60 8 container.0 with pamhc2foodcore:friedeggitem
+execute unless items block 8 -60 8 container.0 #c:foods/cooked_eggs
+item replace block 8 -60 8 container.0 with bountifulfares:cooked_egg
+execute unless items block 8 -60 8 container.0 #c:foods/cooked_eggs
+item replace block 8 -60 8 container.0 with croptopia:sunny_side_eggs
+execute unless items block 8 -60 8 container.0 #c:foods/cooked_eggs
+# NEGATIVE: cooked eggs must never reach c:eggs (a raw-egg slot in ~30 recipes). KC widens
+# c:eggs with its OWN fried egg upstream - that is its call and is not asserted here.
+item replace block 8 -60 8 container.0 with pamhc2foodcore:friedeggitem
+execute unless items block 8 -60 8 container.0 #c:eggs
+item replace block 8 -60 8 container.0 with bountifulfares:cooked_egg
+execute unless items block 8 -60 8 container.0 #c:eggs
+
+# --- item 6: Hearth & Harvest and Cultural Delights butter into Croptopia's c:butters.
+# --- (This does NOT fix the player's butter complaint: neither mod reads a butter tag.)
+item replace block 8 -60 8 container.0 with hearthandharvest:butter
+execute if items block 8 -60 8 container.0 #c:butters
+execute if items block 8 -60 8 container.0 #c:butter
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+item replace block 8 -60 8 container.0 with culturaldelights:butter
+execute if items block 8 -60 8 container.0 #c:butters
+execute if items block 8 -60 8 container.0 #c:butter
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
+# NEGATIVE: the two new c:butter floors (CD 1/4, H&H 1/8) must still EXCLUDE Croptopia's
+# 1/16-bottle butter. If either cost were lowered, this line is what catches the rescue.
+item replace block 8 -60 8 container.0 with croptopia:butter
+execute unless items block 8 -60 8 container.0 #c:butter
+# NEGATIVE: butter is not cheese
+item replace block 8 -60 8 container.0 with hearthandharvest:butter
+execute unless items block 8 -60 8 container.0 #c:cheese
+execute unless items block 8 -60 8 container.0 #c:cheeses
+
+# ============================== PHASE B ==============================
+# --- item 1, THE HEADLINE: the wok matches the TAG #kaleidoscope_cookery:oil
+# --- (PotBlockEntity.onPlaceOil -> ItemStack.is(TagMod.OIL)), so a hand-authored
+# --- data/kaleidoscope_cookery/tags/item/oil.json primes the wok with foreign oils
+# --- and unlocks its 225 pot / flex_pot recipes.
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:oil
+execute if items block 8 -60 8 container.0 #kaleidoscope_cookery:oil
+item replace block 8 -60 8 container.0 with hearthandharvest:cooking_oil
+execute if items block 8 -60 8 container.0 #kaleidoscope_cookery:oil
+item replace block 8 -60 8 container.0 with cookscollection:cooking_oil
+execute if items block 8 -60 8 container.0 #kaleidoscope_cookery:oil
+item replace block 8 -60 8 container.0 with rusticdelight:cooking_oil
+execute if items block 8 -60 8 container.0 #kaleidoscope_cookery:oil
+item replace block 8 -60 8 container.0 with croptopia:olive_oil
+execute if items block 8 -60 8 container.0 #kaleidoscope_cookery:oil
+# Pam's oil is 1/2 against the wok tag's only floor (KC's own 1/4 oil): x0.50, it PASSES.
+# Under the withdrawn "1 c:seeds = 1 olive" reading it was x2.00 EXCLUDE - this line is the
+# regression test for the settled pumpkin-seed convention.
+item replace block 8 -60 8 container.0 with pamhc2foodcore:cookingoilitem
+execute if items block 8 -60 8 container.0 #kaleidoscope_cookery:oil
+# NEGATIVE: the wok tag is an oil tag, not a dumping ground
+item replace block 8 -60 8 container.0 with croptopia:cheese
+execute unless items block 8 -60 8 container.0 #kaleidoscope_cookery:oil
+# NEGATIVE: KC's own 1/4 oil must never travel OUTWARD (plan item 1, "DO NOT"): it is far
+# below Croptopia's 2-olive and Pam's 1/2 floors, and Cook's/CD/RD already share their own tag.
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:oil
+execute unless items block 8 -60 8 container.0 #c:olive_oils
+execute unless items block 8 -60 8 container.0 #c:cookingoil
+execute unless items block 8 -60 8 container.0 #c:cooking_oil
+execute unless items block 8 -60 8 container.0 #rusticdelight:cooking_oil
+
+# --- item 5: the three bottled oils into Pam's c:cookingoil (16 recipes), and ONLY
+# --- Cook's 4-sunflower oil into Croptopia's c:olive_oils (2-olive floor).
+item replace block 8 -60 8 container.0 with hearthandharvest:cooking_oil
+execute if items block 8 -60 8 container.0 #c:cookingoil
+execute unless items block 8 -60 8 container.0 #c:olive_oils
+item replace block 8 -60 8 container.0 with rusticdelight:cooking_oil
+execute if items block 8 -60 8 container.0 #c:cookingoil
+execute unless items block 8 -60 8 container.0 #c:olive_oils
+item replace block 8 -60 8 container.0 with cookscollection:cooking_oil
+execute if items block 8 -60 8 container.0 #c:cookingoil
+execute if items block 8 -60 8 container.0 #c:olive_oils
+item replace block 8 -60 8 container.0 with croptopia:olive_oil
+execute if items block 8 -60 8 container.0 #c:cookingoil
+# NEGATIVE: Pam's 1/2-vegetable oil stays out of Croptopia's 2-olive tag (0.6.0 shipped it in)
+item replace block 8 -60 8 container.0 with pamhc2foodcore:cookingoilitem
+execute unless items block 8 -60 8 container.0 #c:olive_oils
+
+# --- item 3: KC's raw dough. Inbound already worked (KC's own c:dough references
+# --- #c:doughs and #c:foods/dough); outbound to Croptopia's 13 c:doughs recipes is
+# --- GATE farm_and_charm (x2.07 against Croptopia's own dough) and to the 10
+# --- c:foods/dough readers a straight PASS via pantrywork:bridged/foods_dough.
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:raw_dough
+execute if items block 8 -60 8 container.0 #c:dough
+execute if items block 8 -60 8 container.0 #c:doughs
+execute if items block 8 -60 8 container.0 #c:foods/dough
+execute if items block 8 -60 8 container.0 #pantrywork:bridged/foods_dough
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farm_and_charm/c/doughs
+# NEGATIVE: dough is not flour (KC's millstone makes both; they must not merge)
+execute unless items block 8 -60 8 container.0 #c:flour
+execute unless items block 8 -60 8 container.0 #c:flours
+
+# --- item 4: Hybrid Delights' salt is in ZERO tags of its own (its jar ships only
+# --- c:tools/knife), so it is bridged by id. 1/4 salt_source, PASS everywhere.
+item replace block 8 -60 8 container.0 with hybrid_delights:salt
+execute if items block 8 -60 8 container.0 #c:salt
+execute if items block 8 -60 8 container.0 #c:salts
+# 0.8.0 PHASE C flipped this line: c:dusts/salt (36 readers - H&H 25, CD 7, Cook's 4) IS an
+# emit target now. Hybrid Delights' 1/4 salt is x1.00 against both Cook's and Cultural
+# Delights' floors there, so it PASSES ungated.
+execute if items block 8 -60 8 container.0 #c:dusts/salt
+# Cook's Collection's mined salt (1/4) passes both names ungated; Hearth & Harvest's
+# water-bottle salt (1/32, the cheapest salt in the game) only does so behind the
+# cookscollection gate, which this boot opens.
+item replace block 8 -60 8 container.0 with cookscollection:salt
+execute if items block 8 -60 8 container.0 #c:salt
+execute if items block 8 -60 8 container.0 #c:salts
+item replace block 8 -60 8 container.0 with hearthandharvest:salt
+execute if items block 8 -60 8 container.0 #c:salt
+execute if items block 8 -60 8 container.0 #c:salts
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection/c/salt
+# 0.8.0 PHASE C, the other half of c:dusts/salt: Croptopia's 1/16 and Pam's 1/8 salt are 4x
+# and 2x below Cook's and Cultural Delights' 1/4 floor there and ride in only behind the
+# hearthandharvest gate (H&H's own 1/32 salt is already in that tag natively, so the overlay
+# dilutes nothing that is not upstream). This boot opens that gate.
+item replace block 8 -60 8 container.0 with croptopia:salt
+execute if items block 8 -60 8 container.0 #pantrywork:gated/hearthandharvest/c/dusts/salt
+execute if items block 8 -60 8 container.0 #c:dusts/salt
+item replace block 8 -60 8 container.0 with pamhc2foodcore:saltitem
+execute if items block 8 -60 8 container.0 #pantrywork:gated/hearthandharvest/c/dusts/salt
+execute if items block 8 -60 8 container.0 #c:dusts/salt
+# ...and Pam's salt reaches Meadow's and Croptopia's c:salts through gate _4, whose rescuer
+# list 0.8.0 widened from croptopia to cookscollection_or_croptopia
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection_or_croptopia/c/salts
+execute if items block 8 -60 8 container.0 #c:salts
+
+# ===================== SIDE EFFECTS OF THE NEW FLOORS =====================
+# Adding these five jars gave several judged tags a new defining mod. These lines pin the
+# consequences that are already shipped, so phase C can tell a deliberate change from a bug.
+#
+# Kaleidoscope Cookery lists ONLY the whole vanilla chicken in its own c:foods/raw_chicken
+# (its 1/3 cut small meats live in c:raw_meats), so that tag's floor became a whole chicken
+# and Farm & Charm's 1/3 chicken_parts had to move behind a farmersdelight gate - the canonical
+# tag is now pantrywork:bridged/foods_raw_chicken instead of a straight ref to the dialects.
+item replace block 8 -60 8 container.0 with minecraft:chicken
+execute if items block 8 -60 8 container.0 #c:foods/raw_chicken
+item replace block 8 -60 8 container.0 with farmersdelight:chicken_cuts
+execute if items block 8 -60 8 container.0 #c:foods/raw_chicken
+item replace block 8 -60 8 container.0 with farm_and_charm:chicken_parts
+execute if items block 8 -60 8 container.0 #c:foods/raw_chicken
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight/bridged/foods_raw_chicken
+# KC's sashimi is 1/3 of a fish (chopping board, 1 cod -> 3) and rides into Farm & Charm's
+# c:raw_fishes through KC's own ref, so c:foods/raw_fish routes that one dialect through
+# pantrywork:bridged/raw_fishes and gates the sashimi on farmersdelight|rusticdelight.
+# The other two dialect refs stayed LIVE, which is what the pufferfish line proves.
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:sashimi
+execute if items block 8 -60 8 container.0 #c:raw_fishes
+execute if items block 8 -60 8 container.0 #c:foods/raw_fish
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight_or_rusticdelight/bridged/raw_fishes
+# NEGATIVE: 1/3 of a fish is too cheap for Pam's and Croptopia's whole-fish names
+execute unless items block 8 -60 8 container.0 #c:rawfish
+execute unless items block 8 -60 8 container.0 #c:fishes
+item replace block 8 -60 8 container.0 with minecraft:pufferfish
+execute if items block 8 -60 8 container.0 #c:foods/raw_fish
+item replace block 8 -60 8 container.0 with farmersdelight:cod_slice
+execute if items block 8 -60 8 container.0 #c:raw_fishes
+execute if items block 8 -60 8 container.0 #pantrywork:gated/kaleidoscope_cookery/c/raw_fishes
+# Rustic Delight's and Cultural Delights' 1/2 cuts reach Pam's and Farm & Charm's c:vegetables
+# only behind croptopia|kaleidoscope_cookery; FD's cabbage leaf joined them there.
+item replace block 8 -60 8 container.0 with rusticdelight:bell_pepper_slice_red
+execute if items block 8 -60 8 container.0 #c:vegetables
+item replace block 8 -60 8 container.0 with rusticdelight:potato_slices
+execute if items block 8 -60 8 container.0 #c:vegetables
+item replace block 8 -60 8 container.0 with culturaldelights:cut_cucumber
+execute if items block 8 -60 8 container.0 #c:vegetables
+# NEGATIVE: KC's lettuce seed is a planting seed and must never cross into the vegetable
+# enumeration our canonical c:foods/vegetable reads.
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:lettuce_seed
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/vegetable
+# Cultural Delights' cheese wedge (3/16 of a bucket: 3 FD milk bottles -> a wheel -> 4 wedges)
+# and Hearth & Harvest's flour (cutting board, 1 wheat -> 2) and goat milk bottle (1/4).
+item replace block 8 -60 8 container.0 with culturaldelights:cheese_wedge
+execute if items block 8 -60 8 container.0 #c:cheese
+execute if items block 8 -60 8 container.0 #c:cheeses
+item replace block 8 -60 8 container.0 with hearthandharvest:flour
+execute if items block 8 -60 8 container.0 #c:flour
+execute if items block 8 -60 8 container.0 #c:flours
+item replace block 8 -60 8 container.0 with hearthandharvest:goat_milk_bottle
+execute if items block 8 -60 8 container.0 #c:milk
+execute if items block 8 -60 8 container.0 #c:milks
+# NEGATIVE: the c:foods/milk-era shim and the bucket-milk enumeration stay bucket-only
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/drinks_milk
+execute unless items block 8 -60 8 container.0 #c:foods/milk
+item replace block 8 -60 8 container.0 with cookscollection:rustic_loaf_slice
+execute if items block 8 -60 8 container.0 #c:foods/bread
+
+# ============ 0.8.0 BLOCKER B1: THE TWO CORN KERNELS ARE PLANTING SEEDS ============
+# culturaldelights:corn_kernels and hearthandharvest:corn_kernels are seed stock, not corn.
+# Each is in its OWN mod's c:seeds and c:seeds/corn (H&H's also in c:animal_foods,
+# minecraft:villager_plantable_seeds, chicken_food and parrot_food) and in NO food tag of its
+# own: CD's own c:crops/corn holds corn_cob, H&H's holds hearthandharvest:corn. 0.8.0 shipped
+# both INSIDE c:crops/corn, c:foods/corn, c:crops/grain, c:grain, c:grains, c:grain/corn and
+# c:grains/corn, reached through Croptopia's c:corn -> #c:seeds/corn reference, and from there
+# into c:foods/vegetable, canonical c:foods and the garnish role. Three things that made it a
+# blocker rather than a cosmetic error:
+#   * CD's cutting/corn_kernels.json takes 1 x #c:crops/corn and returns 1 kernel + 1 more at
+#     50% + straw, so kernels INSIDE that tag are a net-positive duplication loop, automatable
+#     on a cutting board;
+#   * corn_cob_crate (9 x #c:crops/corn) then from_crate/corn_cob (-> 9 corn cobs) upgraded
+#     nine seeds into nine whole cobs;
+#   * seeds satisfied real food recipes - CD's 9 c:crops/corn readers and Bountiful Fares' 5
+#     c:foods/corn readers, where three seeds would have crafted maize bread.
+# Fixed by Test-IsSeed rule 3 (the item's own mod is the authority on its own item), not by a
+# hand denylist. hearthandharvest:corn_kernels also now has its real cost (cutting board,
+# 1 corn -> 2, so 1/2 produce = x2.00 EXCLUDE), which is a second independent guard; CD's is
+# 2/3 (expected 1.5 per corn) = exactly x1.50, which PASSES, so for that one the seed rule is
+# the only thing standing between it and every corn tag. Both halves matter.
+item replace block 8 -60 8 container.0 with culturaldelights:corn_kernels
+# non-vacuity: the id resolves on this boot and its own mod files it as seed stock
+execute if items block 8 -60 8 container.0 #c:seeds
+execute if items block 8 -60 8 container.0 #c:seeds/corn
+execute unless items block 8 -60 8 container.0 #c:crops/corn
+execute unless items block 8 -60 8 container.0 #c:foods/corn
+execute unless items block 8 -60 8 container.0 #c:crops/grain
+execute unless items block 8 -60 8 container.0 #c:grains
+execute unless items block 8 -60 8 container.0 #c:grain/corn
+execute unless items block 8 -60 8 container.0 #c:grains/corn
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/vegetable
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component
+execute unless items block 8 -60 8 container.0 #c:foods
+# UPSTREAM, and not ours to undo: Croptopia's own c:corn lists croptopia:corn_seed AND
+# references #c:seeds/corn, and its c:grain references #c:corn. So both kernels (and
+# croptopia:corn_seed) are in c:corn and c:grain with or without Pantrywork - a datapack
+# cannot subtract a member. These two lines record that, so a future change is visible.
+execute if items block 8 -60 8 container.0 #c:corn
+execute if items block 8 -60 8 container.0 #c:grain
+item replace block 8 -60 8 container.0 with hearthandharvest:corn_kernels
+execute if items block 8 -60 8 container.0 #c:seeds
+execute if items block 8 -60 8 container.0 #c:seeds/corn
+execute unless items block 8 -60 8 container.0 #c:crops/corn
+execute unless items block 8 -60 8 container.0 #c:foods/corn
+execute unless items block 8 -60 8 container.0 #c:crops/grain
+execute unless items block 8 -60 8 container.0 #c:grains
+execute unless items block 8 -60 8 container.0 #c:grain/corn
+execute unless items block 8 -60 8 container.0 #c:grains/corn
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/vegetable
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component
+execute unless items block 8 -60 8 container.0 #c:foods
+execute if items block 8 -60 8 container.0 #c:corn
+execute if items block 8 -60 8 container.0 #c:grain
+# ...and the REAL corn still bridges in every direction. Without these lines the `unless` block
+# above could pass by the corn family being empty.
+item replace block 8 -60 8 container.0 with croptopia:corn
+execute if items block 8 -60 8 container.0 #c:crops/corn
+execute if items block 8 -60 8 container.0 #c:foods/corn
+execute if items block 8 -60 8 container.0 #c:grain
+execute if items block 8 -60 8 container.0 #c:grains
+item replace block 8 -60 8 container.0 with culturaldelights:corn_cob
+execute if items block 8 -60 8 container.0 #c:crops/corn
+execute if items block 8 -60 8 container.0 #c:foods/corn
+execute if items block 8 -60 8 container.0 #c:grain
+item replace block 8 -60 8 container.0 with hearthandharvest:corn
+execute if items block 8 -60 8 container.0 #c:crops/corn
+execute if items block 8 -60 8 container.0 #c:foods/corn
+execute if items block 8 -60 8 container.0 #c:grain
+execute if items block 8 -60 8 container.0 #c:grains
+item replace block 8 -60 8 container.0 with farm_and_charm:corn
+execute if items block 8 -60 8 container.0 #c:crops/corn
+execute if items block 8 -60 8 container.0 #c:foods/corn
+execute if items block 8 -60 8 container.0 #c:grain
+item replace block 8 -60 8 container.0 with bountifulfares:maize
+execute if items block 8 -60 8 container.0 #c:foods/corn
+execute if items block 8 -60 8 container.0 #c:crops/corn
+execute if items block 8 -60 8 container.0 #c:grain/corn
+execute if items block 8 -60 8 container.0 #c:grains/corn
+
+# --- 0.8.0 review M3: create:chocolate_glazed_berries is honeyed_apple's sibling ---
+# A candied treat Create files in its own c:foods/berry. Rustic Delight's c:foods/fruit
+# references #c:foods/berry, so the generator's fruits union picked it up and 0.8.0 emitted it
+# into Croptopia's c:fruits - a processed sweet in another mod's raw-fruit ingredient slot.
+# Now on the generator's non-food blacklist, beside create:honeyed_apple.
+item replace block 8 -60 8 container.0 with create:chocolate_glazed_berries
+# non-vacuity: Create's own tag still holds it, so the id resolves on this boot
+execute if items block 8 -60 8 container.0 #c:foods/berry
+execute unless items block 8 -60 8 container.0 #c:fruits
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/fruit
+# DISCLOSED, not a leak: the garnish role references #c:foods/berry (for Hearth and Harvest's
+# five real berries), so Create's own classification of its own item surfaces in that role.
+# A role is Pantrywork's own labelling, not a recipe slot with a floor, and a datapack cannot
+# subtract Create's entry - the same rule-2 reasoning the c:foods checks already use. What must
+# never happen is the two `unless` lines above.
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+item replace block 8 -60 8 container.0 with create:honeyed_apple
+execute unless items block 8 -60 8 container.0 #c:fruits
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/fruit
+
+# ============ 0.8.0 BLUEBERRIES: Oh The Biomes We've Gone (sixth player report) ============
+# The report said "biomes you'll go", but that mod (`byg`) stops at MC 1.19.4. The live mod is
+# Oh The Biomes We've Gone, mod id `biomeswevegone`, 2.6.2 on NeoForge 1.21.1. It has NO 26.x
+# build on any loader, so these bridges are inert on both 26.x jars.
+#
+# ALREADY TRUE BEFORE 0.8.0, asserted here so a regression cannot hide:
+#   * Croptopia and Hearth and Harvest already interoperate BOTH ways - Croptopia's own
+#     c:blueberries is [croptopia:blueberry, #c:fruits/blueberry, #c:crops/blueberry] and H&H
+#     fills #c:fruits/blueberry with its own berry, so each mod's blueberry is already in the
+#     other's recipes. Nothing here changes that.
+#   * BYG's blueberries already reached #c:foods/berry, because BYG files them there itself
+#     (sole member). So Farmer's Delight's fruit_salad and stuffed_pumpkin_block, Rustic
+#     Delight's fruit_beignet and sweet_salad (RD defines c:foods/fruit as
+#     [minecraft:melon_slice, #c:foods/berry]) and Pantrywork's garnish role all accepted them
+#     with no change at all. Four working paths, re-asserted, not claimed as new.
+# WHAT 0.8.0 ADDS: biomeswevegone:blueberries into `c:fruits/blueberry` - 5 Hearth and Harvest
+#   readers (blueberry_muffin, blueberry_pie, cooking/blueberry_jam, stomping/blueberry_juice,
+#   blueberry_crate) and, through Croptopia's own #c:fruits/blueberry reference, its 3
+#   c:blueberries readers (blueberry_jam, blueberry_seed, shaped_scones) = 8 recipes. Plus the
+#   generic `c:fruits` tier (Croptopia fruit_smoothie + shaped_fruit_cake, Pam's fruit punch +
+#   fruit salad + trail mix). Cost: 1 gathered produce against 1-produce floors, x1.00, no gate.
+#   The `c:blueberries` entries are BELT AND BRACES, not a recipe fix: every Croptopia build
+#   that reads that tag also carries the ref, so they only stop the bridge depending on it.
+# NOT FIXABLE HERE: BYG's own blueberry_pie names `biomeswevegone:blueberries` by exact item id,
+#   so other mods' blueberries cannot be used in it. That needs the BYG author.
+item replace block 8 -60 8 container.0 with biomeswevegone:blueberries
+execute if items block 8 -60 8 container.0 #c:fruits/blueberry
+execute if items block 8 -60 8 container.0 #c:blueberries
+execute if items block 8 -60 8 container.0 #c:fruits
+# the four already-working paths
+execute if items block 8 -60 8 container.0 #c:foods/berry
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+execute if items block 8 -60 8 container.0 #c:foods
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+execute if items block 8 -60 8 container.0 #pantrywork:food_component
+# NEGATIVE: `c:blueberry` (SINGULAR) is Croptopia's SEED tag, not a dialect - its file is
+# [croptopia:blueberry_seed, #c:seeds/blueberry], exactly like c:strawberry. Never written into.
+execute unless items block 8 -60 8 container.0 #c:blueberry
+execute unless items block 8 -60 8 container.0 #c:seeds
+execute unless items block 8 -60 8 container.0 #c:seeds/blueberry
+# NEGATIVE: a blueberry bridge must not pour the fruit union into a vegetable tag
+execute unless items block 8 -60 8 container.0 #c:vegetables
+# NEGATIVE, and a fact worth stating rather than assuming: pantrywork:bridged/fruit enumerates
+# c:fruits + c:strawberries AS THE JARS SHIP THEM, so it does not re-absorb our own c:fruits
+# emission. BYG's berry reaches the canonical c:foods/fruit through BYG's own file, not ours.
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/fruit
+# The other two blueberries. Non-vacuity for every `unless` above and below: the blueberry
+# family is NOT empty on this boot.
+item replace block 8 -60 8 container.0 with croptopia:blueberry
+execute if items block 8 -60 8 container.0 #c:fruits/blueberry
+execute if items block 8 -60 8 container.0 #c:blueberries
+execute if items block 8 -60 8 container.0 #c:fruits
+item replace block 8 -60 8 container.0 with hearthandharvest:blueberries
+execute if items block 8 -60 8 container.0 #c:fruits/blueberry
+execute if items block 8 -60 8 container.0 #c:blueberries
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:foods/berry
+# NEGATIVE: both mods' blueberry SEED stock stays out of every food tag, while their own mods'
+# seed tags still hold it (so these ids resolve and the negatives are not about a missing item).
+item replace block 8 -60 8 container.0 with croptopia:blueberry_seed
+execute if items block 8 -60 8 container.0 #c:blueberry
+execute if items block 8 -60 8 container.0 #c:seeds/blueberry
+execute unless items block 8 -60 8 container.0 #c:fruits/blueberry
+execute unless items block 8 -60 8 container.0 #c:blueberries
+execute unless items block 8 -60 8 container.0 #c:fruits
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+# NO live probe for hearthandharvest:blueberry_pips, and that is measured, not an oversight:
+# HHModItems registers it (and raspberry_pips) inside a ModList.get().isLoaded("berry_good")
+# branch, so on any boot without Berry Good the ITEM DOES NOT EXIST - `item replace` answers
+# "Unknown item" and every assertion after it would silently be about the previous slot item.
+# H&H lists it in its own c:seeds/blueberry as required:false for exactly that reason. Croptopia's
+# blueberry_seed above is the live seed guard; the pips are covered statically by the generator's
+# own "dropped seeds" line and by AuditRoles check 1.
+
+# --- SapperSquad's decision: biomeswevegone:soul_fruit must NOT cross any bridge ---
+# It is food with a DEBUFF: nutrition 4, saturation 0.35, and
+# effect(new MobEffectInstance(MobEffects.BLINDNESS, 40), 1.0f) - read out of BWGItems in the
+# 2.6.2 jar, with the invokedynamic -> BootstrapMethods -> lambda mapping checked. BYG files it
+# in its own c:foods/fruit, which the generator's fruits union reads, so without the non-food
+# blacklist entry it would be emitted into Croptopia's c:fruits and from there satisfy Pam's
+# fruit punch / fruit salad / trail mix, Croptopia's fruit smoothie / fruit cake and Rustic
+# Delight's beignet / sweet salad. THE COST FLOOR IS BLIND TO IT: a cost measures processing
+# effort, and soul_fruit is a gathered drop worth exactly the 1 produce c:fruits asks for, so it
+# PASSES at x1.00. The blacklist line and AuditRoles' general denylist are the only two guards,
+# and both were mutation-proven: delete the blacklist and it lands in c:fruits and the audit
+# fails with "non-food via Pantrywork : 1".
+item replace block 8 -60 8 container.0 with biomeswevegone:soul_fruit
+# non-vacuity: BYG's own classification of its own item still holds it, so the id resolves here
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+execute if items block 8 -60 8 container.0 #c:foods
+execute unless items block 8 -60 8 container.0 #c:fruits
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/fruit
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+execute unless items block 8 -60 8 container.0 #c:foods/berry
+# DISCLOSED, not hidden: BYG's three OTHER c:foods/fruit members carry no effect of any kind
+# (baobab_fruit 2/0.35, yucca_fruit 2/0.35, green_apple 4/0.35, each read out of BWGItems the
+# same way), and they DO ride into Croptopia's c:fruits beside the blueberry. Its cooked yucca
+# fruit is in BYG's own c:foods and in no fruit tag, so that one does not.
+item replace block 8 -60 8 container.0 with biomeswevegone:green_apple
+execute if items block 8 -60 8 container.0 #c:fruits
+item replace block 8 -60 8 container.0 with biomeswevegone:baobab_fruit
+execute if items block 8 -60 8 container.0 #c:fruits
+item replace block 8 -60 8 container.0 with biomeswevegone:yucca_fruit
+execute if items block 8 -60 8 container.0 #c:fruits
+item replace block 8 -60 8 container.0 with biomeswevegone:cooked_yucca_fruit
+execute if items block 8 -60 8 container.0 #c:foods
+execute unless items block 8 -60 8 container.0 #c:fruits
+
+# --- BYG's pumpkin seeds: a seed, and out of everything ---
+# Caught twice over: the `_seeds` name rule plus c:seeds membership (rule 2), and BYG filing it
+# in its own c:seeds/pumpkin while filing it in no food tag of its own (rule 3).
+item replace block 8 -60 8 container.0 with biomeswevegone:pale_pumpkin_seeds
+execute if items block 8 -60 8 container.0 #c:seeds
+execute if items block 8 -60 8 container.0 #c:seeds/pumpkin
+execute unless items block 8 -60 8 container.0 #c:fruits
+execute unless items block 8 -60 8 container.0 #c:fruits/blueberry
+execute unless items block 8 -60 8 container.0 #c:blueberries
+execute unless items block 8 -60 8 container.0 #c:foods/berry
+execute unless items block 8 -60 8 container.0 #c:vegetables
+execute unless items block 8 -60 8 container.0 #c:foods
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/fruit
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+# BYG's whole pale pumpkin sits in its own c:crops/pumpkin, which no category reads, so it
+# reaches nothing of ours either
+item replace block 8 -60 8 container.0 with biomeswevegone:pale_pumpkin
+execute unless items block 8 -60 8 container.0 #c:vegetables
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+
+# --- FORWARD GUARD (latent today), recorded as a judgment in tools/cost-floors.json ---
+# biomeswevegone:oddion_bulb is real FOOD (ItemNameBlockItem over ODDION_CROP, nutrition 2 /
+# saturation 0.35) that is ALSO plantable, and the third seed signal MISLABELS it: BYG files it
+# in bare c:crops and minecraft:villager_plantable_seeds - neither of which counts as food
+# evidence - while BYG's own c:foods lists only the COOKED bulb. It is the farm_and_charm:onion
+# case without the rescue. Harmless in 0.8.0 only because no category reads bare c:crops and BYG
+# defines no vegetable dialect, so these lines pass today for the right reason and will fail
+# loudly if a future pass makes bare c:crops a union source.
+item replace block 8 -60 8 container.0 with biomeswevegone:oddion_bulb
+execute if items block 8 -60 8 container.0 #c:crops
+execute unless items block 8 -60 8 container.0 #c:vegetables
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/vegetable
+execute unless items block 8 -60 8 container.0 #c:foods
+execute unless items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+item replace block 8 -60 8 container.0 with biomeswevegone:cooked_oddion_bulb
+execute if items block 8 -60 8 container.0 #c:foods
+
+# ===================== GATE IDENTITY (must stay UNKNOWN) =====================
+# Stone in the slot: these five tag ids do not exist with the rescuer sets this version
+# derives. "Test failed" means the overlay exists and leaked; "Test passed" means the gate
+# set moved and every gate suite plus AuditRoles check 5 needs re-cutting with it.
+item replace block 8 -60 8 container.0 with minecraft:stone
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/salts
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/vegetables
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/bountifulfares_or_farm_and_charm_or_pamhc2foodcore/c/flour
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/raw_fishes
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/kaleidoscope_cookery/c/vegetables
+

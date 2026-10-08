@@ -2,6 +2,7 @@
   "values": [
     { "id": "pamhc2foodcore:friedeggitem", "required": false },
     { "id": "bountifulfares:cooked_egg", "required": false },
-    { "id": "croptopia:sunny_side_eggs", "required": false }
+    { "id": "croptopia:sunny_side_eggs", "required": false },
+    { "id": "kaleidoscope_cookery:fried_egg", "required": false }
   ]
 }

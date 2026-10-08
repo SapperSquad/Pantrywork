@@ -1,0 +1,91 @@
+# Gate scenario S6 (tools/neo-server-1211), NEW in 0.8.0 - THE SALT FAMILY.
+# Pantrywork release jar + Farmer's Delight 1.3.2 + Hearth and Harvest 1.3.4 + Cook's
+# Collection 0.6.1 + Pam's HarvestCraft 2 Food Core. No Meadow, no Croptopia, no Create.
+# (Cook's and H&H both hard-require farmersdelight; nothing here requires architectury.)
+# Do NOT run tagtest-gates.txt here - it needs Meadow.
+# Expected: 30 passed / 0 failed / 5 expected.
+#
+# What this boot proves:
+#   gate _3  (cookscollection)            OPEN  - H&H's 1/32 salt into c:salt and c:salts
+#   gate _4  (cookscollection|croptopia)  OPEN  by COOK'S, with no Croptopia loaded: the
+#                                               0.8.0 rename that widened the Pam's-salt gate
+#   gate _12 (hearthandharvest)           OPEN  - Pam's 1/8 salt into the new c:dusts/salt
+#   gate _1  (bountifulfares|farm_and_charm) CLOSED while H&H's 1/2 flour and corn_meal exist
+#                                               (the only boot that can show that)
+#   gate _14 (pamhc2foodcore)             OPEN  - FD's bottle AND H&H's goat milk bottle
+#   gates _6, _7, _8, _13                 CLOSED
+# THE TRAP this scenario exists to watch: Cook's Collection files c:salt and c:salts as
+# literally "#c:dusts/salt", so anything Pantrywork puts in c:dusts/salt is ALSO reachable
+# from those two tags. That is why gates _3 and _4 are asserted on the overlay's OWN tag
+# first (review TV-1) - the plain #c:salt / #c:salts lines are reachability, not gate proofs.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- gate _3: Hearth and Harvest's 1/32 salt, the cheapest salt in the scanned set ---
+item replace block 8 -60 8 container.0 with hearthandharvest:salt
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection/c/salt
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection/c/salts
+execute if items block 8 -60 8 container.0 #c:salt
+execute if items block 8 -60 8 container.0 #c:salts
+execute if items block 8 -60 8 container.0 #c:dusts/salt
+# --- Cook's own mined 1/4 salt reaches Pam's c:salt dialect (ungated PASS) ---
+item replace block 8 -60 8 container.0 with cookscollection:salt
+execute if items block 8 -60 8 container.0 #c:salt
+execute if items block 8 -60 8 container.0 #c:dusts/salt
+# --- gates _12 and _4: Pam's 1/8 salt into c:dusts/salt and into Cook's c:salts ---
+item replace block 8 -60 8 container.0 with pamhc2foodcore:saltitem
+execute if items block 8 -60 8 container.0 #pantrywork:gated/hearthandharvest/c/dusts/salt
+execute if items block 8 -60 8 container.0 #c:dusts/salt
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection_or_croptopia/c/salts
+execute if items block 8 -60 8 container.0 #c:salts
+execute if items block 8 -60 8 container.0 #c:salt
+# --- gate _1 CLOSED: H&H's 1/2-wheat flour and corn meal stay out of c:flour (Pam's 1-wheat
+# flour is the floor here and nothing rescues a half) ---
+item replace block 8 -60 8 container.0 with hearthandharvest:flour
+execute unless items block 8 -60 8 container.0 #c:flour
+item replace block 8 -60 8 container.0 with hearthandharvest:corn_meal
+execute unless items block 8 -60 8 container.0 #c:flour
+item replace block 8 -60 8 container.0 with pamhc2foodcore:flouritem
+execute if items block 8 -60 8 container.0 #c:flour
+# --- gate _14 OPEN (Pam's), gate _6 CLOSED (no Croptopia) ---
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute if items block 8 -60 8 container.0 #c:milk
+execute unless items block 8 -60 8 container.0 #c:milks
+item replace block 8 -60 8 container.0 with hearthandharvest:goat_milk_bottle
+execute if items block 8 -60 8 container.0 #c:milk
+# --- 0.8.0 item 6: H&H butter into Croptopia's c:butters (ungated PASS; the tag is ours here) ---
+item replace block 8 -60 8 container.0 with hearthandharvest:butter
+execute if items block 8 -60 8 container.0 #c:butters
+# --- 0.8.0 item 5: the bottled oils into Pam's c:cookingoil; only Cook's 4-sunflower oil is
+# dear enough for Croptopia's c:olive_oils ---
+item replace block 8 -60 8 container.0 with hearthandharvest:cooking_oil
+execute if items block 8 -60 8 container.0 #c:cookingoil
+execute unless items block 8 -60 8 container.0 #c:olive_oils
+item replace block 8 -60 8 container.0 with cookscollection:cooking_oil
+execute if items block 8 -60 8 container.0 #c:cookingoil
+execute if items block 8 -60 8 container.0 #c:olive_oils
+# --- 0.8.0 items 1 and 8: the hand-authored foreign oil tags. Kaleidoscope Cookery and
+# Rustic Delight are NOT loaded here, so both tags exist only because Pantrywork ships them
+# (harmless: with the mod absent nothing reads them). S8 and S9 assert them with the mod on.
+execute if items block 8 -60 8 container.0 #kaleidoscope_cookery:oil
+execute if items block 8 -60 8 container.0 #rusticdelight:cooking_oil
+item replace block 8 -60 8 container.0 with hearthandharvest:cooking_oil
+execute if items block 8 -60 8 container.0 #kaleidoscope_cookery:oil
+execute if items block 8 -60 8 container.0 #rusticdelight:cooking_oil
+# --- gates _13, _7, _8 CLOSED ---
+item replace block 8 -60 8 container.0 with farmersdelight:cod_slice
+execute unless items block 8 -60 8 container.0 #c:raw_fishes
+item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
+execute unless items block 8 -60 8 container.0 #c:vegetables
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+# --- overlay level ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/bountifulfares_or_farm_and_charm/c/flour
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/kaleidoscope_cookery/c/raw_fishes
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia_or_kaleidoscope_cookery/c/vegetables
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/culturaldelights_or_rusticdelight/bridged/vegetable
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/milks

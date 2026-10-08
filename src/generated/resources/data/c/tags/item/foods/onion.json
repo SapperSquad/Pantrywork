@@ -1,0 +1,6 @@
+{
+  "values": [
+    { "id": "croptopia:onion", "required": false },
+    { "id": "farm_and_charm:onion", "required": false }
+  ]
+}

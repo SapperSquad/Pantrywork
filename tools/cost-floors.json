@@ -20,7 +20,48 @@
     "c:cheeses pamhc2foodcore:cheeseitem and c:salts pamhc2foodcore:saltitem: verifier PLAUSIBLE (PASS equally defensible); the conservative GATE croptopia is taken. Croptopia is the only reader of c:cheeses, so the cheese gate changes no recipe.",
     "meadow:cooked_buffalo_meat: strict own-mod costing (Meadow's pot makes 4 per raw buffalo meat) -> EXCLUDE from c:foods/cooked_meat. Verifier: Meadow's pot is 4:1 only for beef and chicken, 2:1 for the rest.",
     "c:cookedfish / c:cooked_fishes / c:foods/cooked_fish have no recipe consumer. The first two keep whole-fish floors only so cut removals stay applied (SapperSquad's decision); c:foods/cooked_fish is moot.",
-    "End's Delight cuts (1/3 dragon meat, 1/2 shulker meat) are GATE farmersdelight in c:foods/raw_meat and c:foods/cooked_meat, always satisfied: End's Delight declares farmersdelight required, so they PASS by dependency-rescue."
+"End's Delight cuts (1/3 dragon meat, 1/2 shulker meat) are GATE farmersdelight in c:foods/raw_meat and c:foods/cooked_meat, always satisfied: End's Delight declares farmersdelight required, so they PASS by dependency-rescue.",
+    "SEEDS (0.8.0, settled after the 0.8.0 refutation pass): a planting seed costs its share of the produce it is crafted from, so minecraft:pumpkin_seeds is 1/4 of a pumpkin (1 pumpkin -> 4 seeds, verified in the 1.21.1 client jar) and minecraft:melon_seeds is 1 (1 melon slice -> 1). One rule everywhere: it fixes kaleidoscope_cookery:oil (millstone, 1 c:seeds -> 1) at 1/4 olive and rusticdelight:cooking_oil (6 pumpkin seeds -> 2) at 3/4. The earlier working note that 1 c:seeds = 1 olive is WITHDRAWN - it contradicted this rule.",
+    "MOB DROPS (0.8.0): a route that starts at a mob drop is not costed as a cheaper route. Costs measure processing effort, not scarcity (the same reason the salt convention ignores how common water is), so kaleidoscope_cookery:oil is NOT 0 because pigs drop it to a kitchen knife, and hearthandharvest:jerky is NOT 0 because rotten flesh works. A whole mob drop itself is still 1 unit (minecraft:porkchop, meadow:raw_buffalo_meat, rusticdelight:calamari).",
+    "pamhc2foodcore:cookingoilitem in kaleidoscope_cookery:oil (0.8.0, the headline wok fix): Pam
+'
+s oil is 1/2 against the wok tag
+'
+s only floor, KC
+'
+s own 1/4 oil - x0.50, well inside tolerance, so it PASSES and ships in the hand-authored data/kaleidoscope_cookery/tags/item/oil.json. Under the withdrawn 1-olive-per-seed reading it was x2.00 EXCLUDE; the pumpkin-seed rule is what includes it. It stays OUT of c:olive_oils (x0.25 there, unchanged).",
+    "hearthandharvest:goat_milk_bottle (0.8.0): no recipe makes it, so the cost is a judgment. Taken as 1/4 of a bucket, matching Farmer
+'
+s Delight
+'
+s milk bottle, rather than 1 as a direct gather. It changes no verdict: at 1/4 the H&H floor in c:drinks/milk equals FD
+'
+s, so Croptopia
+'
+s 1/16 bottle, its soy milk and Pam
+'
+s 1/8 fresh milk all stay EXCLUDEd from pantrywork:bridged/drinks_milk, and the goat bottle itself gates into c:milk / c:milks exactly where FD
+'
+s bottle does.",
+    "hearthandharvest:salt = 1/32 (0.8.0 re-derivation, demanded by the refutation): the jar has TWO cooking-pot routes, 1 water bucket -> 8 salt (1/8) and 1 water bottle -> 2 salt. One water-bottle ratio is used project-wide - 16 bottles per bucket, as croptopia:salt already does - so the bottle route is 1/32 and it is the cheapest. Consequence, disclosed: it is the cheapest salt in the game, EXCLUDEd from c:salt / c:salts except behind the Cook
+'
+s Collection gate below.",
+    "floor(cookscollection, c:salt) = floor(cookscollection, c:salts) = hearthandharvest:salt 1/32 (0.8.0): Cook
+'
+s Collection files both tags as exactly #c:dusts/salt, so its own salt recipes accept whatever that tag holds - with Hearth and Harvest installed, H&H
+'
+s 1/32 salt. Chased per the floor convention, like the croptopia c:vegetables and farm_and_charm c:dough rows. It widens the c:salts gate on Pam
+'
+s saltitem from croptopia to cookscollection_or_croptopia; the conservative alternative (Cook
+'
+s own mined 1/4 salt, no chase) was rejected as a convention change, but it is the one row where the chase reaches a mod that is not implied by the judged item.",
+    "EMPTY DEFINERS (0.8.0): Kaleidoscope Cookery ships data/c/tags/item/doughs.json and data/c/tags/item/foods/dough.json with an empty values list - it declares both tags only so its own c:dough reference resolves. A definer that lists no item imposes no floor, so both get a {none} row rather than a code change in Test-FloorDefiners. The conduit is real but harmless: KC
+'
+s own c:dough references both, and its raw_dough costs 1.013.",
+    "BLUEBERRIES (0.8.0, sixth player report): all three blueberries are raw gathered produce and cost exactly the 1-produce tag default, so NO item row was added for any of them - croptopia:blueberry is a crop drop, biomeswevegone:blueberries is a bush drop that no recipe produces at all, and hearthandharvest:blueberries has exactly one producing recipe, the 9-for-9 crate round trip (9 x #c:fruits/blueberry -> 1 blueberry_crate -> 9 blueberries), which is not a cheaper route. The same reading as every other gathered fruit in this file (croptopia:apple, croptopia:banana and the rest also have no row). Consequence: x1.00 into c:fruits/blueberry, c:blueberries and c:fruits, so the bridge is an unconditional PASS with no gate and no exclusion. Disclosed rather than glossed: because the crate takes #c:fruits/blueberry and gives back 9 Hearth and Harvest blueberries, the bridge also makes BYG blueberries convertible into H&H ones at 9:9 - a conversion, not a duplication, and it exists in the other direction already between Croptopia and H&H.",
+    "biomeswevegone:soul_fruit (0.8.0, SapperSquad decision): NOT bridged - on the generator non-food blacklist beside create:honeyed_apple. It is food with a DEBUFF: nutrition 4, saturation 0.35, effect(MobEffectInstance(MobEffects.BLINDNESS, 40), 1.0f), read out of BWGItems in the 2.6.2 jar. BYG files it in its own c:foods/fruit, which the fruits category reads, so it would have been emitted into Croptopia c:fruits and reached 7 recipes (Pam fruit punch / fruit salad / trail mix, Croptopia fruit smoothie / fruit cake, Rustic Delight beignet / sweet salad). THE COST FLOOR CANNOT CATCH THIS and was never going to: a cost measures processing effort, and soul_fruit is a gathered drop worth exactly the 1 produce the c:fruits floor asks for, x1.00 PASS. Recorded here so the number is on the record and nobody later reads the PASS as permission. BYG own blueberry_pie and green_apple_pie name their fruit by exact item id, so BYG own recipes are unaffected either way.",
+    "biomeswevegone:oddion_bulb (0.8.0, LATENT - no path reaches it today, recorded because the next vegetable pass will meet it): it is real FOOD (ItemNameBlockItem over ODDION_CROP, nutrition 2, saturation 0.35) and it is also plantable, and the third seed signal would MISLABEL it as seed stock. BYG files it in minecraft:villager_plantable_seeds and in BARE c:crops - both of which Test-IsFoodEvidenceTag deliberately refuses as food evidence - while BYG own c:foods lists only the COOKED bulb (biomeswevegone:cooked_oddion_bulb). So ownSeedFiled holds it, ownFoodFiled does not, and rule 3 returns true. This is the farm_and_charm:onion case WITHOUT the rescue: F&C onion survives because F&C files it in its own c:vegetables and c:crops/onion, and BYG files its bulb in no food tag of its own at all. It is harmless in 0.8.0 only because no category reads bare c:crops and BYG defines no vegetable dialect, so the bulb never reaches a union. If a future pass makes bare c:crops a union source, or BYG starts filing the raw bulb in a c: food tag, re-check this before trusting the seed line in the report.",
+    "CORN KERNELS (0.8.0 blocker B1): culturaldelights:corn_kernels and hearthandharvest:corn_kernels are PLANTING SEEDS, not corn. Both are in their own mod's c:seeds and c:seeds/corn (H&H's also in c:animal_foods and minecraft:villager_plantable_seeds) and in no food tag of their own, while those mods' own corn tags hold corn_cob and corn. 0.8.0 shipped them inside c:crops/corn, c:foods/corn, c:crops/grain, c:grain, c:grains, c:grain/corn and c:grains/corn, reached through Croptopia's c:corn -> #c:seeds/corn reference. Fixed by Test-IsSeed rule 3 (the item's own mod is the authority), not by a hand denylist. Costs are recorded for both anyway: H&H's 1/2 is x2.00 and would EXCLUDE on its own, CD's 2/3 is exactly x1.50 and would NOT - the cost floor alone was never going to catch this, which is why the seed rule is the fix."
   ],
   "units": {
     "milk_bucket": "milk content, in milk buckets",
@@ -36,7 +77,12 @@
     "produce": "one gathered unit of vegetable, fruit, grain or nut"
   },
   "dependencies": {
-    "ends_delight": ["farmersdelight"]
+    "cookscollection": ["farmersdelight"],
+    "culturaldelights": ["cookscollection", "farmersdelight"],
+    "ends_delight": ["farmersdelight"],
+    "hearthandharvest": ["farmersdelight"],
+    "hybrid_delights": ["farmersdelight"],
+    "rusticdelight": ["farmersdelight"]
   },
   "modAliases": {
     "croptopia-refabricated": { "as": "croptopia", "loader": "fabric", "why": "Croptopia's Fabric 1.21.10 build (Croptopia Refabricated 0.10.0, tools/work/jars-12110): mod id croptopia-refabricated, no 'provides', conflicts with croptopia. Its recipes and c: tags match croptopia 4.2.4 for every judged tag (bottle 16 per bucket, cheese = pot + c:milks + c:salts, c:milks/c:cheeses/c:salts/c:vegetables identical), so its floors are Croptopia's and every gate on croptopia must also open for it on Fabric (review CF-2: fabric-server-12110 went 5/2 without this)." }
@@ -49,6 +95,7 @@
     "croptopia:milk_bottle": { "unit": "milk_bucket", "cost": "1/16", "why": "milk bucket + 3 glass bottles -> 16" },
     "croptopia:soy_milk": { "unit": "milk_bucket", "cost": 0, "why": "glass bottle + soybeans in the food press: no milk" },
     "bountifulfares:coconut_milk_bottle": { "unit": "milk_bucket", "cost": 0, "why": "fermented coconut half: no milk" },
+    "hearthandharvest:goat_milk_bottle": { "unit": "milk_bucket", "cost": "1/4", "why": "no recipe produces it (a glass bottle used on a goat); costed as a bottle = 1/4 of a bucket, the same reading as Farmer's Delight's milk bottle (0.8.0 judgment)" },
 
     "pamhc2foodcore:cheeseitem": { "unit": "milk_bucket", "cost": "1/8", "why": "pot + c:milk (cheapest Pam's milk: 1/8 fresh milk) + salt" },
     "croptopia:cheese": { "unit": "milk_bucket", "cost": "1/16", "why": "pot + c:milks (its 1/16 bottle) + salt" },
@@ -62,10 +109,12 @@
     "brewinandchewin:flaxen_cheese_wedge": { "unit": "milk_bucket", "cost": "1/4", "why": "1000 mB milk ferment -> unripe wheel -> ripe wheel -> 4 wedges" },
     "brewinandchewin:scarlet_cheese_wedge": { "unit": "milk_bucket", "cost": "1/4", "why": "1000 mB milk ferment -> unripe wheel -> ripe wheel -> 4 wedges" },
     "refurbished_furniture:cheese": { "unit": "milk_bucket", "cost": "1/2", "why": "sea salt + milk bucket -> 2" },
+    "culturaldelights:cheese_wedge": { "unit": "milk_bucket", "cost": "3/16", "why": "aging vat: 3 c:drinks/milk + brown mushroom + salt -> 1 cheese_wheel; the cheapest milk CD can see is Farmer's Delight's 1/4 bottle (FD is a hard dependency), so a wheel is 3/4, and a knife cuts it into 4 wedges (the cheese_block route, 2 wheels -> 8 wedges, is the same 3/16)" },
 
     "farm_and_charm:butter": { "unit": "milk_bucket", "cost": "1/4", "why": "crafting bowl: farm_and_charm:milk -> 4" },
     "pamhc2foodcore:butteritem": { "unit": "milk_bucket", "cost": "1/8", "why": "pot + c:milk (1/8 fresh milk) -> 1" },
     "croptopia:butter": { "unit": "milk_bucket", "cost": "1/16", "why": "pot + press + c:milks (1/16 bottle) + salt -> 1" },
+    "culturaldelights:butter": { "unit": "milk_bucket", "cost": "1/4", "why": "shapeless c:drinks/milk + c:dusts/salt -> 1; the cheapest milk CD can see is FD's 1/4 bottle (FD is a hard dependency of Cultural Delights)" },     "hearthandharvest:butter": { "unit": "milk_bucket", "cost": "1/8", "why": "shapeless c:dusts/salt + c:drinks/milk -> 2; H&H's own milk in that tag is its 1/4 goat_milk_bottle" },
 
     "farm_and_charm:dough": { "unit": "wheat", "cost": 0.094, "why": "flour (mincer: wheat -> 4) + yeast (1/12) + water bottle -> 5; base 0.067" },
     "create:dough": { "unit": "wheat", "cost": "2/3", "why": "wheat flour (milling 1 + 25% x 2 = 1.5 per wheat) -> dough 1:1 by fan splashing (consumes nothing) or with water" },
@@ -73,6 +122,8 @@
     "pamhc2foodcore:doughitem": { "unit": "wheat", "cost": 0.6, "why": "flour (1 wheat) + fresh water + salt -> 2" },
     "croptopia:dough": { "unit": "wheat", "cost": 2.1, "why": "flour (2 flourable grain) + water bottle -> 1" },
     "refurbished_furniture:dough": { "unit": "wheat", "cost": 1.725, "why": "flour (bowl + 3 wheat + sea salt -> 1) + water bucket -> 2" },
+    "culturaldelights:corn_dough": { "unit": "wheat", "cost": 1.033, "why": "shapeless c:buckets/water + 3 c:crops/corn (its own corn_cob, 1 flourable grain each) -> 3; the water bucket is a trace side 0.10 spread over 3" },
+    "kaleidoscope_cookery:raw_dough": { "unit": "wheat", "cost": 1.013, "why": "shapeless water bucket + N kaleidoscope_cookery:flour -> N for N=1..8; the 8-flour variant is cheapest: 1 flour (1 wheat) + 1/8 of the 0.10 water side = exactly 1.0125" },
 
     "farm_and_charm:flour": { "unit": "wheat", "cost": "1/4", "why": "mincer: 1 wheat -> 4" },
     "bountifulfares:flour": { "unit": "wheat", "cost": "1/2", "why": "milling: 1 wheat or maize -> 2" },
@@ -80,6 +131,9 @@
     "pamhc2foodcore:flouritem": { "unit": "wheat", "cost": 1, "why": "grinder + 1 c:flour_plants -> 1" },
     "croptopia:flour": { "unit": "wheat", "cost": 2, "why": "2 flourable grain -> 1" },
     "refurbished_furniture:wheat_flour": { "unit": "wheat", "cost": 3.35, "why": "bowl + 3 wheat + sea salt -> 1" },
+    "hearthandharvest:flour": { "unit": "wheat", "cost": "1/2", "why": "cutting board: 1 wheat -> 2 (the flour_bag route is 9 flour per bag, circular)" },
+    "hearthandharvest:corn_meal": { "unit": "wheat", "cost": "1/2", "why": "cutting board: 1 corn_kernels -> 1; kernels are cutting board 1 corn -> 2 (+ a corn husk), so half a flourable grain" },
+    "kaleidoscope_cookery:flour": { "unit": "wheat", "cost": 1, "why": "millstone: 1 minecraft:wheat -> 1" },
 
     "farmersdelight:raw_pasta": { "unit": "wheat", "cost": 1.083, "why": "knife on 1 FD-native dough -> 1" },
     "farm_and_charm:raw_pasta": { "unit": "wheat", "cost": 0.047, "why": "mincer: F&C dough -> 2" },
@@ -90,10 +144,12 @@
     "refurbished_furniture:bread_slice": { "unit": "wheat", "cost": "1/2", "why": "1 bread -> 6 slices" },
     "refurbished_furniture:toast": { "unit": "wheat", "cost": "1/2", "why": "1 bread slice -> 1 toast" },
     "farm_and_charm:farmers_bread": { "unit": "wheat", "cost": 0.065, "why": "stove: F&C dough + water bottle -> 3; base 0.022" },
+    "cookscollection:rustic_loaf_slice": { "unit": "wheat", "cost": 0.592, "why": "baking: 2 c:foods/dough/wheat (FD's wheat_dough 1.083; FD is a hard dependency) + sugar + salt -> 1 rustic_loaf = 2.366; knife on the loaf -> 4 slices" },     "hearthandharvest:tortilla": { "unit": "wheat", "cost": 0.35, "why": "shapeless_remainder: c:dusts/salt + c:flours (its own 1/2 flour) + water bottle -> 2, glass bottle given back; (0.5 + 0.10 salt + 0.10 water) / 2, the same shape as Pam's doughitem" },
 
     "minecraft:cookie": { "unit": "wheat", "cost": "1/4", "why": "2 wheat + cocoa -> 8" },
     "farmersdelight:honey_cookie": { "unit": "wheat", "cost": "1/4", "why": "2 wheat + honey bottle -> 8" },
     "farmersdelight:sweet_berry_cookie": { "unit": "wheat", "cost": "1/4", "why": "2 wheat + sweet berries -> 8" },
+    "hearthandharvest:maple_cookie": { "unit": "wheat", "cost": "1/4", "why": "2 wheat + syrup bottle -> 8; the flavour side is not charged, as for minecraft:cookie and FD's honey / sweet-berry cookies" },     "hearthandharvest:peanut_butter_cookie": { "unit": "wheat", "cost": "1/4", "why": "2 wheat + peanut butter -> 8" },     "rusticdelight:cherry_blossom_cookie": { "unit": "wheat", "cost": "1/4", "why": "2 wheat + 1 #rusticdelight:cherry_blossom_ingredients -> 8" },     "rusticdelight:coffee_cookie": { "unit": "wheat", "cost": "1/4", "why": "2 wheat + 1 #rusticdelight:coffee_ingredients -> 8" },     "rusticdelight:syrup_cookie": { "unit": "wheat", "cost": "1/4", "why": "2 wheat + 1 #rusticdelight:syrup -> 8" },
 
     "croptopia:toast": { "unit": "bread_loaf", "cost": 1, "why": "smelt/smoke/campfire 1 bread -> 1" },
     "pamhc2foodcore:toastitem": { "unit": "bread_loaf", "cost": 0.625, "why": "toastitem_x2: skillet + c:bread + c:butter -> 2 (half a bread + half a butter)" },
@@ -102,9 +158,11 @@
     "pamhc2foodcore:saltitem": { "unit": "salt_source", "cost": "1/8", "why": "pot + fresh water (bucket -> 8) -> 1" },
     "refurbished_furniture:sea_salt": { "unit": "salt_source", "cost": "1/4", "why": "oven: water bucket -> 4" },
     "meadow:alpine_salt": { "unit": "salt_source", "cost": "1/4", "why": "pot: limestone -> 4" },
+    "cookscollection:salt": { "unit": "salt_source", "cost": "1/4", "why": "shapeless 1 cookscollection:salt_block -> 4; the block is a worldgen ore (its only source, mined with a pickaxe), the same shape as Meadow's limestone -> 4" },     "hearthandharvest:salt": { "unit": "salt_source", "cost": "1/32", "why": "cooking pot, cheapest of its two routes: 1 water bottle -> 2 salt, and a water bottle is 1/16 of a bucket by this file's own ratio (see croptopia:salt), so 1/32; the other route is 1 water bucket -> 8 salt (1/8)" },     "hybrid_delights:salt": { "unit": "salt_source", "cost": "1/4", "why": "cooking pot: 1 brine_bottle -> 1 salt; brine bottles are 1 hybrid_aquatic:brine_bucket + 4 glass bottles -> 4, and a filled bucket gives the bucket back, so 4 salt per brine bucket - the same as Refurbished's sea salt" },
 
     "croptopia:olive_oil": { "unit": "olive", "cost": 2, "why": "2 c:olives + press -> 1" },
     "pamhc2foodcore:cookingoilitem": { "unit": "olive", "cost": "1/2", "why": "roller + 1 c:vegetables or c:nuts -> 2" },
+    "cookscollection:cooking_oil": { "unit": "olive", "cost": 4, "why": "shapeless glass bottle + 4 minecraft:sunflower -> 1; the bottle is the oil's own craftRemainder (OilItem built on drinkItem(), ModItems lambda$static$2) and costs 0" },     "hearthandharvest:cooking_oil": { "unit": "olive", "cost": 1, "why": "stomping basin, cheapest of three routes: 4 c:vegetables/corn (its own corn) -> 1000 mB with HHDataMaps.BOTTLE_VOLUME = 250, so 4 bottles at 1 corn each; peanuts give 500 mB per 4 (2 each) and c:seeds 125 mB per 8 (4+ each). The item is a BucketItem with craftRemainder GLASS_BOTTLE, so the bottle costs 0" },     "kaleidoscope_cookery:oil": { "unit": "olive", "cost": "1/4", "why": "millstone: 1 c:seeds -> 1; the cheapest c:seeds member is minecraft:pumpkin_seeds (platform #c:seeds/pumpkin), 1/4 of a pumpkin. The pig-drop-to-a-kitchen-knife route is a mob drop and is not costed" },     "rusticdelight:cooking_oil": { "unit": "olive", "cost": "3/4", "why": "FD cooking pot: 6 #rusticdelight:cooking_oil_ingredients -> 2, container glass bottle; the cheapest costed ingredient is minecraft:pumpkin_seeds at 1/4 (its cotton seeds are a wild-plant drop), and the pot ejects craftRemainder so the bottle costs 0" },
 
     "farmersdelight:bone_broth": { "unit": "bone", "cost": 1.25, "why": "cooking pot: 1 bone + 1 garnish -> 1" },
     "pamhc2foodcore:stockitem": { "unit": "bone", "cost": "1/2", "why": "pot + 1 bone or raw meat -> 2" },
@@ -125,9 +183,28 @@
     "pamhc2foodcore:friedeggitem": { "unit": "egg", "cost": 1, "why": "skillet + 1 egg -> 1" },
     "bountifulfares:cooked_egg": { "unit": "egg", "cost": 1, "why": "smelt 1 egg -> 1" },
     "croptopia:sunny_side_eggs": { "unit": "egg", "cost": 1, "why": "2 eggs + pan -> 2" },
+    "kaleidoscope_cookery:fried_egg": { "unit": "egg", "cost": 1.011, "why": "wok (pot): N c:eggs -> N for N=1..9; cheapest is 1 minecraft:egg plus 1/9 of the 0.10 oil that primes the wok" },
 
     "farmersdelight:cabbage_leaf": { "unit": "produce", "cost": "1/2", "why": "knife: 1 cabbage -> 2 leaves" },
     "minecraft:melon_slice": { "unit": "produce", "cost": 1, "why": "raw gathered produce: the drop from breaking a melon block (SapperSquad FC2-4, raw gathered produce = 1 base unit)" },
+    "culturaldelights:cut_cucumber": { "unit": "produce", "cost": "1/2", "why": "knife: 1 cucumber -> 2" },
+    "culturaldelights:cut_eggplant": { "unit": "produce", "cost": "1/2", "why": "knife: 1 eggplant -> 2" },
+    "culturaldelights:smoked_cut_eggplant": { "unit": "produce", "cost": "1/2", "why": "cut eggplant smoked 1:1" },
+    "culturaldelights:pickle": { "unit": "produce", "cost": 1.088, "why": "aging vat: 4 cucumbers + vinegar (a bottled side, 0.25) + c:dusts/salt (0.10) -> 4" },
+    "culturaldelights:cut_pickle": { "unit": "produce", "cost": 0.544, "why": "knife: 1 pickle -> 2" },
+    "culturaldelights:cut_avocado": { "unit": "produce", "cost": "1/2", "why": "knife: 1 avocado -> 2 (+ an avocado_pit, which is a seed)" },
+    "rusticdelight:potato_slices": { "unit": "produce", "cost": "1/2", "why": "knife: 1 potato -> 2" },
+    "rusticdelight:bell_pepper_slice_green": { "unit": "produce", "cost": "1/2", "why": "knife: 1 bell_pepper_green -> 2 (+ a 10% seed chance); the block route is 9 peppers -> 9 slices" },
+    "rusticdelight:bell_pepper_slice_yellow": { "unit": "produce", "cost": "1/2", "why": "knife: 1 bell_pepper_yellow -> 2" },
+    "rusticdelight:bell_pepper_slice_red": { "unit": "produce", "cost": "1/2", "why": "knife: 1 bell_pepper_red -> 2" },
+    "rusticdelight:bell_pepper_slice_orange": { "unit": "produce", "cost": "1/2", "why": "knife: 1 bell_pepper_orange -> 2" },
+    "rusticdelight:bell_pepper_slice_white": { "unit": "produce", "cost": "1/2", "why": "knife: 1 bell_pepper_white -> 2" },
+    "rusticdelight:bell_pepper_slice_pink": { "unit": "produce", "cost": "1/2", "why": "knife: 1 bell_pepper_pink -> 2" },
+    "rusticdelight:bell_pepper_slice_blue": { "unit": "produce", "cost": "1/2", "why": "knife: 1 bell_pepper_blue -> 2" },
+    "rusticdelight:bell_pepper_slice_purple": { "unit": "produce", "cost": "1/2", "why": "knife: 1 bell_pepper_purple -> 2" },
+    "rusticdelight:bell_pepper_slice_black": { "unit": "produce", "cost": "1/2", "why": "knife: 1 bell_pepper_black -> 2" },
+    "hearthandharvest:corn_kernels": { "unit": "produce", "cost": "1/2", "why": "cutting board: 1 hearthandharvest:corn -> 2 kernels (+ a corn_husk); the corn_kernel_bag is a 9<->9 round trip, so it is not cheaper. x2.00 against every 1-produce corn floor, which is the second, independent reason it is out of the corn and grain tags (the first is that it is a PLANTING SEED - H&H files it in its own c:seeds, c:seeds/corn, c:animal_foods and minecraft:villager_plantable_seeds and in no food tag of its own). 0.8.0 shipped it into c:crops/corn, c:foods/corn, c:crops/grain, c:grain, c:grains, c:grain/corn and c:grains/corn with NO cost row at all, so it fell back to the 1-produce tag default: blocker B1" },
+    "culturaldelights:corn_kernels": { "unit": "produce", "cost": "2/3", "why": "cutting board: 1 #c:crops/corn -> 1 kernel + 1 more at 50% + a straw, so expected 1.5 kernels per corn (the create:wheat_flour convention for a chance yield); the shapeless route is 1 corn -> 1 and the wild_corn route starts at a wild-plant drop, which is not costed. 2/3 is x1.50 against the 1-produce corn floors - exactly tolerance, so the cost floor does NOT exclude it: it is kept out solely because it is a PLANTING SEED (CD files it in its own c:seeds and c:seeds/corn and in no food tag of its own; its own c:crops/corn and c:vegetables/corn hold corn_cob instead). Recorded so the number is on the record, and because the kernels-in/kernels-out cutting recipe is a duplication loop as soon as they are inside #c:crops/corn: blocker B1" },
 
     "minecraft:porkchop": { "unit": "meat", "cost": 1, "why": "whole raw meat" },
     "minecraft:beef": { "unit": "meat", "cost": 1, "why": "whole raw meat" },
@@ -173,6 +250,14 @@
     "meadow:cooked_buffalo_meat": { "unit": "meat", "cost": 0.275, "why": "Meadow cooking pot: raw buffalo meat + c:salts -> 4 (smoking 1:1)" },
     "croptopia:ground_pork": { "unit": "meat", "cost": 0, "why": "food press + #croptopia:pork_replacements [porkchop, tofu] -> 2; tofu = cooking pot + water bottle + soybean -> 1, so the cheapest route holds no meat (same on 1.21.1, every 26.x jar and Croptopia Refabricated)" },
     "pamhc2foodcore:groundporkitem": { "unit": "meat", "cost": "1/2", "why": "grinder: porkchop -> 2" },
+    "kaleidoscope_cookery:raw_pork_belly": { "unit": "meat", "cost": "1/3", "why": "chopping board: 1 porkchop -> 3" },
+    "kaleidoscope_cookery:cooked_pork_belly": { "unit": "meat", "cost": "1/3", "why": "chopping board: 1 cooked porkchop -> 3 (raw pork belly also cooks 1:1)" },
+    "kaleidoscope_cookery:raw_cow_offal": { "unit": "meat", "cost": "1/3", "why": "chopping board: 1 beef -> 3" },
+    "kaleidoscope_cookery:cooked_cow_offal": { "unit": "meat", "cost": "1/3", "why": "chopping board: 1 cooked beef -> 3" },
+    "kaleidoscope_cookery:raw_lamb_chops": { "unit": "meat", "cost": "1/3", "why": "chopping board: 1 mutton -> 3" },
+    "kaleidoscope_cookery:cooked_lamb_chops": { "unit": "meat", "cost": "1/3", "why": "chopping board: 1 cooked mutton -> 3" },
+    "hearthandharvest:raw_sausage": { "unit": "meat", "cost": "1/3", "why": "shapeless cleaver (a tool, not consumed) + 1 beef -> 3; porkchop and mutton give 2, chicken and rabbit 1" },
+    "hearthandharvest:cooked_sausage": { "unit": "meat", "cost": "1/3", "why": "raw sausage cooked 1:1 (the skewered sausage and the jerky are the same 1/3)" },
 
     "farmersdelight:cod_slice": { "unit": "fish", "cost": "1/2", "why": "knife: cod -> 2" },
     "farmersdelight:salmon_slice": { "unit": "fish", "cost": "1/2", "why": "knife: salmon -> 2" },
@@ -188,37 +273,45 @@
     "aquaculture:fish_fillet_raw": { "unit": "fish", "cost": "1/14", "why": "Aquaculture 2.7.21 FishWeightHandler.registerFishData fillets per fish: atlantic_halibut 14, pacific_halibut 12, capitaine/arapaima/tuna 10, cod/catfish 6, gar/bayad/minecraft:cod 4, six species 1; weight config off by default" },
     "aquaculture:fish_fillet_cooked": { "unit": "fish", "cost": "1/14", "why": "raw fillet cooked 1:1; cheapest raw fillet is 1/14 of an Atlantic halibut" },
     "farm_and_charm:cooked_cod": { "unit": "fish", "cost": 1.75, "why": "roaster: cod + 3 sides -> 1" },
-    "farm_and_charm:cooked_salmon": { "unit": "fish", "cost": 1.75, "why": "roaster: salmon + 3 sides -> 1" }
+    "farm_and_charm:cooked_salmon": { "unit": "fish", "cost": 1.75, "why": "roaster: salmon + 3 sides -> 1" },
+    "kaleidoscope_cookery:sashimi": { "unit": "fish", "cost": "1/3", "why": "chopping board: 1 cod, salmon or tropical fish -> 3" },
+    "culturaldelights:raw_calamari": { "unit": "fish", "cost": "1/2", "why": "knife: 1 culturaldelights:squid (a mob drop, 1 whole unit) -> 2 (+ a 50% ink sac)" },
+    "culturaldelights:cooked_calamari": { "unit": "fish", "cost": "1/2", "why": "raw calamari cooked 1:1" },
+    "rusticdelight:calamari_slice": { "unit": "fish", "cost": "1/2", "why": "knife: 1 rusticdelight:calamari (a squid drop, 1 whole unit) -> 2 + bone meal" },
+    "rusticdelight:cooked_calamari_slice": { "unit": "fish", "cost": "1/2", "why": "calamari slice cooked 1:1" }
   },
   "tags": {
     "c:milk":   { "unit": "milk_bucket", "floors": { "farm_and_charm": "minecraft:milk_bucket", "meadow": "minecraft:milk_bucket", "pamhc2foodcore": "pamhc2foodcore:freshmilkitem" } },
     "c:milks":  { "unit": "milk_bucket", "floors": { "croptopia": { "item": "croptopia:milk_bottle", "why": "its 1/16 bottle; soy milk is a plant milk and not a floor" }, "meadow": "minecraft:milk_bucket" } },
-    "c:drinks/milk": { "unit": "milk_bucket", "floors": { "neoforge": "minecraft:milk_bucket", "farmersdelight": "farmersdelight:milk_bottle" } },
+    "c:drinks/milk": { "unit": "milk_bucket", "floors": { "neoforge": "minecraft:milk_bucket", "farmersdelight": "farmersdelight:milk_bottle", "hearthandharvest": "hearthandharvest:goat_milk_bottle" } },
     "c:foods/milk":  { "unit": "milk_bucket", "floors": { "bountifulfares": { "item": "minecraft:milk_bucket", "why": "coconut milk is a plant milk and not a floor" }, "farmersdelight": { "none": "only FD Refabricated 3.4.2 (Fabric 1.21.10) still defines the tag; no reader of it has a 1.21.10 build, so FD's own bottle there is not a floor for any recipe (see judgments)" } } },
 
     "c:cheese":  { "unit": "milk_bucket", "floors": { "meadow": "meadow:cheese_slice", "pamhc2foodcore": "pamhc2foodcore:cheeseitem" } },
     "c:cheeses": { "unit": "milk_bucket", "floors": { "croptopia": "croptopia:cheese", "meadow": "meadow:cheese_slice" } },
-    "c:butter":  { "unit": "milk_bucket", "floors": { "farm_and_charm": "farm_and_charm:butter", "pamhc2foodcore": "pamhc2foodcore:butteritem" } },
+    "c:butter":  { "unit": "milk_bucket", "floors": { "culturaldelights": "culturaldelights:butter", "farm_and_charm": "farm_and_charm:butter", "hearthandharvest": "hearthandharvest:butter", "pamhc2foodcore": "pamhc2foodcore:butteritem" } },
     "c:butters": { "unit": "milk_bucket", "floors": { "croptopia": "croptopia:butter" } },
 
-    "c:dough":  { "unit": "wheat", "floors": { "farm_and_charm": { "item": "farm_and_charm:dough", "why": "via its own c:dough -> #c:doughs" }, "pamhc2foodcore": "pamhc2foodcore:doughitem" } },
-    "c:doughs": { "unit": "wheat", "floors": { "croptopia": "croptopia:dough", "farm_and_charm": "farm_and_charm:dough" } },
-    "c:foods/dough": { "unit": "wheat", "floors": { "neoforge": { "none": "lists only an optional #c:foods/doughs that nothing defines" }, "create": "create:dough", "farmersdelight": { "item": "farmersdelight:wheat_dough", "why": "via its own #c:foods/dough/wheat" } } },
-    "c:flour":  { "unit": "wheat", "floors": { "bountifulfares": "bountifulfares:flour", "croptopia": "croptopia:flour", "farm_and_charm": { "item": "farm_and_charm:flour", "why": "via its own c:flour -> #c:flours" }, "pamhc2foodcore": "pamhc2foodcore:flouritem" } },
-    "c:flours": { "unit": "wheat", "floors": { "create": "create:wheat_flour", "farm_and_charm": "farm_and_charm:flour" } },
+    "c:dough":  { "unit": "wheat", "floors": { "farm_and_charm": { "item": "farm_and_charm:dough", "why": "via its own c:dough -> #c:doughs" }, "kaleidoscope_cookery": { "item": "farm_and_charm:dough", "why": "Kaleidoscope Cookery files c:dough as [its own raw_dough, #c:doughs, #c:foods/dough], so its dough recipes already accept every dough those two tags carry; the cheapest is Farm and Charm 0.094 (Create 2/3 and FD 1.083 also ride in). Its own raw_dough costs 1.013" }, "pamhc2foodcore": "pamhc2foodcore:doughitem" } },
+    "c:doughs": { "unit": "wheat", "floors": { "croptopia": "croptopia:dough", "farm_and_charm": "farm_and_charm:dough", "kaleidoscope_cookery": { "none": "Kaleidoscope Cookery 1.6.0 ships data/c/tags/item/doughs.json with an EMPTY values list - it declares the tag so its own c:dough reference resolves, and lists no item. A definer that lists nothing imposes no floor" } } },
+    "c:foods/dough": { "unit": "wheat", "floors": { "neoforge": { "none": "lists only an optional #c:foods/doughs that nothing defines" }, "create": "create:dough", "culturaldelights": "culturaldelights:corn_dough", "farmersdelight": { "item": "farmersdelight:wheat_dough", "why": "via its own #c:foods/dough/wheat" }, "kaleidoscope_cookery": { "none": "Kaleidoscope Cookery 1.6.0 ships data/c/tags/item/foods/dough.json with an EMPTY values list too (same as its c:doughs): declared so its own c:dough reference resolves, listing no item, so no floor" } } },
+    "c:flour":  { "unit": "wheat", "floors": { "bountifulfares": "bountifulfares:flour", "croptopia": "croptopia:flour", "farm_and_charm": { "item": "farm_and_charm:flour", "why": "via its own c:flour -> #c:flours" }, "kaleidoscope_cookery": "kaleidoscope_cookery:flour", "pamhc2foodcore": "pamhc2foodcore:flouritem" } },
+    "c:flours": { "unit": "wheat", "floors": { "create": "create:wheat_flour", "farm_and_charm": "farm_and_charm:flour", "hearthandharvest": { "item": "hearthandharvest:flour", "why": "its own file lists flour and corn_meal, both 1/2" } } },
     "c:pasta":  { "unit": "wheat", "floors": { "farm_and_charm": "farm_and_charm:raw_pasta", "pamhc2foodcore": "pamhc2foodcore:pastaitem" } },
     "c:foods/pasta": { "unit": "wheat", "floors": { "farmersdelight": "farmersdelight:raw_pasta" } },
-    "c:foods/bread": { "unit": "wheat", "floors": { "neoforge": "minecraft:bread", "bountifulfares": "bountifulfares:maize_bread", "refurbished_furniture": "refurbished_furniture:bread_slice" } },
+    "c:foods/bread": { "unit": "wheat", "floors": { "neoforge": "minecraft:bread", "bountifulfares": "bountifulfares:maize_bread", "cookscollection": "cookscollection:rustic_loaf_slice", "hearthandharvest": { "item": "hearthandharvest:tortilla", "why": "its own file lists tortilla (0.35) and corn_bread" }, "refurbished_furniture": "refurbished_furniture:bread_slice" } },
     "c:cookies": { "unit": "wheat", "floors": { "pamhc2foodcore": "minecraft:cookie" } },
 
     "c:toast":  { "unit": "bread_loaf", "floors": { "pamhc2foodcore": "pamhc2foodcore:toastitem" } },
     "c:toasts": { "unit": "bread_loaf", "floors": { "croptopia": "croptopia:toast" } },
 
-    "c:salt":  { "unit": "salt_source", "floors": { "croptopia": "croptopia:salt", "meadow": "meadow:alpine_salt", "pamhc2foodcore": "pamhc2foodcore:saltitem" } },
-    "c:salts": { "unit": "salt_source", "floors": { "croptopia": "croptopia:salt", "meadow": "meadow:alpine_salt" } },
+    "c:salt":  { "unit": "salt_source", "floors": { "cookscollection": { "item": "hearthandharvest:salt", "why": "Cook's Collection files c:salt as exactly #c:dusts/salt, so its salt recipes accept every salt that tag carries; with Hearth and Harvest loaded that is its 1/32 salt (Cook's own mined salt is 1/4)" }, "croptopia": "croptopia:salt", "meadow": "meadow:alpine_salt", "pamhc2foodcore": "pamhc2foodcore:saltitem" } },
+    "c:salts": { "unit": "salt_source", "floors": { "cookscollection": { "item": "hearthandharvest:salt", "why": "same file shape as its c:salt: exactly #c:dusts/salt" }, "croptopia": "croptopia:salt", "meadow": "meadow:alpine_salt" } },
+    "c:dusts/salt": { "unit": "salt_source", "floors": { "cookscollection": "cookscollection:salt", "culturaldelights": { "item": "cookscollection:salt", "why": "Cultural Delights' own data/c/tags/item/dusts/salt.json lists exactly one id, cookscollection:salt (required:false), and Cook's Collection is a hard dependency of CD 0.18.x, so its 1/4 mined salt is the cheapest salt CD's 7 readers see" }, "hearthandharvest": "hearthandharvest:salt" } },
 
     "c:olive_oils": { "unit": "olive", "floors": { "croptopia": "croptopia:olive_oil" } },
     "c:cookingoil": { "unit": "olive", "floors": { "pamhc2foodcore": "pamhc2foodcore:cookingoilitem" } },
+    "kaleidoscope_cookery:oil": { "unit": "olive", "floors": { "kaleidoscope_cookery": "kaleidoscope_cookery:oil" } },
+    "rusticdelight:cooking_oil": { "unit": "olive", "floors": { "rusticdelight": { "item": "rusticdelight:cooking_oil", "why": "Rustic Delight's own data/rusticdelight/tags/item/cooking_oil.json lists its own 3/4 oil plus an optional frycooks_delight:canola_oil (a mod nobody here has opened, so it is not costed and cannot set the floor). 10 readers: 9 Rustic Delight fry recipes plus its override of Farmer's Delight's fried_rice" } } },
     "c:stock": { "unit": "bone", "floors": { "pamhc2foodcore": "pamhc2foodcore:stockitem" } },
 
     "c:juices/applejuice":  { "unit": "fruit", "floors": { "pamhc2foodcore": "pamhc2foodcore:applejuiceitem" } },
@@ -230,7 +323,7 @@
     "c:jellies/applejelly":      { "unit": "fruit", "floors": { "pamhc2foodcore": "pamhc2foodcore:applejellyitem" } },
 
     "c:foods/cooked_egg": { "unit": "egg", "floors": { "farmersdelight": "farmersdelight:fried_egg" } },
-    "c:eggs": { "unit": "egg", "default": 1, "floors": { "neoforge": "minecraft:egg", "meadow": "minecraft:egg" } },
+    "c:eggs": { "unit": "egg", "default": 1, "floors": { "neoforge": "minecraft:egg", "kaleidoscope_cookery": { "item": "minecraft:egg", "why": "its file is [fried_egg 1.011, minecraft:egg, minecraft:turtle_egg]; the whole egg is the cheapest" }, "meadow": "minecraft:egg" } },
 
     "c:rawpork":    { "unit": "meat", "floors": { "pamhc2foodcore": "minecraft:porkchop" } },
     "c:raw_pork":   { "unit": "meat", "floors": { "farm_and_charm": "farm_and_charm:bacon" } },
@@ -252,46 +345,50 @@
     "c:ground_pork":   { "unit": "meat", "floors": { "croptopia": "croptopia:ground_pork" } },
     "c:groundmeats/groundpork": { "unit": "meat", "floors": { "pamhc2foodcore": "pamhc2foodcore:groundporkitem" } },
     "c:groundmeats": { "unit": "meat", "floors": { "pamhc2foodcore": { "item": "pamhc2foodcore:groundporkitem", "why": "Pam's own parent over its six ground-meat leaves, read by the meatloaf; every leaf is grinder + 1 raw meat (ground fish: + 1 c:fishes) -> 2. Judged so an injection that reaches it through Pam's own #c:groundmeats/groundpork ref is caught" } } },
-    "c:foods/raw_pork":    { "unit": "meat", "floors": { "farmersdelight": { "item": "farmersdelight:bacon", "why": "via its own #c:foods/raw_bacon" } } },
+    "c:foods/raw_pork":    { "unit": "meat", "floors": { "farmersdelight": { "item": "farmersdelight:bacon", "why": "via its own #c:foods/raw_bacon" }, "kaleidoscope_cookery": "kaleidoscope_cookery:raw_pork_belly" } },
     "c:foods/raw_bacon":   { "unit": "meat", "floors": { "farmersdelight": "farmersdelight:bacon" } },
-    "c:foods/raw_beef":    { "unit": "meat", "floors": { "farmersdelight": "farmersdelight:minced_beef" } },
-    "c:foods/raw_chicken": { "unit": "meat", "floors": { "farmersdelight": "farmersdelight:chicken_cuts" } },
-    "c:foods/raw_mutton":  { "unit": "meat", "floors": { "farmersdelight": "farmersdelight:mutton_chops" } },
-    "c:foods/cooked_pork":    { "unit": "meat", "floors": { "farmersdelight": { "item": "farmersdelight:cooked_bacon", "why": "via its own #c:foods/cooked_bacon" } } },
-    "c:foods/cooked_beef":    { "unit": "meat", "floors": { "farmersdelight": "farmersdelight:beef_patty" } },
+    "c:foods/raw_beef":    { "unit": "meat", "floors": { "farmersdelight": "farmersdelight:minced_beef", "kaleidoscope_cookery": "kaleidoscope_cookery:raw_cow_offal" } },
+    "c:foods/raw_chicken": { "unit": "meat", "floors": { "farmersdelight": "farmersdelight:chicken_cuts", "kaleidoscope_cookery": { "item": "minecraft:chicken", "why": "its file lists only the whole vanilla chicken; its own cut small meats are in c:raw_meats, not here" } } },
+    "c:foods/raw_mutton":  { "unit": "meat", "floors": { "farmersdelight": "farmersdelight:mutton_chops", "kaleidoscope_cookery": "kaleidoscope_cookery:raw_lamb_chops" } },
+    "c:foods/cooked_pork":    { "unit": "meat", "floors": { "farmersdelight": { "item": "farmersdelight:cooked_bacon", "why": "via its own #c:foods/cooked_bacon" }, "kaleidoscope_cookery": "kaleidoscope_cookery:cooked_pork_belly" } },
+    "c:foods/cooked_beef":    { "unit": "meat", "floors": { "farmersdelight": "farmersdelight:beef_patty", "kaleidoscope_cookery": "kaleidoscope_cookery:cooked_cow_offal" } },
     "c:foods/cooked_chicken": { "unit": "meat", "floors": { "farmersdelight": "farmersdelight:cooked_chicken_cuts" } },
-    "c:foods/cooked_mutton":  { "unit": "meat", "floors": { "farmersdelight": "farmersdelight:cooked_mutton_chops" } },
-    "c:foods/raw_meat":    { "unit": "meat", "floors": { "neoforge": "minecraft:beef", "farmersdelight": { "item": "farmersdelight:bacon", "why": "via its own refs to c:foods/raw_pork etc." } } },
-    "c:foods/cooked_meat": { "unit": "meat", "floors": { "neoforge": "minecraft:cooked_beef", "farmersdelight": { "item": "farmersdelight:cooked_bacon", "why": "via its own refs to c:foods/cooked_pork etc." } } },
+    "c:foods/cooked_mutton":  { "unit": "meat", "floors": { "farmersdelight": "farmersdelight:cooked_mutton_chops", "kaleidoscope_cookery": "kaleidoscope_cookery:cooked_lamb_chops" } },
+    "c:foods/raw_meat":    { "unit": "meat", "floors": { "neoforge": "minecraft:beef", "farmersdelight": { "item": "farmersdelight:bacon", "why": "via its own refs to c:foods/raw_pork etc." }, "hearthandharvest": { "item": "hearthandharvest:raw_sausage", "why": "its file lists raw_sausage and raw_skewered_sausage, both 1/3 (cleaver + 1 beef -> 3)" } } },
+    "c:foods/cooked_meat": { "unit": "meat", "floors": { "neoforge": "minecraft:cooked_beef", "farmersdelight": { "item": "farmersdelight:cooked_bacon", "why": "via its own refs to c:foods/cooked_pork etc." }, "hearthandharvest": { "item": "hearthandharvest:cooked_sausage", "why": "its file lists cooked_sausage, skewered_sausage and jerky; all three are 1/3 of a whole raw meat" } } },
 
     "c:rawfish":    { "unit": "fish", "default": 1, "floors": { "pamhc2foodcore": "minecraft:cod" } },
     "c:fishes":     { "unit": "fish", "default": 1, "floors": { "pamhc2foodcore": "minecraft:cod" } },
-    "c:raw_fishes": { "unit": "fish", "default": 1, "floors": { "farm_and_charm": "minecraft:cod" } },
+    "c:raw_fishes": { "unit": "fish", "default": 1, "floors": { "farm_and_charm": "minecraft:cod", "kaleidoscope_cookery": { "item": "kaleidoscope_cookery:sashimi", "why": "its file is [#c:foods/raw_cod, #c:foods/raw_salmon, #c:foods/tropical_fish] and its OWN c:foods/tropical_fish holds its 1/3 sashimi, so its raw-fish recipes already accept a third of a fish" } } },
     "c:cookedfish":    { "unit": "fish", "default": 1, "note": "no recipe consumer; floor kept so cut removals stay applied", "floors": { "pamhc2foodcore": { "item": "minecraft:cooked_cod", "cost": 1, "why": "whole cooked fish" } } },
     "c:cooked_fishes": { "unit": "fish", "default": 1, "note": "no recipe consumer; floor kept so cut removals stay applied", "floors": { "farm_and_charm": { "item": "farm_and_charm:cooked_cod", "cost": 1, "why": "one whole fish; the dish's sides are not counted for this recipe-moot tag (SapperSquad's cut-removal decision)" } } },
-    "c:foods/raw_fish": { "unit": "fish", "default": 1, "floors": { "neoforge": "minecraft:cod", "aquaculture": "aquaculture:atlantic_cod", "farmersdelight": { "item": "farmersdelight:cod_slice", "why": "via its own #c:foods/raw_cod" }, "fishofthieves": { "item": "fishofthieves:splashtail", "why": "via its own #fishofthieves:thieves_fish" } } },
+    "c:foods/raw_fish": { "unit": "fish", "default": 1, "floors": { "neoforge": "minecraft:cod", "aquaculture": "aquaculture:atlantic_cod", "farmersdelight": { "item": "farmersdelight:cod_slice", "why": "via its own #c:foods/raw_cod" }, "fishofthieves": { "item": "fishofthieves:splashtail", "why": "via its own #fishofthieves:thieves_fish" }, "rusticdelight": { "item": "rusticdelight:calamari_slice", "why": "its file is #c:foods/raw_calamari, which holds its own calamari (1) and calamari_slice (1/2)" } } },
 
-    "c:foods/vegetable": { "unit": "produce", "default": 1, "floors": { "neoforge": "minecraft:carrot", "bountifulfares": "bountifulfares:leek", "farmersdelight": "farmersdelight:onion" } },
-    "c:vegetables": { "unit": "produce", "default": 1, "floors": { "croptopia": { "item": "farmersdelight:cabbage_leaf", "why": "Croptopia's own c:vegetables -> #c:cabbage -> #c:crops/cabbage pulls FD's leaf in whenever FD is loaded" }, "farm_and_charm": "farm_and_charm:onion", "pamhc2foodcore": "minecraft:carrot" } },
+    "c:foods/vegetable": { "unit": "produce", "default": 1, "floors": { "neoforge": "minecraft:carrot", "bountifulfares": "bountifulfares:leek", "culturaldelights": { "item": "culturaldelights:cut_cucumber", "why": "its file lists cut_cucumber and cut_eggplant (1/2 each) beside whole cucumber, eggplant and corn" }, "farmersdelight": "farmersdelight:onion", "rusticdelight": { "item": "rusticdelight:potato_slices", "why": "its file is potato_slices (1/2) + #c:foods/bell_pepper, which holds nine 1/2 bell-pepper slices" } } },
+    "c:vegetables": { "unit": "produce", "default": 1, "floors": { "croptopia": { "item": "farmersdelight:cabbage_leaf", "why": "Croptopia's own c:vegetables -> #c:cabbage -> #c:crops/cabbage pulls FD's leaf in whenever FD is loaded" }, "farm_and_charm": "farm_and_charm:onion", "kaleidoscope_cookery": { "item": "farmersdelight:cabbage_leaf", "why": "its own c:vegetables ends in an optional #c:crops/cabbage, which FD fills with the leaf: with FD loaded KC's vegetable recipes already take half a cabbage" }, "pamhc2foodcore": "minecraft:carrot" } },
     "c:cabbage": { "unit": "produce", "default": 1, "floors": { "croptopia": { "item": "farmersdelight:cabbage_leaf", "why": "via its own #c:crops/cabbage, which FD fills with the leaf" } } },
     "c:crops/cabbage": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:cabbage", "farmersdelight": "farmersdelight:cabbage_leaf", "farm_and_charm": "farm_and_charm:lettuce" } },
     "c:tomatoes": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:tomato" } },
-    "c:crops/tomato": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:tomato", "farmersdelight": "farmersdelight:tomato", "farm_and_charm": "farm_and_charm:tomato" } },
+    "c:crops/tomato": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:tomato", "farmersdelight": "farmersdelight:tomato", "farm_and_charm": "farm_and_charm:tomato", "kaleidoscope_cookery": "kaleidoscope_cookery:tomato" } },
     "c:onions": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:onion" } },
     "c:crops/onion": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:onion", "farmersdelight": "farmersdelight:onion", "farm_and_charm": "farm_and_charm:onion" } },
+    "c:foods/onion": { "unit": "produce", "default": 1, "floors": { "farmersdelight": "farmersdelight:onion" } },
+    "c:foods/tomato": { "unit": "produce", "default": 1, "floors": { "farmersdelight": "farmersdelight:tomato" } },
+    "c:foods/cabbage": { "unit": "produce", "default": 1, "floors": { "farmersdelight": { "item": "farmersdelight:cabbage_leaf", "why": "its file is [cabbage, cabbage_leaf] and the leaf is half a cabbage" } } },
+    "c:foods/leafy_green": { "unit": "produce", "default": 1, "floors": { "farmersdelight": { "item": "farmersdelight:cabbage_leaf", "why": "its file is exactly #c:foods/cabbage, so the leaf is the cheapest member" } } },
     "c:strawberries": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:strawberry", "farm_and_charm": "farm_and_charm:strawberry" } },
     "c:strawberry": { "unit": "produce", "default": 1, "floors": { "croptopia": { "none": "lists only its strawberry_seed, a seed and never food" }, "farm_and_charm": "farm_and_charm:strawberry" } },
     "c:rice": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:rice" } },
     "c:grain": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:barley", "farm_and_charm": "farm_and_charm:oat" } },
     "c:grains": { "unit": "produce", "default": 1, "floors": { "farm_and_charm": "farm_and_charm:barley" } },
-    "c:crops/grain": { "unit": "produce", "default": 1, "floors": { "farmersdelight": "minecraft:wheat" } },
+    "c:crops/grain": { "unit": "produce", "default": 1, "floors": { "farmersdelight": "minecraft:wheat", "hearthandharvest": "hearthandharvest:corn" } },
     "c:grain/barley": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:barley" } },
     "c:grains/barleys": { "unit": "produce", "default": 1, "floors": { "farm_and_charm": "farm_and_charm:barley" } },
     "c:grain/oat": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:oat" } },
     "c:grains/oats": { "unit": "produce", "default": 1, "floors": { "farm_and_charm": "farm_and_charm:oat" } },
     "c:grain/corn": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:corn" } },
     "c:grains/corn": { "unit": "produce", "default": 1, "floors": { "farm_and_charm": "farm_and_charm:corn" } },
-    "c:crops/corn": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:corn", "farm_and_charm": "farm_and_charm:corn" } },
+    "c:crops/corn": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:corn", "culturaldelights": "culturaldelights:corn_cob", "farm_and_charm": "farm_and_charm:corn", "hearthandharvest": "hearthandharvest:corn" } },
     "c:foods/corn": { "unit": "produce", "default": 1, "floors": { "bountifulfares": "bountifulfares:maize" } },
     "c:fruits": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:apple", "pamhc2foodcore": "minecraft:apple" } },
     "c:fruits/banana": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:banana" } },
@@ -299,9 +396,11 @@
     "c:fruits/mango": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:mango" } },
     "c:fruits/pineapple": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:pineapple" } },
     "c:fruits/orange": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:orange" } },
-    "c:fruits/lemon": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:lemon" } },
+    "c:fruits/lemon": { "unit": "produce", "default": 1, "floors": { "cookscollection": "cookscollection:lemon", "croptopia": "croptopia:lemon", "culturaldelights": { "item": "cookscollection:lemon", "why": "Cultural Delights' own file lists Cook's Collection's lemon (Cook's is a hard dependency of CD)" } } },
     "c:fruits/plum": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:plum" } },
     "c:fruits/elderberry": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:elderberry" } },
+    "c:fruits/blueberry": { "unit": "produce", "default": 1, "floors": { "croptopia": "croptopia:blueberry", "hearthandharvest": { "item": "hearthandharvest:blueberries", "why": "its own file lists exactly one id, hearthandharvest:blueberries, a bush drop; the only recipe that yields it is the 9-blueberry crate round trip (9 x #c:fruits/blueberry -> 1 crate -> 9 blueberries), which is not cheaper, so the 1-produce default stands" } } },
+    "c:blueberries": { "unit": "produce", "default": 1, "floors": { "croptopia": { "item": "croptopia:blueberry", "why": "its own file is [croptopia:blueberry, #c:fruits/blueberry, #c:crops/blueberry] and every member of all three is a whole gathered berry at 1 produce" } } },
     "c:foods/oranges": { "unit": "produce", "default": 1, "floors": { "bountifulfares": "bountifulfares:orange" } },
     "c:foods/lemons": { "unit": "produce", "default": 1, "floors": { "bountifulfares": "bountifulfares:lemon" } },
     "c:foods/plums": { "unit": "produce", "default": 1, "floors": { "bountifulfares": "bountifulfares:plum" } },
@@ -316,7 +415,7 @@
     "c:foods/cooked_fish": { "moot": "no recipe in the scanned jars consumes it (origins:meat is read by code)" },
     "c:foods/cooked_rice": { "moot": "no recipe in the scanned jars consumes it" },
     "c:foods/cookie": { "moot": "no recipe in the scanned jars consumes it" },
-    "c:foods/fruit": { "moot": "no recipe in the scanned jars consumes it" },
+    "c:foods/fruit": { "moot": "read by 2 Rustic Delight recipes (fruit_beignet and sweet_salad) since 0.8.0 scanned that jar, so it is no longer reader-free - but still moot as currency: the only pantrywork:bridged/fruit member under 1 produce is culturaldelights:cut_avocado (1/2), and Cultural Delights own c:foods/fruit lists that same cut itself, so no floor would bind. Not un-mooted (8 definer rows that move no verdict)" },
     "c:foods/soup": { "moot": "no recipe in the scanned jars consumes it" },
     "origins:meat": { "moot": "Origins reads it in code for diets; not recipe currency" },
     "pantrywork:food_component": { "moot": "role tag: classification, no scanned recipe consumes it" },

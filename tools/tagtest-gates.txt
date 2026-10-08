@@ -4,8 +4,37 @@
 # only while one of <mods> is loaded, so a gate is proven only by booting WITH and
 # WITHOUT its mods. One clean boot per scenario (stop, confirm java exited, swap jars).
 #
-# mods/ holds pantrywork-<version>.jar (the -Prelease build, not a dev jar) plus exactly
-# these jars from tools/work/jars:
+# 0.8.0 re-cut: 5 overlays became 14, so the matrix grew from S1-S5 to S1-S12. Every
+# `pantrywork:gated/*` id below was read out of src/generated/resources after the phase-C
+# generator run; the overlay NUMBERS are not asserted anywhere (they renumber whenever a
+# gate set is added), only the tag ids, which carry the rescuer list.
+#
+# THE 14 GATES (overlay number : rescuers : what is gated)
+#   _1  bountifulfares|farm_and_charm                 c:flour <- H&H flour + corn_meal (1/2 wheat)
+#   _2  bountifulfares|farm_and_charm|kaleidoscope_cookery|pamhc2foodcore
+#                                                     c:flour <- create:wheat_flour (2/3 wheat)
+#   _3  cookscollection                               c:salt + c:salts <- H&H salt (1/32)
+#   _4  cookscollection|croptopia                     c:salts <- Pam's saltitem (1/8)
+#   _5  create                                        bridged/foods_dough <- Pam's doughitem
+#   _6  croptopia                                     c:cheeses <- Pam's cheese; c:milks <- FD
+#                                                     bottle, H&H goat bottle, Pam's fresh milk
+#   _7  croptopia|kaleidoscope_cookery                c:vegetables <- FD cabbage leaf, CD's 4
+#                                                     cuts, RD's 9 pepper slices + potato slices
+#   _8  culturaldelights|rusticdelight                bridged/vegetable <- FD cabbage leaf
+#   _9  farm_and_charm                                c:doughs <- Create, CD, FD, KC, Pam's dough
+#   _10 farmersdelight                                bridged/foods_raw_chicken <- F&C chicken_parts
+#   _11 farmersdelight|rusticdelight                  bridged/raw_fishes <- KC sashimi (1/3 fish)
+#   _12 hearthandharvest                              c:dusts/salt <- Croptopia salt, Pam's saltitem
+#   _13 kaleidoscope_cookery                          c:raw_fishes <- FD cod/salmon slice, CD raw
+#                                                     calamari, RD calamari slice (all 1/2 fish)
+#   _14 pamhc2foodcore                                c:milk <- FD bottle, H&H goat bottle
+#
+# SCENARIOS. mods/ holds pantrywork-<version>.jar (the -Prelease build, not a dev jar) plus
+# exactly these jars from tools/work/jars. Dependency-complete as shipped (read out of each
+# jar's neoforge.mods.toml): Cook's Collection, Hearth and Harvest and Rustic Delight each
+# require farmersdelight; Farm & Charm and Meadow require architectury; Croptopia requires
+# epherolib; Create bundles Flywheel/Ponder/Registrate; Kaleidoscope Cookery and Pam's
+# require nothing.
 #   S1  FarmersDelight-1.21.1-1.3.2.jar, letsdo-meadow-neoforge-1.4.8.jar,
 #       architectury-13.0.11-neoforge.jar                      (no Pam's, no Croptopia)
 #   S2  S1 + pamhc2foodcore-NEOFORGE-1.21.1-1.0.4.jar          (Pam's, no Croptopia)
@@ -13,21 +42,57 @@
 #                                                              (Pam's AND Croptopia)
 #   S4  S1 + croptopia-neoforge-1.21.1-4.2.4.jar + EpheroLib-1.21.1-NEO-FORGE-1.2.0.jar
 #                                                              (Croptopia, no Pam's)
-#   S5  create-1.21.1-6.0.10.jar ONLY (bundles Flywheel, Ponder, Registrate): the one boot
-#       where the flour gate (Bountiful Fares | Farm & Charm | Pam's) is closed while its
-#       item exists. Run ONLY tagtest-gates-s5.txt there (this file needs FD and Meadow).
-# Farm & Charm and Bountiful Fares are never loaded, so their gates stay closed.
+#   S5  create-1.21.1-6.0.10.jar ONLY: the one boot where gate _2 is CLOSED while Create's
+#       flour exists. Run ONLY tagtest-gates-s5.txt there.
+#   S6  FarmersDelight-1.21.1-1.3.2.jar, hearthandharvest-1.21.1-1.3.4.jar,
+#       cookscollection-0.6.1.jar, pamhc2foodcore-NEOFORGE-1.21.1-1.0.4.jar
+#       THE SALT FAMILY: gates _3, _4 (by Cook's, not Croptopia) and _12 OPEN; _1 CLOSED
+#       while H&H's flour exists. Run ONLY tagtest-gates-s6.txt (no Meadow, no Croptopia).
+#   S7  create-1.21.1-6.0.10.jar + kaleidoscopecookery-1.6.0-neoforge+mc1.21.1.jar
+#       gate _2 OPEN with Kaleidoscope Cookery as the ONLY rescuer. Only s7.
+#   S8  FarmersDelight + rusticdelight-neoforge-1.21-1.7.1.jar + pamhc2foodcore
+#       Rustic Delight's whole bell peppers IN c:vegetables while gate _7 is CLOSED (so its
+#       slices are out), gate _8 OPEN by Rustic Delight, Pam's oil in RD's own oil tag. Only s8.
+#   S9  FarmersDelight + kaleidoscopecookery + rusticdelight-neoforge-1.21-1.7.1.jar
+#       gates _7 (by KC, no Croptopia), _11 and _13 OPEN at item level. Only s9.
+#   S10 letsdo-farm_and_charm-neoforge-1.1.23.jar, architectury-13.0.11-neoforge.jar,
+#       kaleidoscopecookery-1.6.0-neoforge+mc1.21.1.jar
+#       gate _10 CLOSED while F&C's chicken_parts exists and Kaleidoscope Cookery (a reader
+#       of c:foods/raw_chicken) is loaded; gate _9 OPEN. Only s10.
+#   S11 S10 minus Kaleidoscope Cookery, plus FarmersDelight-1.21.1-1.3.2.jar and
+#       hearthandharvest-1.21.1-1.3.4.jar
+#       gates _1 and _10 OPEN at item level. Only s11.
+#   S12 FarmersDelight-1.21.1-1.3.2.jar, hearthandharvest-1.21.1-1.3.4.jar,
+#       croptopia-neoforge-1.21.1-4.2.4.jar, EpheroLib-1.21.1-NEO-FORGE-1.2.0.jar,
+#       Oh-The-Biomes-Weve-Gone-NeoForge-2.6.2.jar, TerraBlender-neoforge-1.21.1-4.1.0.8.jar,
+#       Corgilib-NeoForge-1.21.1-5.0.0.9.jar, Oh-The-Trees-Youll-Grow-neoforge-1.21.1-5.3.4.jar,
+#       geckolib-neoforge-1.21.1-4.9.3.jar
+#       THE BLUEBERRY SCENARIO: the only release-jar boot that carries Oh The Biomes We've
+#       Gone (its floor is 21.1.173, so unlike Cultural Delights it CAN boot here), with two
+#       real crafts and the soul_fruit exclusion. BYG's last four jars are its hard deps.
+#       Gates _6, _10 and _12 OPEN; _3, _9 and _13 CLOSED. Only s12.
+# Bountiful Fares is never loaded, so the bountifulfares half of gates _1 and _2 is covered
+# only by the dev boots. Cultural Delights CANNOT boot on this harness at all: its
+# neoforge.mods.toml requires neoforge >= 21.1.247 and tools/neo-server-1211 is 21.1.241 on
+# purpose, so the culturaldelights half of gate _8 and CD's four 1/2 cuts in gate _7 are
+# proven only on the dev boot (which pins 21.1.247). Gate _5 is proven CLOSED at item level
+# here (S2) and OPEN at item level only on the dev boot, which carries Create and Pam's.
 #
-# On S1-S4 run THIS file (checks true in all four scenarios), then
+# On S1-S4 run THIS file (every assertion is true in all four scenarios), then
 # tagtest-gates-s<N>.txt for that scenario, and classify each output with CountSuite:
 #   tools\rcon.ps1 -File tools\tagtest-gates.txt > gates.out
 #   powershell -File tools\CountSuite.ps1 -Suite tools\tagtest-gates.txt -Output gates.out
-# Expected: this file 12 passed / 0 failed on each boot; s1 5/0, s2 12/0, s3 16/0 (incl.
-# one craft), s4 7/0 (incl. one craft); s5 6/0 + 1 expected. Every negative below targets a tag that IS
-# defined in that scenario (by Meadow, FD, NeoForge or Pantrywork's own generated file):
-# an undefined tag prints "Unknown item tag" instead of "Test passed" - a failure, never a
-# silent pass. Wipe world/ between scenarios if a chest ever holds an item from a removed
-# mod (spurious "Tried to load invalid item" log line).
+# EXPECTED COUNTS (passed / failed / expected):
+#   this file 19/0/7 on each of S1-S4
+#   s1 7/0/4   s2 15/0/4   s3 18/0/1 (incl. one craft)   s4 9/0/1 (incl. one craft)
+#   s5 6/0/5   s6 30/0/5   s7 16/0/4   s8 19/0/3   s9 20/0/3   s10 7/0/3   s11 17/0/3
+#   s12 27/0/3 (incl. two crafts)
+# Every negative below targets a tag that IS defined in that scenario (by Meadow, FD,
+# NeoForge or a Pantrywork file of our own): an undefined tag prints "Unknown item tag"
+# instead of "Test passed" - a failure, never a silent pass. Closed-gate probes are the
+# `# expect: Unknown item tag` lines; a LEAKED overlay answers "Test failed" there.
+# Wipe world/ between scenarios if a chest ever holds an item from a removed mod (spurious
+# "Tried to load invalid item" log line).
 forceload add 0 0
 setblock 8 -60 8 minecraft:chest
 # --- native members, unaffected by any gate ---
@@ -41,15 +106,55 @@ execute if items block 8 -60 8 container.0 #c:drinks/milk
 # the c:foods/milk shim holds the bucket only (review CF-1); the tag is still defined here
 execute unless items block 8 -60 8 container.0 #c:foods/milk
 execute if items block 8 -60 8 container.0 #pantrywork:food_component/dairy
-# --- Farm & Charm gate always CLOSED here: FD dough out of Croptopia's c:doughs dialect ---
+# --- Farm & Charm gate (_9) always CLOSED here: FD dough out of Croptopia's c:doughs dialect ---
 # (c:doughs is defined by Pantrywork's own doughs.json even without Croptopia)
 item replace block 8 -60 8 container.0 with farmersdelight:wheat_dough
 execute unless items block 8 -60 8 container.0 #c:doughs
 execute if items block 8 -60 8 container.0 #c:dough
 execute if items block 8 -60 8 container.0 #c:foods/dough
-# --- EXCLUDEs, no gate at all ---
+# --- gate _8 (Cultural Delights | Rustic Delight) CLOSED in S1-S4: the cabbage leaf stays
+# out of c:foods/vegetable, which is ours and reaches it only through bridged/vegetable ---
 item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
 execute unless items block 8 -60 8 container.0 #c:foods/vegetable
 execute if items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+# --- EXCLUDEs, no gate at all ---
 item replace block 8 -60 8 container.0 with meadow:cooked_buffalo_meat
 execute unless items block 8 -60 8 container.0 #c:foods/cooked_meat
+# --- gate _13 (Kaleidoscope Cookery) CLOSED in S1-S4: FD's 1/2-fish slices stay out of
+# Farm & Charm's / KC's c:raw_fishes, and are EXCLUDEd from c:rawfish and c:fishes by Pam's
+# whole-fish floor whatever is loaded. They DO reach c:foods/raw_fish: FD's own 1/2 floor
+# rescues them there (bridged/raw_fishes, self-rescue) ---
+item replace block 8 -60 8 container.0 with farmersdelight:cod_slice
+execute unless items block 8 -60 8 container.0 #c:raw_fishes
+execute unless items block 8 -60 8 container.0 #c:rawfish
+execute unless items block 8 -60 8 container.0 #c:fishes
+execute if items block 8 -60 8 container.0 #c:foods/raw_fish
+# --- 0.8.0 NEW emit target c:dusts/salt (36 readers: H&H 25, CD 7, Cook's 4). Meadow's
+# 1/4 limestone salt PASSES every floor it has, so it is ungated ---
+item replace block 8 -60 8 container.0 with meadow:alpine_salt
+execute if items block 8 -60 8 container.0 #c:dusts/salt
+# --- overlay level, stone in the slot: OPEN overlays define their tag, CLOSED ones do not ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+# gates _10 and _11 are OPEN in S1-S4 (Farmer's Delight is loaded in all four)
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight/bridged/foods_raw_chicken
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight_or_rusticdelight/bridged/raw_fishes
+# gate _1: no Bountiful Fares, no Farm & Charm
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/bountifulfares_or_farm_and_charm/c/flour
+# gate _8: no Cultural Delights, no Rustic Delight
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/culturaldelights_or_rusticdelight/bridged/vegetable
+# gate _13: no Kaleidoscope Cookery
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/kaleidoscope_cookery/c/raw_fishes
+# gate _9: no Farm & Charm
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farm_and_charm/c/doughs
+# gate _12: no Hearth and Harvest
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/hearthandharvest/c/dusts/salt
+# gate _3: no Cook's Collection (both of its tags)
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection/c/salt
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection/c/salts

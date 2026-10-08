@@ -352,11 +352,17 @@ execute if items block 8 -60 8 container.0 #pantrywork:food_component/starch
 # Pam's dough (0.6 wheat) is 1.8x below FD's dough but Create's own dough rescues it
 item replace block 8 -60 8 container.0 with pamhc2foodcore:doughitem
 execute if items block 8 -60 8 container.0 #c:foods/dough
-# FD's cabbage leaf is half a cabbage: not a whole vegetable for FD's and B&C's recipes,
-# still a leafy green (FD's own tag) and garnish; in c:vegetables only with Croptopia,
-# whose own c:vegetables already pulls the leaf in
+# FD's cabbage leaf is half a cabbage: a leafy green (FD's own tag) and a garnish, and in
+# c:vegetables only with Croptopia or (0.8.0) Kaleidoscope Cookery, whose own c:vegetables
+# already pulls the leaf in.
+# 0.8.0 phase C FLIPPED the c:foods/vegetable line from `unless` to `if`: Cultural Delights
+# (cut cucumber) and Rustic Delight (potato slices) both became defining mods of that tag and
+# both floor it at 1/2, so the leaf went from EXCLUDE to GATE culturaldelights|rusticdelight.
+# Both boots this suite runs on (full and -PnoFarmAndCharm) load CD and RD, so the gate is
+# open on both; tagtest-gates.txt proves the closed half on the release-jar harness.
 item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
-execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+execute if items block 8 -60 8 container.0 #c:foods/vegetable
+execute if items block 8 -60 8 container.0 #pantrywork:gated/culturaldelights_or_rusticdelight/bridged/vegetable
 execute if items block 8 -60 8 container.0 #pantrywork:food_component/garnish
 execute if items block 8 -60 8 container.0 #c:vegetables
 # Ocean's Delight cuts (6 fugu slices per pufferfish, 9 elder guardian slices per slab) left

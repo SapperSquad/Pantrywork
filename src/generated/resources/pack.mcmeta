@@ -9,39 +9,102 @@
   "neoforge:overlays": {
     "entries": [
       {
-        "neoforge:conditions": [ { "type": "neoforge:or", "values": [ { "type": "neoforge:mod_loaded", "modid": "bountifulfares" }, { "type": "neoforge:mod_loaded", "modid": "farm_and_charm" }, { "type": "neoforge:mod_loaded", "modid": "pamhc2foodcore" } ] } ],
+        "neoforge:conditions": [ { "type": "neoforge:or", "values": [ { "type": "neoforge:mod_loaded", "modid": "bountifulfares" }, { "type": "neoforge:mod_loaded", "modid": "farm_and_charm" } ] } ],
         "formats": [48, 1000],
         "min_format": 48,
         "max_format": 1000,
         "directory": "pantrywork_gate_1"
       },
       {
-        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "create" } ],
+        "neoforge:conditions": [ { "type": "neoforge:or", "values": [ { "type": "neoforge:mod_loaded", "modid": "bountifulfares" }, { "type": "neoforge:mod_loaded", "modid": "farm_and_charm" }, { "type": "neoforge:mod_loaded", "modid": "kaleidoscope_cookery" }, { "type": "neoforge:mod_loaded", "modid": "pamhc2foodcore" } ] } ],
         "formats": [48, 1000],
         "min_format": 48,
         "max_format": 1000,
         "directory": "pantrywork_gate_2"
       },
       {
-        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "croptopia" } ],
+        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "cookscollection" } ],
         "formats": [48, 1000],
         "min_format": 48,
         "max_format": 1000,
         "directory": "pantrywork_gate_3"
       },
       {
-        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "farm_and_charm" } ],
+        "neoforge:conditions": [ { "type": "neoforge:or", "values": [ { "type": "neoforge:mod_loaded", "modid": "cookscollection" }, { "type": "neoforge:mod_loaded", "modid": "croptopia" } ] } ],
         "formats": [48, 1000],
         "min_format": 48,
         "max_format": 1000,
         "directory": "pantrywork_gate_4"
       },
       {
-        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "pamhc2foodcore" } ],
+        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "create" } ],
         "formats": [48, 1000],
         "min_format": 48,
         "max_format": 1000,
         "directory": "pantrywork_gate_5"
+      },
+      {
+        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "croptopia" } ],
+        "formats": [48, 1000],
+        "min_format": 48,
+        "max_format": 1000,
+        "directory": "pantrywork_gate_6"
+      },
+      {
+        "neoforge:conditions": [ { "type": "neoforge:or", "values": [ { "type": "neoforge:mod_loaded", "modid": "croptopia" }, { "type": "neoforge:mod_loaded", "modid": "kaleidoscope_cookery" } ] } ],
+        "formats": [48, 1000],
+        "min_format": 48,
+        "max_format": 1000,
+        "directory": "pantrywork_gate_7"
+      },
+      {
+        "neoforge:conditions": [ { "type": "neoforge:or", "values": [ { "type": "neoforge:mod_loaded", "modid": "culturaldelights" }, { "type": "neoforge:mod_loaded", "modid": "rusticdelight" } ] } ],
+        "formats": [48, 1000],
+        "min_format": 48,
+        "max_format": 1000,
+        "directory": "pantrywork_gate_8"
+      },
+      {
+        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "farm_and_charm" } ],
+        "formats": [48, 1000],
+        "min_format": 48,
+        "max_format": 1000,
+        "directory": "pantrywork_gate_9"
+      },
+      {
+        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "farmersdelight" } ],
+        "formats": [48, 1000],
+        "min_format": 48,
+        "max_format": 1000,
+        "directory": "pantrywork_gate_10"
+      },
+      {
+        "neoforge:conditions": [ { "type": "neoforge:or", "values": [ { "type": "neoforge:mod_loaded", "modid": "farmersdelight" }, { "type": "neoforge:mod_loaded", "modid": "rusticdelight" } ] } ],
+        "formats": [48, 1000],
+        "min_format": 48,
+        "max_format": 1000,
+        "directory": "pantrywork_gate_11"
+      },
+      {
+        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "hearthandharvest" } ],
+        "formats": [48, 1000],
+        "min_format": 48,
+        "max_format": 1000,
+        "directory": "pantrywork_gate_12"
+      },
+      {
+        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "kaleidoscope_cookery" } ],
+        "formats": [48, 1000],
+        "min_format": 48,
+        "max_format": 1000,
+        "directory": "pantrywork_gate_13"
+      },
+      {
+        "neoforge:conditions": [ { "type": "neoforge:mod_loaded", "modid": "pamhc2foodcore" } ],
+        "formats": [48, 1000],
+        "min_format": 48,
+        "max_format": 1000,
+        "directory": "pantrywork_gate_14"
       }
     ]
   },
@@ -49,22 +112,58 @@
     "entries": [
       {
         "directory": "pantrywork_gate_1",
-        "condition": { "condition": "fabric:any_mods_loaded", "values": ["bountifulfares", "farm_and_charm", "pamhc2foodcore"] }
+        "condition": { "condition": "fabric:any_mods_loaded", "values": ["bountifulfares", "farm_and_charm"] }
       },
       {
         "directory": "pantrywork_gate_2",
-        "condition": { "condition": "fabric:all_mods_loaded", "values": ["create"] }
+        "condition": { "condition": "fabric:any_mods_loaded", "values": ["bountifulfares", "farm_and_charm", "kaleidoscope_cookery", "pamhc2foodcore"] }
       },
       {
         "directory": "pantrywork_gate_3",
-        "condition": { "condition": "fabric:any_mods_loaded", "values": ["croptopia", "croptopia-refabricated"] }
+        "condition": { "condition": "fabric:all_mods_loaded", "values": ["cookscollection"] }
       },
       {
         "directory": "pantrywork_gate_4",
-        "condition": { "condition": "fabric:all_mods_loaded", "values": ["farm_and_charm"] }
+        "condition": { "condition": "fabric:any_mods_loaded", "values": ["cookscollection", "croptopia", "croptopia-refabricated"] }
       },
       {
         "directory": "pantrywork_gate_5",
+        "condition": { "condition": "fabric:all_mods_loaded", "values": ["create"] }
+      },
+      {
+        "directory": "pantrywork_gate_6",
+        "condition": { "condition": "fabric:any_mods_loaded", "values": ["croptopia", "croptopia-refabricated"] }
+      },
+      {
+        "directory": "pantrywork_gate_7",
+        "condition": { "condition": "fabric:any_mods_loaded", "values": ["croptopia", "croptopia-refabricated", "kaleidoscope_cookery"] }
+      },
+      {
+        "directory": "pantrywork_gate_8",
+        "condition": { "condition": "fabric:any_mods_loaded", "values": ["culturaldelights", "rusticdelight"] }
+      },
+      {
+        "directory": "pantrywork_gate_9",
+        "condition": { "condition": "fabric:all_mods_loaded", "values": ["farm_and_charm"] }
+      },
+      {
+        "directory": "pantrywork_gate_10",
+        "condition": { "condition": "fabric:all_mods_loaded", "values": ["farmersdelight"] }
+      },
+      {
+        "directory": "pantrywork_gate_11",
+        "condition": { "condition": "fabric:any_mods_loaded", "values": ["farmersdelight", "rusticdelight"] }
+      },
+      {
+        "directory": "pantrywork_gate_12",
+        "condition": { "condition": "fabric:all_mods_loaded", "values": ["hearthandharvest"] }
+      },
+      {
+        "directory": "pantrywork_gate_13",
+        "condition": { "condition": "fabric:all_mods_loaded", "values": ["kaleidoscope_cookery"] }
+      },
+      {
+        "directory": "pantrywork_gate_14",
         "condition": { "condition": "fabric:all_mods_loaded", "values": ["pamhc2foodcore"] }
       }
     ]

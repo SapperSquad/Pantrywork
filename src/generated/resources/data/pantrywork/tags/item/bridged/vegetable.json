@@ -29,6 +29,9 @@
     { "id": "croptopia:turnip", "required": false },
     { "id": "croptopia:yam", "required": false },
     { "id": "croptopia:zucchini", "required": false },
+    { "id": "culturaldelights:cucumber", "required": false },
+    { "id": "culturaldelights:eggplant", "required": false },
+    { "id": "culturaldelights:white_eggplant", "required": false },
     { "id": "farm_and_charm:corn", "required": false },
     { "id": "farm_and_charm:lettuce", "required": false },
     { "id": "farm_and_charm:onion", "required": false },
@@ -37,8 +40,13 @@
     { "id": "farmersdelight:cabbage", "required": false },
     { "id": "farmersdelight:onion", "required": false },
     { "id": "farmersdelight:tomato", "required": false },
+    { "id": "kaleidoscope_cookery:green_chili", "required": false },
+    { "id": "kaleidoscope_cookery:lettuce", "required": false },
+    { "id": "kaleidoscope_cookery:red_chili", "required": false },
+    { "id": "kaleidoscope_cookery:tomato", "required": false },
     { "id": "minecraft:beetroot", "required": false },
     { "id": "minecraft:carrot", "required": false },
-    { "id": "minecraft:potato", "required": false }
+    { "id": "minecraft:potato", "required": false },
+    { "id": "#pantrywork:gated/culturaldelights_or_rusticdelight/bridged/vegetable", "required": false }
   ]
 }

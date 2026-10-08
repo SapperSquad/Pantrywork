@@ -1,6 +1,8 @@
 {
   "values": [
     { "id": "croptopia:corn", "required": false },
-    { "id": "farm_and_charm:corn", "required": false }
+    { "id": "culturaldelights:corn_cob", "required": false },
+    { "id": "farm_and_charm:corn", "required": false },
+    { "id": "hearthandharvest:corn", "required": false }
   ]
 }

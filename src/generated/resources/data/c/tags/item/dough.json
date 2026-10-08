@@ -2,6 +2,7 @@
   "values": [
     { "id": "create:dough", "required": false },
     { "id": "croptopia:dough", "required": false },
+    { "id": "culturaldelights:corn_dough", "required": false },
     { "id": "farm_and_charm:dough", "required": false },
     { "id": "farmersdelight:wheat_dough", "required": false },
     { "id": "pamhc2foodcore:doughitem", "required": false },

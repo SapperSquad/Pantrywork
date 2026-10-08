@@ -89,8 +89,14 @@ item replace block 8 -60 8 container.0 with farmersdelight:mutton_chops
 execute unless items block 8 -60 8 container.0 #c:raw_mutton
 item replace block 8 -60 8 container.0 with farmersdelight:cooked_mutton_chops
 execute unless items block 8 -60 8 container.0 #c:cooked_mutton
+# 0.8.0 phase C FLIPPED this line. Kaleidoscope Cookery joined c:raw_fishes as a defining mod
+# and floors it at 1/3 of a fish (its chopping-board sashimi), so FD's 1/2 slices are no longer
+# too cheap for it - they GATE on kaleidoscope_cookery, which this boot loads. With KC absent
+# they are out again (tagtest-gates-s8 / the common gates file prove the closed half).
 item replace block 8 -60 8 container.0 with farmersdelight:cod_slice
-execute unless items block 8 -60 8 container.0 #c:raw_fishes
+execute if items block 8 -60 8 container.0 #c:raw_fishes
+execute if items block 8 -60 8 container.0 #pantrywork:gated/kaleidoscope_cookery/c/raw_fishes
+# Ocean's Delight's 1/6 fugu slice is below even KC's 1/3 and nothing rescues it anywhere
 item replace block 8 -60 8 container.0 with oceansdelight:fugu_slice
 execute unless items block 8 -60 8 container.0 #c:raw_fishes
 item replace block 8 -60 8 container.0 with farmersdelight:cooked_salmon_slice

@@ -20,7 +20,15 @@ Requires JDK 21 — pinned machine-wide via `~/.gradle/gradle.properties`
 ./gradlew runServer                   # headless dev server + every compat mod in build.gradle's dependencies block (see below)
 ./gradlew runServer -PnoCompatMods    # boot-matrix run: no compat mods loaded
 ./gradlew runServer -PnoFarmAndCharm  # every compat mod EXCEPT Let's Do Farm & Charm (tagtest-nofandc.txt)
+./gradlew runServer -PnoHybridDelights  # drop Hybrid Delights (+ HAPI, Kotlin for Forge) for boot stability
+./gradlew runServer -PnoByg           # drop Oh The Biomes We've Gone + TerraBlender/CorgiLib/OhTheTrees
 ```
+
+`-PnoHybridDelights` and `-PnoByg` are dev conveniences, not test modes: the full boot carries
+both mod groups and is the one `tagtest-kaleido.txt` is scoped to. **GeckoLib sits in
+`if (!noHybridDelights || !noByg)`** because it is a hard dep of BOTH — inside either block
+alone, the other mod group would fail to load silently. `-PnoByg` has never actually been
+booted; the full boot with BYG and its three libraries came up normally and moved no suite.
 
 NeoForge 26.x metadata gotchas (learned live 2026-08-22): omit `modLoader`/`loaderVersion`
 entirely for a no-code jar (lowcodefml still works but warns deprecated); ship BOTH
@@ -34,21 +42,34 @@ Refabricated + Croptopia Fabric + EpheroLib, RCON preconfigured same
 port/password) with suite `tools/tagtest-fabric.txt` — boot with
 `java -Xmx2G -jar fabric-server-1.21.1.jar nogui` from that directory.
 
-NeoForge pin is 21.1.241 (NOT PhytoForge's 21.1.72 — FD 1.3.2 requires
->= 21.1.219, Croptopia >= 21.1.80).
+NeoForge pin is 21.1.247 (NOT PhytoForge's 21.1.72). Floors in the dev set:
+Cultural Delights 0.18.x requires >= 21.1.247 (the reason for the 0.8.0 bump from
+21.1.241), Rustic Delight and Hybrid Delights >= 21.1.219, FD 1.3.2 >= 21.1.219,
+Croptopia >= 21.1.80. The SHIPPED range is unchanged (neo_version_range=[21.1.0,));
+tools/neo-server-1211 deliberately stays on 21.1.241 so the release jar is still
+proven on the older build players run.
 
 Compat mods come from two places (see `dependencies` in build.gradle):
 Modrinth maven (FD) and local jars in `tools/work/jars/` (CurseForge-only
 mods; re-fetch instructions in `tools/work/jars/SOURCES.md`). The full dev set:
 FD, Croptopia+EpheroLib, Pam's Food Core, Ocean's Delight, End's Delight,
 Origins+Jupiter, Let's Do Vinery/Meadow/Farm & Charm+Architectury, Brewin' &
-Chewin', Aquaculture 2, and since 0.7.0 Create 6.0.10, Bountiful Fares
+Chewin', Aquaculture 2, since 0.7.0 Create 6.0.10, Bountiful Fares
 3.0.12+NexusLib, Fish of Thieves 21.1.2.1+Cloth Config and Refurbished
-Furniture 1.0.22+Framework. Farm & Charm is listed on its own so
+Furniture 1.0.22+Framework, and since 0.8.0 Kaleidoscope Cookery 1.6.0, Hearth
+and Harvest 1.3.4, Cultural Delights 0.18.1 + Cook's Collection 0.6.1, Rustic
+Delight 1.7.1, Hybrid Delights 1.3.1 (+ HAPI, Kotlin for Forge) and Oh The Biomes
+We've Gone 2.6.2 (+ TerraBlender 4.1.0.8, CorgiLib 5.0.0.9, Oh The Trees You'll
+Grow 5.3.4, GeckoLib 4.9.3). Farm & Charm is listed on its own so
 `-PnoFarmAndCharm` can drop it; the neoforge.mods.toml templates declare every
-food mod as an optional AFTER dep: 14 ids in the 1.21.1 template, 12 in the 26.x one
-(the same list minus create and bountifulfares; it still names Pam's, Farm & Charm,
-Meadow and the other mods with no 26.x build, which is harmless for optional deps).
+food mod as an optional AFTER dep: 21 ids in the 1.21.1 template (0.8.0 added
+kaleidoscope_cookery, hearthandharvest, culturaldelights, cookscollection,
+rusticdelight, hybrid_delights and biomeswevegone), 12 in the 26.x one
+(the 1.21.1 list minus create, bountifulfares and ALL SEVEN of the 0.8.0 ids — none of
+those eight has a 26.x build. It still names Pam's, Farm & Charm, Meadow and the other
+mods with no 26.x build, which is harmless for optional deps. Counted out of the staged
+jars' neoforge.mods.toml each release; `FOOD_MOD_COUNT` in tools/GenPromo.java must
+equal the 1.21.1 number, and the promo render throws if its roster disagrees).
 
 ## Tag audit (release gate)
 
@@ -68,10 +89,30 @@ failure class it guards:
    the harness never covered: the mod installed alone, where convention tags
    (`c:foods/berry`, `c:buckets/milk`) simply do not exist.
 
-Seed classification deliberately combines two signals — a name rule alone
-condemns `croptopia:roasted_pumpkin_seeds` (real food), and `c:seeds`
-membership alone condemns `farm_and_charm:onion` (plantable food). Keep
-`Test-IsSeed` in this script and in `GenerateBridges.ps1` in step.
+Seed classification deliberately combines three signals (the third added at
+0.8.0) — a name rule alone condemns `croptopia:roasted_pumpkin_seeds` (real
+food), and `c:seeds` membership alone condemns `farm_and_charm:onion`
+(plantable food). (1) A trailing `_seed`/`_sapling` is decisive on its own.
+(2) A trailing `_seeds` counts when the ecosystem also files the item under
+`c:seeds`. (3) An item that its **OWN** mod files in a planting tag (`c:seeds`,
+a `c:seeds/<crop>` leaf, `minecraft:villager_plantable_seeds`) and in none of
+its own mod's food tags is a planting seed — the authority is the mod that owns
+the item, so a third mod listing someone else's item can neither condemn nor
+rescue it. Two `c:` tags are deliberately NOT food evidence, and without both
+exclusions rule 3 does not fire: bare `c:crops`, a mixed plantable-crop bag
+(Bountiful Fares files six of its own seeds there, beside its maize), and
+`c:animal_foods`, which is feed (Hearth and Harvest's is corn, corn kernels and
+universal feed). Rule 3 is what caught `culturaldelights:corn_kernels` and
+`hearthandharvest:corn_kernels` before 0.8.0 shipped — both were reaching seven
+corn/grain tags, `c:foods/vegetable`, canonical `c:foods` and the garnish role,
+and the cost floor would NOT have caught CD's, which passes at exactly x1.50.
+Both kernels REMAIN in Croptopia's own `c:corn`/`c:grain` (its tag references
+`#c:seeds/corn` and a datapack cannot subtract a member): reported as
+`upstream`, no Pantrywork path reaches it. The helpers are in
+`tools/CostFloor.ps1` (`Test-IsPlantingTag`, `Test-IsFoodEvidenceTag`,
+`Add-OwnFiledEntries`); keep `Test-IsSeed` byte-identical in this script and in
+`GenerateBridges.ps1`, and read the generator's per-category "dropped seeds:"
+line after every run — it is what nobody was reading when two seeds got in.
 
 Tags we merely inject into (another mod's dialect tag) are reported as
 `upstream` and never fail the build — a datapack cannot subtract members, and
@@ -210,7 +251,15 @@ any failure, on a suite/output mismatch, or on 0 classified lines (a 0/0 suite D
 Closed-gate probes are written `execute if items ... #pantrywork:gated/...` with stone in the
 slot plus `# expect: Unknown item tag`, so a LEAKED overlay answers "Test failed" (review TV-3).
 
-Test suites (all re-verified green 2026-09-13 for 0.7.0 on the dev server;
+Test suites (all re-verified green for 0.8.0 on the dev server 2026-10-06; three moved with the
+0.8.0 payload and the numbers below are the NEW expected counts: **tagtest-letsdo 49 -> 50**
+(FD's cod_slice is IN c:raw_fishes with Kaleidoscope Cookery loaded, plus a line on the overlay's
+own tag; Ocean's Delight's 1/6 fugu slice stays out), **tagtest-feedback 203 -> 204** (FD's
+cabbage leaf is back IN c:foods/vegetable with Cultural Delights and Rustic Delight loaded, plus
+a line on that overlay's tag), and the NEW **tagtest-kaleido 212/0/5** (101/0/5 before the
+blocker fix added 54 corn-kernel and glazed-berry assertions, 155/0/5 before the blueberry
+wave added 57 more). Earlier boot-matrix blocks
+below quote the 0.7.0 counts, which is correct as a record of what was measured then;
 **every crafter check needs two `time query gametime` lines after the redstone
 pulse** — with Create/BF/FoT/Refurbished loaded the crafter tick lands after the
 next RCON command, so unpadded checks failed while the follow-up kill still
@@ -238,26 +287,131 @@ reported the result; tagtest-multi/-reverse, crafttest and tagtest-nofd were pad
   FD's canonical tags, bacon_with_eggs out of c:cookedpork, cooked buffalo meat out of
   c:foods/cooked_meat), F&C corn in c:foods/corn and create:dough in c:doughs (gate open);
   full boot only
+- `tools/tagtest-kaleido.txt` — **NEW at 0.8.0**, the five Farmer's Delight addons from the
+  player report (Kaleidoscope Cookery, Hearth and Harvest, Cultural Delights + its hard dep
+  Cook's Collection, Rustic Delight, Hybrid Delights). **FULL dev boot only** (`runServer` with
+  every compat jar, Farm & Charm and Hybrid Delights included): several assertions sit behind a
+  gate that is open only because its mod is on that boot, so the file is meaningless on
+  `-PnoFarmAndCharm`, `-PnoHybridDelights`, `-PnoByg` or `-PnoCompatMods`. 212 passed / 0 failed / 5
+  expected (132 `if`, 85 `unless`; the 5 expected are closed-gate identity probes naming tag ids
+  that do not exist on that boot). Covers both hand-authored foreign-namespace oil tags, the KC
+  fried egg into c:foods/cooked_egg, HD salt into c:salt/c:salts/c:dusts/salt, the oils into
+  c:cookingoil and c:olive_oils, the butters, cabbage/leafy_green/onion/tomato, and RD's whole
+  bell peppers in with its slices out. The blocker fix added 54 assertions (101 -> 155): both
+  corn kernels OUT of the whole corn/grain family, c:foods/vegetable, canonical c:foods and the
+  garnish role but IN c:seeds/c:seeds/corn and (upstream, unavoidable) c:corn/c:grain; the five
+  real corn items still IN, so the `unless` block cannot pass on an empty family; and
+  create:chocolate_glazed_berries OUT of c:fruits and pantrywork:bridged/fruit while openly
+  asserted IN Create's own c:foods/berry and the garnish role. The BLUEBERRY wave added 57
+  more (155 -> 212): Oh The Biomes We've Gone's blueberries into c:fruits/blueberry,
+  c:blueberries and c:fruits with its three other fruits, the Croptopia/H&H pair that already
+  worked asserted as already working, soul_fruit OUT of c:fruits and bridged/fruit while openly
+  asserted IN BYG's own c:foods/fruit, and the singular c:blueberry / c:seeds/blueberry seed-tag
+  negatives. Every `biomeswevegone:` line needs the BYG jar, which is the second reason the file
+  is full-boot-only
 - `tools/tagtest-nofandc.txt` — Farm & Charm independence; only meaningful on a
   `runServer -PnoFarmAndCharm` boot (21/0 there), incl. Pam's bread from croptopia:dough
   without F&C and the Farm & Charm GATE closed live: Create, FD and Pam's dough OUT of
   c:doughs, still in c:dough. NOT vacuous on a full boot any more: there F&C opens that
   gate, so exactly the three `unless #c:doughs` lines fail (18/3, measured 2026-09-13) -
   the gate proven open and closed by the same three lines; any other failure is a bug
-- `tools/tagtest-gates.txt` + `tagtest-gates-s1..s5.txt` — cost-floor gates on the
-  NeoForge 1.21.1 RELEASE jar, one boot per scenario on tools/neo-server-1211 (S1 FD +
-  Meadow; S2 + Pam's; S3 + Pam's + Croptopia; S4 FD + Meadow + Croptopia without Pam's;
-  S5 Create ALONE - the only boot where the flour gate is closed while Create's flour exists;
-  run only s5 there); scenario jars and expected counts are in the tagtest-gates.txt header.
-  Gate proofs assert the overlay's OWN tag (`#pantrywork:gated/croptopia/c/vegetables`,
-  `.../c/salts`) wherever a third mod's ref also reaches the item: Croptopia's c:vegetables ->
-  #c:cabbage -> FD's #c:crops/cabbage reaches the cabbage leaf and Croptopia's c:salts -> #c:salt
-  reaches Pam's salt with no overlay at all (review TV-1)
-- `tools/tagtest-fabric-gates.txt` — the Fabric gate overlays at tag level, for Fabric harnesses
-  WITH a Croptopia build (fabric-server, -12110 with Croptopia Refabricated, -2612, -262): 12
-  passed + 4 expected (CountSuite)
-- **FC2-4 re-cut 2026-09-13 (CURRENT: the jars in dist/0.7.0 and all eight harness mods folders; booted,
-  see the FC2 boot matrix block right below).** SapperSquad's rule "raw gathered produce = 1 base unit": minecraft:melon_slice 1/5 -> 1 produce,
+- `tools/tagtest-gates.txt` + `tagtest-gates-s1..s12.txt` — cost-floor gates on the
+  NeoForge 1.21.1 RELEASE jar, one boot per scenario on tools/neo-server-1211. 0.8.0 took the
+  overlay count from 5 to 14 and the matrix from S1-S5 to S1-S12 (S1 FD + Meadow; S2 + Pam's;
+  S3 + Pam's + Croptopia; S4 FD + Meadow + Croptopia without Pam's; S5 Create ALONE; S6 FD +
+  Hearth and Harvest + Cook's + Pam's, the salt family; S7 Create + Kaleidoscope Cookery, the
+  only boot where KC alone opens the flour gate; S8 FD + Rustic Delight + Pam's, whole bell
+  peppers in while the cut gate is closed; S9 FD + KC + Rustic Delight, the cut gates open at
+  item level; S10 Farm & Charm + KC, the Farmer's Delight chicken gate CLOSED; S11 Farm & Charm
+  + FD + H&H, that gate and the H&H flour gate OPEN; **S12 FD + H&H + Croptopia + Oh The Biomes
+  We've Gone and its four hard deps, the blueberry scenario — the only release-jar boot that
+  carries BYG, with two real crafts and the soul_fruit exclusion**). The common file runs on S1-S4 only; every
+  other scenario runs its own file alone. Scenario jars and the full 14-gate table are in the
+  tagtest-gates.txt header; expected counts (passed/failed/expected) are
+  **gates.txt 19/0/7 on each of S1-S4; s1 7/0/4, s2 15/0/4, s3 18/0/1, s4 9/0/1, s5 6/0/5,
+  s6 30/0/5, s7 16/0/4, s8 19/0/3, s9 20/0/3, s10 7/0/3, s11 17/0/3, s12 27/0/3** — and each suite file
+  repeats its own in its header. 13 of the 14 overlays get BOTH an open and a closed proof at
+  item level here; `_5` (create) is the exception, closed at item level on S2 and open only on
+  the dev boot, which is the one place Create and Pam's load together. Gate proofs assert the
+  overlay's OWN tag
+  (`#pantrywork:gated/croptopia_or_kaleidoscope_cookery/c/vegetables`,
+  `#pantrywork:gated/cookscollection_or_croptopia/c/salts`) wherever a third mod's ref also
+  reaches the item: Croptopia's c:vegetables -> #c:cabbage -> FD's #c:crops/cabbage reaches the
+  cabbage leaf, Croptopia's c:salts -> #c:salt reaches Pam's salt with no overlay at all
+  (review TV-1), and since 0.8.0 Cook's Collection's c:salt/c:salts are literally #c:dusts/salt,
+  so anything we put in that new dialect is reachable from both. **Cultural Delights cannot
+  boot on tools/neo-server-1211 at all** — its neoforge.mods.toml requires neoforge >= 21.1.247
+  and that harness deliberately stays on 21.1.241 — so the culturaldelights half of the
+  `culturaldelights_or_rusticdelight` gate and CD's four 1/2 cuts are dev-boot-only proofs.
+  Dev-boot-only for the same kind of reason, and to be disclosed in release copy rather than
+  glossed: the `bountifulfares` half of gates `_1` and `_2` (Bountiful Fares is in no scenario),
+  the open half of `_5`, and Hybrid Delights' three salt bridges (its jar needs hapi + Kotlin for
+  Forge, and its salt item exists only alongside Hybrid Aquatic, so it is behind
+  `-PnoHybridDelights` for boot stability; the generator and audit read the jar directory, not
+  the boot)
+- `tools/tagtest-fabric-gates.txt` — the Fabric gate overlays at tag level plus item-level
+  checks, for Fabric harnesses WITH a Croptopia build (fabric-server, -12110 with Croptopia
+  Refabricated, -2612, -262): 22 passed + 10 expected (CountSuite). FD Refabricated's mod id is
+  literally `farmersdelight`, so the two 0.8.0 Farmer's-Delight-rescued overlays open there too
+- **0.8.0 BOOT MATRIX 2026-10-07 (CURRENT: the four jars in dist/0.8.0 and in all eight harness mods
+  folders, the rebuild that carries BOTH the seed-rule blocker fix and the blueberry bridge; every
+  earlier block below is a record of what older bytes were measured on and is SUPERSEDED as the
+  release).** Static first: generator (documented command) **106 tag files** + pack.mcmeta, 16 gated,
+  14 overlays, 42 GATE / 66 EXCLUDE / 11 rescued PASS (the blueberry work needed no new verdict),
+  re-run byte-stable; `-SelfTest` PASSED; AuditRoles full 129 tags / 14 overlays /
+  **720 routes** / 46 gates proven conditional, `-Minimal` **664 routes** / 42
+  gates, every counter 0, both exit 0. Both tools print `neoforge 21.1.247 (the
+  gradle.properties pin)`. All four jars: **146 payload files** (129 data + pack.mcmeta + 16 overlay
+  tag files), identical across the four, re-measured file by file against the regenerated source
+  tree: **0 missing / 0 extra / 0 differing**, the only two source files absent being the dev-only
+  test recipe and the gametest structure `-Prelease` strips. No gametest / test recipe / structure,
+  version 0.8.0, authors SapperSquad, fabric-api in both fabric.mod.json, **21**
+  optional AFTER deps in the 1.21.1 toml and 12 in the 26.x one, no jar holding
+  `corn_kernels` or `chocolate_glazed_berries`, and `biomeswevegone` in exactly 3 payload files per
+  jar (c/tags/item/blueberries.json, fruits.json, fruits/blueberry.json) plus the 1.21.1 toml.
+  SHA-1s: pantrywork-0.8.0.jar **E61935B3**, -fabric **0728AF65**, -fabric-mc26 **EB67143E**,
+  -neoforge-mc26 **1E2615AF** (full values in PUBLISHING.md). Every
+  suite classified with tools\CountSuite.ps1; fresh world + deleted latest.log/debug.log before
+  every boot; stopped via RCON; java confirmed exited and 25575 free between boots.
+  DEV, 4 boots: full `runServer` (**8601 recipes** — BYG adds ~1220) tagtest 14/0, multi 14/0,
+  reverse 18/0, crafttest-reverse 4/0, crafttest 4/0, addons 8/0, origins 11/0, letsdo 50/0,
+  brewaqua 24/0, seedfix 10/0, collisions 17/0, milkshim 15/0, feedback 204/0,
+  **kaleido 212/0 + 5 expected**,
+  nofandc 18/3 (the three documented open-gate `unless #c:doughs` lines); `-PnoFarmAndCharm` (8431)
+  nofandc 21/0 + feedback 204/0; `-PnoCompatMods` (1291) tagtest-nofd 5/0; `runGameTestServer`
+  (8602) "All 7 required tests passed". `-PnoByg` was NOT needed: the full boot with BYG and its
+  three libraries came up normally and moved no suite. RELEASE, **23 boots / 34 suite runs**:
+  neo-server-1211 (21.1.241, **E61935B3**) solo tagtest-neo26 5/0 + tagtest-nofd 4/1 (the cake line,
+  by design - the dev recipe is stripped); S1-S4 each tagtest-gates **19/0 + 7 expected** plus
+  s1 7/0+4, s2 15/0+4, s3 18/0+1, s4 9/0+1; S5 6/0+5; S6 30/0+5; S7 16/0+4; S8 19/0+3; S9 20/0+3;
+  S10 7/0+3; S11 17/0+3; **S12 27/0+3 (the blueberry scenario, two real crafts)**.
+  neo-server-2612 (26.1.2.94, **1E2615AF**): neo26-compat 7/0, **neo26-gates 7/0 + 12 expected**,
+  solo neo26 5/0. neo-server-262 (26.2.0.64, **1E2615AF**): compat262 5/0, neo26-feedback 37/0,
+  neo26-gates 7/0 + 12 expected, solo neo26 5/0. Fabric (Loader 0.19.3 on all five harnesses):
+  fabric-server 1.21.1, -12110, -2612 and -262 each
+  tagtest-fabric 7/0 + **fabric-gates 22/0 + 10 expected** (**0728AF65** on the 1.21.x harnesses,
+  **EB67143E** on the 26.x ones); -12111 tagtest-fabric-fd 9/0 only (the other two suites are scoped
+  by their own headers to a harness with a Croptopia build, and it has none). No-Fabric-API boot
+  (scratch copy of fabric-server, the dist -fabric jar alone): "Mod resolution failed",
+  "Incompatible mods found!", "requires any version of fabric-api, which is missing!", no world
+  directory created. Log scan, all 23 release boots AND all four dev boots:
+  ZERO lines matching pack.mcmeta, overlay, pantrywork_gate, pantrywork:gated, "Failed to load",
+  "Missing data pack", "Tried to load invalid" or "Couldn't load tag" — EXCEPT exactly the two
+  documented KC-without-Quark TagLoader lines on each of the three Kaleidoscope scenarios (S7, S9,
+  S10). S12's scan is clean, so BYG and four library mods introduced nothing. The other ERROR/WARN
+  lines on the dev boots are the upstream baselines in Gotchas (KC-without-Quark, Cook's Collection's
+  pizza recipe, Rustic Delight's legacy forge tag, the Jupiter config notice, and the three BYG-era
+  additions below).
+- **BYG LOG BASELINE, ADDED 0.8.0 (dev boot):** adding Oh The Biomes We've Gone and its three
+  libraries added exactly 5 new WARN/ERROR line classes to the full dev boot and lost none (169 ->
+  174 distinct classes out of 176 lines). None is Pantrywork's: `terrablender.refmap.json` and
+  `terrablender_neoforge.mixins.json` refmap WARNs (the dev-environment refmap class already
+  represented by 15 other mods); two `Method overwrite conflict` WARNs for `scheduleRandomTick` and
+  `getScheduledRandomTicks` between corgilib and ohthetreesyoullgrow (same author, same two methods);
+  and a `ServerLifecycleHooks` ERROR that `minecraft:allay` has a spawn entry with no registered
+  spawn placement, from a BYG biome. Treat all five as baseline on any boot carrying BYG.
+- **FC2-4 re-cut 2026-09-13 (the 0.7.0 record; SUPERSEDED as the release by the 0.8.0 boot matrix
+  above - dist/0.8.0 and all eight harness mods folders now hold the 0.8.0 jars).** SapperSquad's rule "raw gathered produce = 1 base unit": minecraft:melon_slice 1/5 -> 1 produce,
   Pam's melon juice 0.4 -> 2, Croptopia's 1/5 -> 1. Resolver: the slice PASSes c:fruits (x1.00, back as in
   0.6.0); c:juices/melonjuice <- croptopia:melon_juice 1 vs 2 = x2.00, still EXCLUDE. Generator (documented
   command) exit 0: 88 tag files + pack.mcmeta, 11 GATE / 45 EXCLUDE / 7 rescued PASS, only
@@ -273,8 +427,9 @@ reported the result; tagtest-multi/-reverse, crafttest and tagtest-nofd were pad
   origins:meat, version 0.7.0, authors SapperSquad. Replaced jars (6993E4FB / F666A5AA / D79D4686 / 3E101DD7)
   moved to scratch, not deleted. publish.ps1 dry run (-SkipCurseForge) exit 0: four files resolve, Modrinth
   Fabric API (P7dR8mSH, required) on the two Fabric files only.
-- **FC2 boot matrix 2026-09-13 (CURRENT, on the FC2-4 jars above; every boot result in the blocks below ran
-  EARLIER bytes and is SUPERSEDED).** Counts re-derived in the docs pass by running tools\CountSuite.ps1 on
+- **FC2 boot matrix 2026-09-13 (the 0.7.0 record, on the FC2-4 jars above; SUPERSEDED as the release
+  by the 0.8.0 boot matrix at the top of this list, and every boot result in the blocks below ran
+  bytes older still).** Counts re-derived in the docs pass by running tools\CountSuite.ps1 on
   every saved suite output (scratchpad fc2dev / fc2neo / fc2fab runs). Clean world + fresh logs per boot,
   stopped via RCON, java exited and 25575 free after each; every dedicated server's Pantrywork jar was
   SHA-1-checked against dist/0.7.0 before boot. DEV (source tree; its 126-file payload is 0 missing / extra
@@ -426,7 +581,10 @@ with JDK 21: `& "C:\Program Files\Java\jdk-21.0.11\bin\java.exe" @user_jvm_args.
 (clean on the release jar alone). The dev runServer only ever proved the dev classpath;
 this is where the `-Prelease` jar (test recipe and gametests stripped) boots, and where
 the cost-floor gates are proven closed and open: swap compat jars from tools/work/jars
-into mods/ per the scenarios in tools/tagtest-gates.txt, one clean boot each. On a
+into mods/ per the scenarios in tools/tagtest-gates.txt, one clean boot each (S1-S12 since
+0.8.0). It stays on 21.1.241 on purpose, which means Cultural Delights (requires >= 21.1.247)
+can never be part of a scenario here - check a new compat jar's `versionRange` before adding
+it to the matrix. On a
 release jar tagtest-nofd.txt's cake crafter check cannot pass (the dev test recipe is
 stripped); assert purity on the unconsumed input the way tagtest-neo26.txt does.
 
@@ -445,9 +603,10 @@ release purity via a powered crafter), `tagtest-neo26-compat.txt`
 (croptopia only; no Aquaculture on 26.2 yet), `tagtest-fabric.txt` (both
 fabric 26.x harnesses, incl. the FD-milk smoothie craft).
 `tagtest-neo26-gates.txt` (both NeoForge 26.x harnesses WITH Croptopia, never solo): no GATEd
-item has a NeoForge 26.x build, so the gate overlays are proven at the tag level - the four
-croptopia-gated `pantrywork:gated/*` tags exist (6 passed incl. two native-member checks) and
-the four closed-gate lines answer exactly "Unknown item tag" (expected; any other answer is a bug).
+item has a NeoForge 26.x build, so the gate overlays are proven at the tag level - since 0.8.0
+Croptopia is the only rescuer with a NeoForge 26.x build, so exactly three of the fourteen
+overlays open (four `pantrywork:gated/*` tags; 7 passed incl. three Croptopia member checks) and
+the twelve closed-gate lines answer exactly "Unknown item tag" (expected; any other answer is a bug).
 `tagtest-neo26-feedback.txt` (0.7.0, neo-server-262 only): Fish of Thieves
 fruits into Croptopia's c:fruits / per-fruit tags, mango_pit/half_pineapple/
 raw_mango exclusions, Refurbished cheese/dough/flour/salt in, toast/bread_slice/
@@ -461,8 +620,8 @@ and Refurbished 1.0.25 + Framework 0.13.26 (list + hashes in
 `tools/neo-server-262/HARNESS-MODS.txt`); compat262 still passes with them.
 SUPERSEDED (review F11): an early 2026-09-13 "release smoke" recorded here (fabric 7/0 x3,
 neo-2612 compat 7/0, neo-262 compat262 5/0 + feedback 37/0) ran jars from BEFORE the cost-floor
-pass; the current jars and their measured results are in the "FC2-4 re-cut" and "FC2 boot matrix"
-blocks above.
+pass; the current jars and their measured results are in the "0.8.0 BOOT MATRIX 2026-10-07" block
+above.
 Boot recipe for any harness: delete
 `logs\latest.log`, launch from the harness dir with jdk-26.0.1, wait for
 `RCON running`, run the suite, send `stop`, then scan the log.
@@ -504,6 +663,32 @@ regenerable, never a source-less PNG. ASCII-only file. Claims baked into art:
 
 ## Gotchas
 
+- **KNOWN HARNESS BASELINE, ADDED 0.8.0: Kaleidoscope Cookery logs a missing-tag-reference
+  ERROR on every boot without Quark.** Its own
+  `data/kaleidoscope_cookery/tags/item/cookery_mod_items.json` and
+  `data/carryon/tags/block/block_blacklist.json` list nine Quark-only ids
+  (`kaleidoscope_cookery:kalc/quark/{chair,table,cook_stool}_{azalea,ancient,blossom}`) as bare
+  REQUIRED strings, not `{"id": …, "required": false}`. Nothing here is Pantrywork's and nothing
+  we ship touches it — it is upstream's own rule-1 violation. Treat those lines as baseline on **any
+  boot that loads Kaleidoscope Cookery** — the dev boots and gate scenarios S7, S9 and S10, not just
+  the dev log — alongside the existing baseline (Fish of Thieves missing translations,
+  mixin refmaps, Origins `stacking_effect` decode, "Not all defined tags … c:tools/knives" and the
+  twilightforest biome tag, offline mode). The matching MappedRegistry "Not all defined tags …
+  cookery_mod_items" line is part of the same baseline. Any OTHER tag-loading line is a real finding.
+- **KNOWN HARNESS BASELINE, ADDED 0.8.0, DEV BOOT ONLY: RecipeManager "Parsing error loading recipe
+  `brewinandchewin:pizza_from_dough`" with a stack trace.** Measured to its source:
+  `cookscollection-0.6.1.jar` ships `data/brewinandchewin/recipe/pizza_from_dough.json` naming the
+  item `farmersdelight:dough`, which Farmer's Delight renamed to `wheat_dough` after 1.20. It is
+  Cook's Collection's own compat recipe, exact item ids only — no tag and no Pantrywork file is
+  involved. It fires only where Brewin' & Chewin' is also loaded, which is the dev boots alone (no
+  gate scenario carries B&C, S6's Cook's Collection included), so on a release boot this line
+  appearing at all would be a finding.
+- **Fabric harness baseline:** every Fabric boot log carries FD Refabricated's own WARNs — loot-table
+  validation ("Unknown loot table called `farmersdelight:chests/fd_*`" on ~15 vanilla chest tables,
+  and `croptopia:gameplay/fishing` where Croptopia is loaded) and client-mixin targets missing on a
+  dedicated server (`refabricated.GuiGraphicsAccessor`, `GhostSlotsInvoker`, `GuiMixin`). Upstream's,
+  dedicated-server-only, nothing to do with Pantrywork — do not chase them when scanning a Fabric log
+  (read 2026-10-06 in `tools/fabric-server*/logs/latest.log`).
 - `pantrywork:test/universal_sandwich` (recipe) is dev-only tooling for the
   crafter tests — REMOVE before any release.
 - All cross-mod tag/item references must be `{"id": …, "required": false}`;

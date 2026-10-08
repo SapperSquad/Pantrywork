@@ -1,6 +1,10 @@
 {
   "values": [
+    { "id": "create:dough", "required": false },
     { "id": "croptopia:dough", "required": false },
+    { "id": "culturaldelights:corn_dough", "required": false },
+    { "id": "farmersdelight:wheat_dough", "required": false },
+    { "id": "kaleidoscope_cookery:raw_dough", "required": false },
     { "id": "refurbished_furniture:dough", "required": false },
     { "id": "#pantrywork:gated/create/bridged/foods_dough", "required": false }
   ]

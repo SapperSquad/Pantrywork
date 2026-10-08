@@ -1,6 +1,9 @@
 {
   "values": [
+    { "id": "cookscollection:cooking_oil", "required": false },
     { "id": "croptopia:olive_oil", "required": false },
-    { "id": "pamhc2foodcore:cookingoilitem", "required": false }
+    { "id": "hearthandharvest:cooking_oil", "required": false },
+    { "id": "pamhc2foodcore:cookingoilitem", "required": false },
+    { "id": "rusticdelight:cooking_oil", "required": false }
   ]
 }

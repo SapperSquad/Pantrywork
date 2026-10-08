@@ -1,0 +1,8 @@
+{
+  "values": [
+    { "id": "culturaldelights:raw_calamari", "required": false },
+    { "id": "farmersdelight:cod_slice", "required": false },
+    { "id": "farmersdelight:salmon_slice", "required": false },
+    { "id": "rusticdelight:calamari_slice", "required": false }
+  ]
+}

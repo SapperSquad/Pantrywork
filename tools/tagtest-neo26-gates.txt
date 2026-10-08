@@ -1,36 +1,62 @@
-# NeoForge 26.x cost-floor gate overlays (0.7.0), on any 26.x NeoForge harness with Croptopia
+# NeoForge 26.x cost-floor gate overlays, on any 26.x NeoForge harness with Croptopia
 # loaded: neo-server-2612 (Croptopia + EpheroLib + Aquaculture) or neo-server-262 (Croptopia +
 # EpheroLib + Fish of Thieves + Refurbished). NOT for the solo boots (no Croptopia).
-# No GATEd item exists on NeoForge 26.x (Farmer's Delight, Pam's, Create, Bountiful Fares and
-# Farm & Charm have no NeoForge 26.x build), so the gates are proven at the overlay level, with
-# stone in the slot:
+# No GATEd item exists on NeoForge 26.x - Farmer's Delight, Pam's, Create, Bountiful Fares,
+# Farm & Charm and all five mods 0.8.0 added have no NeoForge 26.x build - so the gates are
+# proven at the overlay level, with stone in the slot:
 # - OPEN lines use `unless`: an applied overlay defines its tag -> "Test passed". An overlay that
 #   did not apply answers "Unknown item tag" there, which is unannotated and so a FAILURE.
 # - CLOSED lines use `if` and carry `# expect: Unknown item tag`: a closed overlay leaves its tag
 #   undefined (the expected answer). A LEAKED overlay defines it and the line answers
 #   "Test failed" - a counted failure, not a pass (review TV-3).
+#
+# 0.8.0 re-cut: 5 overlays became 14. Croptopia is the only rescuer with a NeoForge 26.x build,
+# so exactly three overlays open here (four tag files) and eleven stay closed (twelve tag files).
+#   OPEN   _4 cookscollection|croptopia      c:salts
+#          _6 croptopia                      c:cheeses + c:milks
+#          _7 croptopia|kaleidoscope_cookery c:vegetables
+#   CLOSED _1, _2, _3 (two tags), _5, _8, _9, _10, _11, _12, _13, _14
 # Run:      tools\rcon.ps1 -File tools\tagtest-neo26-gates.txt > neo26-gates.out
 # Classify: powershell -File tools\CountSuite.ps1 -Suite tools\tagtest-neo26-gates.txt -Output neo26-gates.out
-# Expected: 6 passed, 0 failed, 4 expected.
+# Expected: 7 passed, 0 failed, 12 expected.
 forceload add 0 0
 setblock 8 -60 8 minecraft:chest
 item replace block 8 -60 8 container.0 with minecraft:stone
-# --- croptopia overlay OPEN: its four gated tags exist ---
+# --- the three croptopia-rescued overlays OPEN: their four gated tags exist ---
 execute unless items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/milks
 execute unless items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/cheeses
-execute unless items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/salts
-execute unless items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/vegetables
-# --- CLOSED overlays ---
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/cookscollection_or_croptopia/c/salts
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/croptopia_or_kaleidoscope_cookery/c/vegetables
+# --- CLOSED overlays: all eleven ---
 # expect: Unknown item tag
-execute if items block 8 -60 8 container.0 #pantrywork:gated/bountifulfares_or_farm_and_charm_or_pamhc2foodcore/c/flour
+execute if items block 8 -60 8 container.0 #pantrywork:gated/bountifulfares_or_farm_and_charm/c/flour
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/bountifulfares_or_farm_and_charm_or_kaleidoscope_cookery_or_pamhc2foodcore/c/flour
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection/c/salt
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection/c/salts
 # expect: Unknown item tag
 execute if items block 8 -60 8 container.0 #pantrywork:gated/create/bridged/foods_dough
 # expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/culturaldelights_or_rusticdelight/bridged/vegetable
+# expect: Unknown item tag
 execute if items block 8 -60 8 container.0 #pantrywork:gated/farm_and_charm/c/doughs
 # expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight/bridged/foods_raw_chicken
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight_or_rusticdelight/bridged/raw_fishes
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/hearthandharvest/c/dusts/salt
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/kaleidoscope_cookery/c/raw_fishes
+# expect: Unknown item tag
 execute if items block 8 -60 8 container.0 #pantrywork:gated/pamhc2foodcore/c/milk
-# --- Croptopia's own members of the gated dialect tags are untouched by the gate refs ---
+# --- Croptopia's own members of the gated dialect tags are untouched by the gate refs, and
+# its 1/16 salt stays out of the new c:dusts/salt dialect (gate _12, closed: no H&H) ---
 item replace block 8 -60 8 container.0 with croptopia:milk_bottle
 execute if items block 8 -60 8 container.0 #c:milks
 item replace block 8 -60 8 container.0 with croptopia:cheese
 execute if items block 8 -60 8 container.0 #c:cheeses
+item replace block 8 -60 8 container.0 with croptopia:salt
+execute unless items block 8 -60 8 container.0 #c:dusts/salt

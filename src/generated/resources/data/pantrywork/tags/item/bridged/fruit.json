@@ -1,5 +1,6 @@
 {
   "values": [
+    { "id": "cookscollection:lemon", "required": false },
     { "id": "croptopia:almond", "required": false },
     { "id": "croptopia:apricot", "required": false },
     { "id": "croptopia:avocado", "required": false },
@@ -38,7 +39,13 @@
     { "id": "croptopia:starfruit", "required": false },
     { "id": "croptopia:strawberry", "required": false },
     { "id": "croptopia:walnut", "required": false },
+    { "id": "culturaldelights:avocado", "required": false },
     { "id": "farm_and_charm:strawberry", "required": false },
+    { "id": "hearthandharvest:blueberries", "required": false },
+    { "id": "hearthandharvest:cherry", "required": false },
+    { "id": "hearthandharvest:green_grapes", "required": false },
+    { "id": "hearthandharvest:raspberry", "required": false },
+    { "id": "hearthandharvest:red_grapes", "required": false },
     { "id": "minecraft:apple", "required": false },
     { "id": "minecraft:chorus_fruit", "required": false },
     { "id": "minecraft:glow_berries", "required": false },

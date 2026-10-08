@@ -1,0 +1,8 @@
+{
+  "values": [
+    { "id": "hybrid_delights:salt", "required": false },
+    { "id": "meadow:alpine_salt", "required": false },
+    { "id": "refurbished_furniture:sea_salt", "required": false },
+    { "id": "#pantrywork:gated/hearthandharvest/c/dusts/salt", "required": false }
+  ]
+}

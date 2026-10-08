@@ -1,19 +1,29 @@
 # Gate scenario S4 (tools/neo-server-1211): S1 + Croptopia (+ EpheroLib) - Croptopia
-# WITHOUT Pam's. See tools/tagtest-gates.txt for setup. Expected: 7 passed / 0 failed.
+# WITHOUT Pam's. See tools/tagtest-gates.txt for setup.
+# Expected: 9 passed / 0 failed / 1 expected.
 forceload add 0 0
 setblock 8 -60 8 minecraft:chest
-# the two milk gates split: croptopia OPEN, pamhc2foodcore CLOSED
+# the two milk gates split: _6 (croptopia) OPEN, _14 (pamhc2foodcore) CLOSED
 item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
 execute if items block 8 -60 8 container.0 #c:milks
 execute unless items block 8 -60 8 container.0 #c:milk
 item replace block 8 -60 8 container.0 with croptopia:milk_bottle
 execute unless items block 8 -60 8 container.0 #c:milk
 execute if items block 8 -60 8 container.0 #c:milks
-# the croptopia overlay's own tag holds FD's leaf (the gate proof); #c:vegetables is reachability
-# only - Croptopia's c:vegetables -> #c:cabbage -> FD's #c:crops/cabbage reaches it anyway (TV-1)
+# gate _12 CLOSED (no Hearth and Harvest): Croptopia's 1/16 salt stays out of c:dusts/salt
+item replace block 8 -60 8 container.0 with croptopia:salt
+execute unless items block 8 -60 8 container.0 #c:dusts/salt
+# gate _7's overlay (renamed croptopia_or_kaleidoscope_cookery in 0.8.0) holds FD's leaf -
+# the gate proof; #c:vegetables is reachability only, since Croptopia's c:vegetables ->
+# #c:cabbage -> FD's #c:crops/cabbage reaches it anyway (TV-1)
 item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
-execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/vegetables
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia_or_kaleidoscope_cookery/c/vegetables
 execute if items block 8 -60 8 container.0 #c:vegetables
+# --- overlay level: gate _4 is OPEN by Croptopia even with no Pam's salt to put in it ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/cookscollection_or_croptopia/c/salts
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/pamhc2foodcore/c/milk
 # --- CRAFT: Croptopia's banana smoothie with FD milk (the c:milks GATE in a real recipe) ---
 kill @e[type=item]
 setblock 8 -60 12 minecraft:air

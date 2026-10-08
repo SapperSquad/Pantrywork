@@ -44,15 +44,25 @@ public class GenPromo {
     static final Color C_BOUNTY  = new Color(0xCFD65A);
     static final Color C_FOT     = new Color(0x2FB59C);
     static final Color C_REFURB  = new Color(0xCFC8BC);
+    static final Color C_KALEIDO = new Color(0xE08A3C);
+    static final Color C_HEARTH  = new Color(0xC75B3F);
+    static final Color C_CULTURE = new Color(0x7FA653);
+    static final Color C_COOKS   = new Color(0xD9B23A);
+    static final Color C_RUSTIC  = new Color(0xB5342C);
+    static final Color C_HYBRID  = new Color(0x5FA8C9);
+    static final Color C_BYG     = new Color(0x5A62B8);
 
     // Bumped whenever a compat module ships. Baked into gallery art, so it must
     // be re-checked every release - images can't be grepped when they go stale.
     // galleryRoster() refuses to render when its roster disagrees with this count.
-    static final int FOOD_MOD_COUNT = 14;
+    // 0.8.0: 14 -> 20, matching the optional AFTER deps in
+    // src/main/templates/META-INF/neoforge.mods.toml (Origins is a consumer, not a
+    // bridged food mod, and has the card's footer line to itself).
+    static final int FOOD_MOD_COUNT = 21;
     static final int DIALECT_COUNT = 4;
     static final String[] NUMBER_WORDS = {"Zero", "One", "Two", "Three", "Four", "Five",
         "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen",
-        "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty"};
+        "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty", "Twenty-one"};
 
     static final String TEX = "tools/work/tex/";
 
@@ -504,11 +514,23 @@ public class GenPromo {
             {"create__dough",                       "Create"},
             {"bountifulfares__maize",               "Bountiful Fares"},
             {"fishofthieves__pineapple",            "Fish of Thieves"},
-            {"refurbished_furniture__cheese",       "Refurbished Furniture"}
+            {"refurbished_furniture__cheese",       "Refurbished Furniture"},
+            {"kaleidoscope_cookery__fried_egg",     "Kaleidoscope Cookery"},
+            {"hearthandharvest__butter",            "Hearth and Harvest"},
+            {"culturaldelights__avocado",           "Cultural Delights"},
+            {"cookscollection__lemon",              "Cook's Collection"},
+            {"rusticdelight__bell_pepper_red",      "Rustic Delight"},
+            {"hybrid_delights__salt",               "Hybrid Delights"},
+            // 0.8.0: a WORLDGEN mod that happens to grow food. It is counted here because
+            // the count is the 1.21.1 toml's optional-AFTER list, and Pantrywork bridges
+            // four of its fruits - not because it is a cooking mod.
+            {"biomeswevegone__blueberries",         "Oh The Biomes We've Gone"}
         };
         Color[] cols = {C_CROP, C_PAMS, C_FD, C_OCEANS, C_ENDS,
                         C_VINERY, C_FARM, C_MEADOW, C_AQUA, C_BREW,
-                        C_CREATE, C_BOUNTY, C_FOT, C_REFURB};
+                        C_CREATE, C_BOUNTY, C_FOT, C_REFURB,
+                        C_KALEIDO, C_HEARTH, C_CULTURE, C_COOKS, C_RUSTIC, C_HYBRID,
+                        C_BYG};
         // The headline count is derived, never typed: a roster that disagrees with
         // FOOD_MOD_COUNT stops the render instead of shipping a stale number.
         if (roster.length != FOOD_MOD_COUNT || cols.length != roster.length) {
@@ -520,15 +542,21 @@ public class GenPromo {
         g.setColor(BODY);
         g.drawString("Install all of them, a few of them, or none - Pantrywork bridges whatever it finds.", 80, 250);
 
-        // Two rows of seven, centered. Every label line must fit its column with a
-        // gutter - measured and enforced here, because a label collision is exactly
-        // the kind of defect that survives when art is only eyeballed.
-        int perRow = 7, s = 104, pitch = 205, y0 = 330, gapY = 240;
-        int x0 = (W - ((perRow - 1) * pitch + s)) / 2;
+        // Rows of seven (0.8.0: three FULL rows, 7/7/7), each row centered on its own
+        // count so a short last row is not left-aligned. Every label line must fit
+        // its column with a gutter - measured and enforced here, because a label
+        // collision is exactly the kind of defect that survives when art is only
+        // eyeballed. The slot size and row pitch shrank at 0.8.0 to fit the third
+        // row above the footer; the guard below still proves it.
+        int perRow = 7, s = 92, pitch = 205, y0 = 296, gapY = 186;
         int maxLabel = pitch - 20;
+        int lowestLabel = 0;
         for (int i = 0; i < roster.length; i++) {
+            int row = i / perRow;
+            int inRow = Math.min(perRow, roster.length - row * perRow);
+            int x0 = (W - ((inRow - 1) * pitch + s)) / 2;
             int cx = x0 + (i % perRow) * pitch;
-            int cy = y0 + (i / perRow) * gapY;
+            int cy = y0 + row * gapY;
             slotItem(g, tex(roster[i][0]), cols[i], cx, cy, s);
             g.setFont(new Font("Segoe UI", Font.BOLD, 22));
             FontMetrics fm = g.getFontMetrics();
@@ -556,16 +584,27 @@ public class GenPromo {
                 g.drawString(ln, cx + (s - fm.stringWidth(ln)) / 2, ty);
                 ty += 26;
             }
-            if (ty - 26 + fm.getDescent() >= cy + gapY && i / perRow < (roster.length - 1) / perRow) {
+            if (ty - 26 + fm.getDescent() >= cy + gapY && row < (roster.length - 1) / perRow) {
                 throw new IllegalStateException("label '" + name + "' runs into the next row");
             }
+            lowestLabel = Math.max(lowestLabel, ty - 26 + fm.getDescent());
         }
 
         g.setFont(new Font("Segoe UI", Font.ITALIC, 26));
         g.setColor(BODY);
         String foot = "Plus Origins diet compat - carnivores and vegetarians can finally eat modded food.";
+        int footY = 876;
+        // The last row has no row below it to collide with, so the footer is the
+        // guard: a roster that grows another row must fail here, not ship overlapped.
+        if (lowestLabel >= footY - g.getFontMetrics().getAscent()) {
+            throw new IllegalStateException("the last row of labels (bottom " + lowestLabel
+                + "px) runs into the footer line at " + footY + "px");
+        }
+        if (footY + g.getFontMetrics().getDescent() > H) {
+            throw new IllegalStateException("the footer line falls off the card");
+        }
         fitOrFail(g, foot, W - 2 * 118);
-        g.drawString(foot, 118, 852);
+        g.drawString(foot, 118, footY);
         g.dispose();
         return img;
     }

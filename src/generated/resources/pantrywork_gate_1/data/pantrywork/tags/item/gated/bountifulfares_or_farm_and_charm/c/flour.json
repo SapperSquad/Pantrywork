@@ -1,0 +1,6 @@
+{
+  "values": [
+    { "id": "hearthandharvest:corn_meal", "required": false },
+    { "id": "hearthandharvest:flour", "required": false }
+  ]
+}

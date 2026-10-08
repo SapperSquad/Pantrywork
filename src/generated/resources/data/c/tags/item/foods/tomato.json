@@ -1,0 +1,7 @@
+{
+  "values": [
+    { "id": "croptopia:tomato", "required": false },
+    { "id": "farm_and_charm:tomato", "required": false },
+    { "id": "kaleidoscope_cookery:tomato", "required": false }
+  ]
+}

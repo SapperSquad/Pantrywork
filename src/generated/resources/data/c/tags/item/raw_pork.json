@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "farmersdelight:bacon", "required": false }
+    { "id": "farmersdelight:bacon", "required": false },
+    { "id": "kaleidoscope_cookery:raw_pork_belly", "required": false }
   ]
 }

@@ -1,0 +1,63 @@
+# Gate scenario S9 (tools/neo-server-1211), NEW in 0.8.0.
+# Pantrywork release jar + Farmer's Delight 1.3.2 + Kaleidoscope Cookery 1.6.0 + Rustic
+# Delight 1.7.1. No Pam's, no Croptopia, no Meadow. Do NOT run tagtest-gates.txt here.
+# Expected: 20 passed / 0 failed / 3 expected.
+#
+# What this boot proves, all at ITEM level and all without Croptopia:
+#   gate _7  OPEN by KALEIDOSCOPE COOKERY - the 0.8.0 churn row that widened the cabbage-leaf
+#            gate from `croptopia` to `croptopia_or_kaleidoscope_cookery`. KC floors
+#            c:vegetables at 1/2 through its own optional #c:crops/cabbage reference, so the
+#            1/2 cuts (FD's leaf, Rustic Delight's pepper slices) ride in behind it.
+#   gate _13 OPEN - FD's cod and salmon slices and RD's calamari slice into c:raw_fishes,
+#            rescued by KC's own 1/3-fish sashimi. They stay EXCLUDEd from c:rawfish and
+#            c:fishes, whose floor is a whole fish and which KC does not define.
+#   gate _11 OPEN - KC's sashimi into c:foods/raw_fish through pantrywork:bridged/raw_fishes,
+#            rescued by Farmer's Delight (and by Rustic Delight) at 1/2.
+#   gate _8  OPEN by Rustic Delight, gate _14 CLOSED (no Pam's).
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- gate _7 OPEN by KC: overlay tag first (the proof), then the dialect tag ---
+item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia_or_kaleidoscope_cookery/c/vegetables
+execute if items block 8 -60 8 container.0 #c:vegetables
+execute if items block 8 -60 8 container.0 #c:foods/vegetable
+item replace block 8 -60 8 container.0 with rusticdelight:bell_pepper_slice_red
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia_or_kaleidoscope_cookery/c/vegetables
+execute if items block 8 -60 8 container.0 #c:vegetables
+item replace block 8 -60 8 container.0 with rusticdelight:bell_pepper_red
+execute if items block 8 -60 8 container.0 #c:vegetables
+# --- gate _13 OPEN by KC ---
+item replace block 8 -60 8 container.0 with farmersdelight:cod_slice
+execute if items block 8 -60 8 container.0 #pantrywork:gated/kaleidoscope_cookery/c/raw_fishes
+execute if items block 8 -60 8 container.0 #c:raw_fishes
+execute unless items block 8 -60 8 container.0 #c:rawfish
+execute unless items block 8 -60 8 container.0 #c:fishes
+item replace block 8 -60 8 container.0 with farmersdelight:salmon_slice
+execute if items block 8 -60 8 container.0 #c:raw_fishes
+item replace block 8 -60 8 container.0 with rusticdelight:calamari_slice
+execute if items block 8 -60 8 container.0 #c:raw_fishes
+# --- gate _11 OPEN by Farmer's Delight / Rustic Delight ---
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:sashimi
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight_or_rusticdelight/bridged/raw_fishes
+execute if items block 8 -60 8 container.0 #c:foods/raw_fish
+# --- the oil tags with both owning mods actually loaded (items 1 and 8) ---
+item replace block 8 -60 8 container.0 with rusticdelight:cooking_oil
+execute if items block 8 -60 8 container.0 #kaleidoscope_cookery:oil
+execute if items block 8 -60 8 container.0 #rusticdelight:cooking_oil
+execute if items block 8 -60 8 container.0 #c:cookingoil
+# --- ungated phase-A/B bridges ---
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:fried_egg
+execute if items block 8 -60 8 container.0 #c:foods/cooked_egg
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:tomato
+execute if items block 8 -60 8 container.0 #c:foods/tomato
+# --- gate _14 CLOSED: no Pam's, so FD's 1/4 bottle stays out of c:milk ---
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute unless items block 8 -60 8 container.0 #c:milk
+# --- overlay level ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/pamhc2foodcore/c/milk
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/hearthandharvest/c/dusts/salt
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection/c/salt

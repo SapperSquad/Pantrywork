@@ -1,0 +1,6 @@
+{
+  "values": [
+    { "id": "croptopia:salt", "required": false },
+    { "id": "pamhc2foodcore:saltitem", "required": false }
+  ]
+}

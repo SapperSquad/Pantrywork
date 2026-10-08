@@ -190,6 +190,102 @@ function Get-LoaderModIds($data, $mods, [string]$loader) {
 # Gate key / overlay directory naming (shared so the audit can parse what the generator wrote)
 function Get-GateKey($gates) { return (($gates | Sort-Object) -join '_or_') }
 
+# SEED CLASSIFICATION - the two tag classifiers behind Test-IsSeed's third rule, here so the
+# generator and the audit cannot disagree on them (0.8.0 blocker B1: culturaldelights:corn_kernels
+# and hearthandharvest:corn_kernels are planting seeds whose names match neither "_seed" nor
+# "_seeds", so the first two rules missed them and they shipped inside c:crops/corn, c:foods/corn
+# and the whole grain family through Croptopia's c:corn -> #c:seeds/corn reference).
+#
+# The third rule asks the item's OWN mod what its own item is: a mod that files its item in a
+# planting tag and in no food tag of its own has classified it as seed stock, not as food.
+# Both halves are measured from the jars, never from the item's name.
+#
+# PLANTING tags: c:seeds, every c:seeds/<crop> leaf, and minecraft:villager_plantable_seeds.
+function Test-IsPlantingTag([string]$tagId) {
+  return ($tagId -eq 'c:seeds' -or $tagId -like 'c:seeds/*' -or $tagId -eq 'minecraft:villager_plantable_seeds')
+}
+# FOOD-EVIDENCE tags: only the c: convention namespace counts as a food classification. A mod's
+# private tags (hearthandharvest:crow_food, kaleidoscope_cookery:cookery_mod_seeds, diet:grains,
+# sereneseasons:summer_crops) and the vanilla feed tags (minecraft:chicken_food, parrot_food) are
+# not statements about human food, and three c: tags are excluded because the jars show they are
+# not either:
+#   c:seeds, c:seeds/*                 planting, by definition
+#   c:crops (BARE)                     a mixed "plantable crop item" bag: Bountiful Fares' own
+#                                      c:crops lists maize_seeds, hoary_seeds, leek_seeds,
+#                                      lapisberry_seeds, sweet_berry_pips and tea_berries beside
+#                                      its maize and leek, and Hearth and Harvest's lists cotton.
+#                                      c:crops/<crop> IS food evidence (Cultural Delights'
+#                                      c:crops/corn is its corn_cob, Rustic Delight's
+#                                      c:crops/coffee is its coffee_beans).
+#   c:animal_foods                     animal feed: Hearth and Harvest's own file is
+#                                      [corn, corn_kernels, universal_feed].
+function Test-IsFoodEvidenceTag([string]$tagId) {
+  if (-not $tagId.StartsWith('c:')) { return $false }
+  if (Test-IsPlantingTag $tagId) { return $false }
+  if ($tagId -eq 'c:crops' -or $tagId -eq 'c:animal_foods') { return $false }
+  return $true
+}
+# Records one tag file's DIRECT item entries into the two own-mod sets. $ownNs is the namespaces
+# the scanning jar owns (its [[mods]] ids plus every assets/<ns>/lang it ships): an entry only
+# counts when the jar that declares the tag owns the item's namespace, so Croptopia listing
+# #c:seeds/corn - or any third mod listing someone else's item - can neither condemn nor rescue it.
+# No scanned jar ships assets/minecraft/lang and the platform jar's mod id is 'neoforge', so
+# vanilla items have no own-mod filing at all; every vanilla planting seed is already caught by
+# the name rules ("_seed"/"_seeds" + c:seeds).
+function Add-OwnFiledEntries([string]$tagId, $values, $ownNs, $seedOut, $foodOut) {
+  $plant = Test-IsPlantingTag $tagId
+  $food = Test-IsFoodEvidenceTag $tagId
+  if (-not ($plant -or $food)) { return }
+  foreach ($v in $values) {
+    $id = if ($v -is [string]) { $v } else { $v.id }
+    if ([string]::IsNullOrEmpty($id) -or $id.StartsWith('#')) { continue }
+    if (-not $ownNs.Contains(($id -split ':')[0])) { continue }
+    if ($plant) { [void]$seedOut.Add($id) } else { [void]$foodOut.Add($id) }
+  }
+}
+
+# PLATFORM CONVENTION TAGS. #c:seeds, #c:foods/*, #c:buckets/milk and the rest of the
+# NeoForge convention set live in the NeoForge universal jar in the gradle cache. Both
+# GenerateBridges.ps1 (which derives the unions and the seed set from them) and
+# AuditRoles.ps1 (which resolves them) must read the SAME jar, and it must be the build
+# gradle.properties actually pins - 0.8.0 bumped neo_version 21.1.241 -> 21.1.247 while the
+# generator still named 21.1.241 in a hardcoded path and the audit took whatever jar the
+# cache listed first (21.1.235), so "the platform" meant two different things in one pass.
+# Resolution order: the pinned neo_version if its jar is cached, else the newest cached
+# build on the pin's own MC line (21.1.x for a 21.1.247 pin; a pin is normally downloaded
+# only by a gradle run, and this script must not need one).
+# Returns @{ path; version; pinned; exact }. Throws if nothing on that line is cached.
+function Resolve-PlatformNeoJar($root) {
+  $pinned = $null
+  $props = Join-Path $root 'gradle.properties'
+  if (Test-Path $props) {
+    foreach ($line in (Get-Content $props)) {
+      if ($line -match '^\s*neo_version\s*=\s*([^\s#]+)') { $pinned = $matches[1]; break }
+    }
+  }
+  $cacheRoot = "$env:USERPROFILE\.gradle\caches\modules-2\files-2.1\net.neoforged\neoforge"
+  if (-not (Test-Path $cacheRoot)) { throw "Resolve-PlatformNeoJar: no NeoForge in the gradle cache ($cacheRoot)" }
+  $findUniversal = {
+    param($ver)
+    $d = Join-Path $cacheRoot $ver
+    if (-not (Test-Path $d)) { return $null }
+    return (Get-ChildItem $d -Recurse -Filter "neoforge-$ver-universal.jar" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName)
+  }
+  if ($pinned) {
+    $p = & $findUniversal $pinned
+    if ($p) { return @{ path = $p; version = $pinned; pinned = $pinned; exact = $true } }
+  }
+  $prefix = if ($pinned -and $pinned -match '^(\d+)\.(\d+)\.') { "$($matches[1]).$($matches[2])." } else { '' }
+  $cands = @(Get-ChildItem $cacheRoot -Directory |
+             Where-Object { $_.Name.StartsWith($prefix) -and $_.Name -match '^\d+(\.\d+)+$' } |
+             Sort-Object { [version]$_.Name } -Descending | ForEach-Object Name)
+  foreach ($v in $cands) {
+    $p = & $findUniversal $v
+    if ($p) { return @{ path = $p; version = $v; pinned = $pinned; exact = $false } }
+  }
+  throw "Resolve-PlatformNeoJar: gradle.properties pins neo_version=$pinned but no neoforge-$prefix*-universal.jar is in the gradle cache ($cacheRoot)"
+}
+
 # modId of a jar: the FIRST [[mods]] entry of META-INF/neoforge.mods.toml, or fabric.mod.json "id".
 # Dependency blocks also carry modId= lines, so only [[mods]] sections count.
 function Get-JarModIds($zip) {

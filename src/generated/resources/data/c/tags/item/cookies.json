@@ -2,6 +2,11 @@
   "values": [
     { "id": "farmersdelight:honey_cookie", "required": false },
     { "id": "farmersdelight:sweet_berry_cookie", "required": false },
-    { "id": "minecraft:cookie", "required": false }
+    { "id": "hearthandharvest:maple_cookie", "required": false },
+    { "id": "hearthandharvest:peanut_butter_cookie", "required": false },
+    { "id": "minecraft:cookie", "required": false },
+    { "id": "rusticdelight:cherry_blossom_cookie", "required": false },
+    { "id": "rusticdelight:coffee_cookie", "required": false },
+    { "id": "rusticdelight:syrup_cookie", "required": false }
   ]
 }

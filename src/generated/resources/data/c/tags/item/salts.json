@@ -1,6 +1,9 @@
 {
   "values": [
+    { "id": "cookscollection:salt", "required": false },
+    { "id": "hybrid_delights:salt", "required": false },
     { "id": "refurbished_furniture:sea_salt", "required": false },
-    { "id": "#pantrywork:gated/croptopia/c/salts", "required": false }
+    { "id": "#pantrywork:gated/cookscollection/c/salts", "required": false },
+    { "id": "#pantrywork:gated/cookscollection_or_croptopia/c/salts", "required": false }
   ]
 }

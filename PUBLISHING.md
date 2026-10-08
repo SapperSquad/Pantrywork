@@ -1,4 +1,4 @@
-# Pantrywork — publishing kit (current as of v0.7.0)
+# Pantrywork — publishing kit (current as of v0.8.0)
 
 Store copy for the Modrinth / CurseForge project pages. Bump this file in the same pass as
 `CHANGELOG.md` and `README.md` — never one alone.
@@ -7,43 +7,53 @@ Store copy for the Modrinth / CurseForge project pages. Bump this file in the sa
 
 | Upload as version | File | Game version tags | Loader | Dependencies |
 |---|---|---|---|---|
-| `0.7.0+mc1.21.1` | `dist/0.7.0/pantrywork-0.7.0.jar` | 1.21.1 | neoforge | none |
-| `0.7.0+mc1.21.x-fabric` | `dist/0.7.0/pantrywork-0.7.0-fabric.jar` | 1.21.1–1.21.11 (booted on 1.21.1, 1.21.10, 1.21.11) | fabric | Fabric API, required |
-| `0.7.0+mc26-fabric` | `dist/0.7.0/pantrywork-0.7.0-fabric-mc26.jar` | 26.1.2, 26.2 | fabric | Fabric API, required |
-| `0.7.0+mc26` | `dist/0.7.0/pantrywork-0.7.0-neoforge-mc26.jar` | 26.1.2, 26.2 | neoforge | none |
+| `0.8.0+mc1.21.1` | `dist/0.8.0/pantrywork-0.8.0.jar` | 1.21.1 | neoforge | none |
+| `0.8.0+mc1.21.x-fabric` | `dist/0.8.0/pantrywork-0.8.0-fabric.jar` | 1.21.1–1.21.11 (booted on 1.21.1, 1.21.10, 1.21.11) | fabric | Fabric API, required |
+| `0.8.0+mc26-fabric` | `dist/0.8.0/pantrywork-0.8.0-fabric-mc26.jar` | 26.1.2, 26.2 | fabric | Fabric API, required |
+| `0.8.0+mc26` | `dist/0.8.0/pantrywork-0.8.0-neoforge-mc26.jar` | 26.1.2, 26.2 | neoforge | none |
 
-Publish: `tools\publish.ps1 -Version 0.7.0 -ChangelogFile tools\changelog-current.md` (dry-run first).
+Publish: `tools\publish.ps1 -Version 0.8.0 -ChangelogFile tools\changelog-current.md` (dry-run first).
 The version names above are exactly what `publish.ps1` generates (`<Version>+mc<label>[-fabric]`).
 
 **Fabric API, on BOTH stores:** `publish.ps1` sends **Fabric API** as a required dependency of the two
 Fabric files (Modrinth project `P7dR8mSH`, `required`; CurseForge relation slug `fabric-api`,
-`requiredDependency`), and both Fabric jars declare `"fabric-api": "*"` in `fabric.mod.json`. Without
-it Fabric Loader refuses to start and names the missing dependency (booted 2026-09-13 on the staged
-`-fabric` jar). The 2026-09-13 dry run (`-DryRun -SkipCurseForge`) listed it on the two Fabric files
-only; the CurseForge relation was not printed (that dry run skips CurseForge). After the upload,
-confirm it on the live pages (release blockers below); add it by hand where a store dropped it.
+`requiredDependency`), and both Fabric jars declare `"fabric-api": "*"` in `fabric.mod.json` (re-read
+out of the staged 0.8.0 jars). Without it Fabric Loader refuses to start and names the missing
+dependency (booted on the staged 0.8.0 `-fabric` jar: it refuses to start, naming `fabric-api`). The
+2026-10-06 dry run (`-DryRun -SkipCurseForge`) listed it on the two Fabric files only; the CurseForge
+relation was not printed (that dry run skips CurseForge). After the upload, confirm it on the live
+pages (release blockers below); add it by hand where a store dropped it.
 
-Build all four with `./gradlew clean build -Prelease fabricJar fabricJar26 neoJar26`. The 0.7.0
-payload changed on every loader (four new mods, cooked eggs, cost floors, conditional overlays,
-generator fixes), so upload all four files. Staged jars (built 2026-09-13; the same bytes are in
-`build/libs`, `dist/0.7.0` and all eight harness mods folders; SHA-1, size):
-`pantrywork-0.7.0.jar` 8DDE4467859590019FD6031C8BA8B07818E76387, 64,946 bytes ·
-`-fabric` B884D869B237DB2588D6A8BBDABC4CEEEB7B47B5, 63,068 ·
-`-fabric-mc26` ACC303CCEAC34B049DA87EA3446FBD71539FADF2, 63,066 ·
-`-neoforge-mc26` C3828E60ADD63C93078B5D4A27B86530DD19F2A8, 63,403.
-These exact files were booted by every dedicated test server in the 0.7.0 verification log (each boot
-checked its Pantrywork jar's SHA-1 against `dist/0.7.0` first). The dev-server suites run the source
-tree, whose 126-file payload matches all four jars byte for byte.
+Build all four with `./gradlew clean build -Prelease fabricJar fabricJar26 neoJar26`. The 0.8.0
+payload changed on every loader (six new mods, the wok oil tag, a new shared salt tag, the blueberry
+dialect, nine new conditional overlays), so upload all four files. Staged jars (built 2026-10-06; the
+same bytes are in `dist/0.8.0`; SHA-1 and size re-measured in this pass, on the rebuild that carries
+both the seed-rule blocker fix and the blueberry bridge — every earlier staged set is superseded and
+must not be uploaded):
+`pantrywork-0.8.0.jar` E61935B3399E6366B9085FCAD77CB37ED8D1EA33, 86,448 bytes ·
+`-fabric` 0728AF650B995C8E6CC99FFE757E86197A87A9EA, 84,376 ·
+`-fabric-mc26` EB67143EF769C2A60F9F40721DE44A45228CEAD7, 84,375 ·
+`-neoforge-mc26` 1E2615AFCB1A563C123EA5047B7FEDFAA3E632C2, 84,712.
+Each carries **146 payload files** — 129 data files (39 hand-authored + 90 generated) + `pack.mcmeta`
++ 16 conditional-overlay tag files in 14 overlays — identical across all four jars, version `0.8.0`,
+authors `SapperSquad`, and no test recipe, structure template or gametest class. These exact files
+were booted by every dedicated test server in the 0.8.0 verification log (each boot checked its
+Pantrywork jar's SHA-1 against `dist/0.8.0` first). The dev-server suites run the source tree, whose
+payload matches all four jars byte for byte.
 Both NeoForge jars declare the food mods as optional AFTER deps (read from the staged jars'
-`neoforge.mods.toml`). The 1.21.1 jar lists 14: farmersdelight, croptopia, pamhc2foodcore, oceansdelight,
-ends_delight, vinery, farm_and_charm, meadow, brewinandchewin, aquaculture, and new in 0.7.0 create,
-bountifulfares, fishofthieves and refurbished_furniture. The 26.x jar lists the same minus create and
-bountifulfares (12), so of the four new mods it adds only Fish of Thieves and Refurbished Furniture; it
-still names mods that have no 26.x build, such as Pam's and Farm & Charm, which is harmless for optional
-deps. Fabric metadata carries no compat entries.
+`neoforge.mods.toml`). The 1.21.1 jar lists **21**: farmersdelight, croptopia, pamhc2foodcore,
+oceansdelight, ends_delight, vinery, farm_and_charm, meadow, brewinandchewin, aquaculture, create,
+bountifulfares, fishofthieves, refurbished_furniture, and new in 0.8.0 kaleidoscope_cookery,
+hearthandharvest, culturaldelights, cookscollection, rusticdelight, hybrid_delights and
+biomeswevegone. The 26.x jar
+lists **12** — the 1.21.1 list minus create, bountifulfares and all seven 0.8.0 ids, none of which has a
+**NeoForge** 26.x build (Rustic Delight has a Fabric 26.x build, which a NeoForge dep list cannot
+name) — and still names mods with no 26.x build at all, such as Pam's and Farm & Charm, which is
+harmless for optional deps. Fabric metadata carries no compat entries.
 
 **Also on both stores this release** (store-mirror rule): paste the new Summary and Project description
-below, and replace the banner, gallery 2 and gallery 4 (see Gallery upload plan).
+below, and replace **gallery 4 only** (see Gallery upload plan — the banner and gallery 2 regenerate
+byte-identical at 0.8.0 and must not be re-uploaded).
 
 Fabric version range: the 1.21.x file declares `>=1.21.1 <1.22` and is tagged 1.21.1–1.21.11 from that
 range; it was booted on 1.21.1, 1.21.10 and 1.21.11 (versions in between were not booted). 2026-08-08:
@@ -94,9 +104,11 @@ in the log below.
   six-item c:drinks/milk union) · GameTests 5/5 · `-PnoCompatMods` boot clean (0 errors,
   vanilla 5/5) · AuditRoles green incl. the new shim-containment check, proven non-vacuous by
   joining the shim to #c:foods and confirming exit 1.
-- 2026-09-13 (0.7.0, the four staged jars listed above). **This block replaces every earlier 0.7.0
-  result:** those runs used builds from before the final repair round (SHA-1s 6993E4FB / F666A5AA /
-  D79D4686 / 3E101DD7 and older), which are superseded. Every suite output classified by
+- 2026-09-13 (0.7.0). **SUPERSEDED as the current release by the 0.8.0 block below** — kept as the
+  record of what 0.7.0 was measured on; its SHA-1s (8DDE4467 / B884D869 / ACC303CC / C3828E60) are the
+  0.7.0 jars, not the files to upload now. It in turn replaced every earlier 0.7.0
+  result: those runs used builds from before the final repair round (SHA-1s 6993E4FB / F666A5AA /
+  D79D4686 / 3E101DD7 and older). Every suite output classified by
   `tools/CountSuite.ps1` (an unannotated "Unknown item tag", a missing answer or a 0/0 suite counts as a
   failure; "+ N expected" = lines annotated as closed-condition probes, which must answer "Unknown item
   tag"). Clean world and fresh logs per boot, stopped via RCON, java confirmed exited; every dedicated
@@ -144,6 +156,190 @@ in the log below.
     tags or tag loading ("Couldn't load tag", "Failed to load", "Missing data pack"), with the
     conditions on or off.
   - Not covered: the four new mods on Fabric (no Fabric harness carries them); Sinytra Connector; Quilt.
+- 2026-10-06 (0.8.0, first staging). **SUPERSEDED as the current release by the 0.8.0 re-cut block
+  below** — kept as the record of what that staging was measured on. The seed-rule blocker fix
+  (`CHANGELOG.md` 0.8.0, "Under the hood") changed eight generated tag files, so all four jars were
+  rebuilt and every result here ran bytes that are no longer the release; those four superseded jars
+  were moved out of `dist/0.8.0`, and their SHA-1s are deliberately gone from this file so nothing
+  stale can be uploaded. Suite outputs classified by `tools/CountSuite.ps1` (an unannotated "Unknown item tag", a
+  missing answer or a 0/0 suite counts as a failure; "+ N expected" = lines annotated as closed-condition
+  probes, which must answer "Unknown item tag"). Clean world and fresh logs per boot; every dedicated
+  server's Pantrywork jar SHA-1-checked against `dist/0.8.0` before boot.
+  - **Static:** generator 104 tag files + `pack.mcmeta` (16 conditional, in 14 overlays; 42 GATE / 66
+    EXCLUDE / 11 rescued PASS), re-run hash-identical · `-SelfTest` passed · AuditRoles full (730
+    Pantrywork routes judged, 46 GATE verdicts proven conditional) and `-Minimal` (672 routes, 42
+    gates), both exit 0 · release jars: 144 payload files each (127 data files + `pack.mcmeta` + 16
+    conditional-overlay tag files), identical across all four jars, version 0.8.0, authors SapperSquad,
+    no test recipe, structure template or gametest class; both Fabric jars declare `fabric-api`.
+  - **NeoForge 1.21.1 dev boot** (every compat mod, including the five new ones): 14 suites at their
+    header counts, including the new `tagtest-kaleido` at 101 passed / 0 failed / 5 expected,
+    `tagtest-letsdo` 50 and `tagtest-feedback` 204 (both of which moved by exactly the gate churn this
+    release introduced) · **`-PnoFarmAndCharm`**: tagtest-nofandc 21/0 · **`-PnoCompatMods`**:
+    tagtest-nofd 5/0 · **GameTests 7/7**.
+  - **NeoForge 1.21.1 dedicated server** (21.1.241, release jar): alone, plus eleven gate scenarios
+    S1–S11 that switch the Pam's, Croptopia, Create, Farm & Charm, Cook's Collection, Hearth and
+    Harvest, Kaleidoscope Cookery and Rustic Delight conditions on and off at item level. 13 of the 14
+    overlays get both an open and a closed proof here.
+  - **NeoForge 26.1.2.94 and 26.2.0.64**, each with Croptopia (compat suites, solo boots, and
+    `tagtest-neo26-gates` at 7 passed / 0 failed / 12 expected: Croptopia is the only rescuer with a
+    NeoForge 26.x build, so exactly three of the fourteen overlays open there).
+  - **Fabric** 1.21.1, 1.21.10, 1.21.11, 26.1.2 and 26.2: `tagtest-fabric` 7/0, `tagtest-fabric-gates`
+    22 passed / 0 failed / 10 expected, `tagtest-fabric-fd` 9/0 on the 1.21.11 harness.
+  - **Fabric without Fabric API** (the staged `-fabric` jar alone): Fabric Loader refuses to start and
+    names the missing dependency.
+  - 22 boots, 33 suite runs, all green.
+  - **Publish dry run** `tools\publish.ps1 -Version 0.8.0 -ChangelogFile tools\changelog-current.md
+    -DryRun -SkipCurseForge`: exit 0, all four files resolved as `0.8.0+mc1.21.1` (neoforge, 1.21.1),
+    `0.8.0+mc1.21.x-fabric` (fabric, 1.21.1–1.21.11), `0.8.0+mc26-fabric` and `0.8.0+mc26` (both 26.1.2
+    + 26.2), version type `release`, project `rNg1wypx`. Fabric API (`P7dR8mSH`, `required`) is on the
+    two Fabric files and on neither NeoForge file. It warned again that `CURSEFORGE_PROJECT_ID` is
+    `1616194` and used `1617573` instead — expected, see the hazard note at the end of this file.
+  - **Not covered, stated honestly.** Cultural Delights cannot boot on `tools/neo-server-1211` at all —
+    its `neoforge.mods.toml` requires NeoForge ≥ 21.1.247 and that harness deliberately stays on
+    21.1.241, so the release jars players run are still proven on the older build. So CD's half of the
+    `culturaldelights_or_rusticdelight` gate, Bountiful Fares' half of the two `c:flour` gates, the open
+    half of the `create` gate, and Hybrid Delights' three salt bridges (its jar needs HAPI and Kotlin
+    for Forge, and its salt item exists only with Hybrid Aquatic installed) are proven on the dev boot
+    only. Also not covered: the five new mods on Fabric (no Fabric harness carries them); Sinytra
+    Connector; Quilt.
+- 2026-10-06 (0.8.0 re-cut #1, SHA-1s CF295036 / D8D31300 / EBB90AB3 / CFF8781E). **SUPERSEDED as
+  the current release by the 2026-10-07 blueberry block below** — the blueberry bridge added two
+  generated tag files, so those four jars were rebuilt again and every result here ran bytes that
+  are no longer shipped. Their SHA-1s are kept only so an uploaded file can be identified; the jars
+  themselves were moved out of `dist/0.8.0`.
+  The seed-rule blocker fix dropped Cultural Delights' and Hearth and Harvest's corn
+  kernels and `create:chocolate_glazed_berries` from eight generated tag files, which changed every
+  jar's bytes, so the entire matrix was re-run on the new ones and nothing is carried over from the
+  block above. Suite outputs classified by `tools/CountSuite.ps1` (an unannotated "Unknown item tag",
+  a missing answer or a 0/0 suite counts as a failure; "+ N expected" = lines annotated as
+  closed-condition probes, which must answer "Unknown item tag"). Clean world and fresh logs per
+  boot, stopped via RCON, java confirmed exited and port 25575 free between boots; every dedicated
+  server's Pantrywork jar SHA-1-checked against `dist/0.8.0` before boot.
+  - **Static:** generator 104 tag files + `pack.mcmeta` (16 conditional, in 14 overlays; 42 GATE / 66
+    EXCLUDE / 11 rescued PASS — unchanged by the fix, which dropped three silent PASSes), re-run
+    hash-identical · `-SelfTest` passed · AuditRoles full (127 tags, 14 overlays, **713** Pantrywork
+    routes judged, 46 GATE verdicts proven conditional, 102 dilution-guard pairs) and `-Minimal`
+    (**657** routes, 42 gates, 94 pairs), every counter 0 and both exit 0 — the first staging's 730 /
+    672 fell by exactly the 17 (tag, item) pairs the three dropped entries accounted for · both tools
+    report the platform convention tags from `neoforge 21.1.247`, the `gradle.properties` pin ·
+    release jars: 144 payload files each (127 data files + `pack.mcmeta` + 16 conditional-overlay tag
+    files), identical across all four jars, version 0.8.0, authors SapperSquad, no test recipe,
+    structure template or gametest class; both Fabric jars declare `fabric-api`; and a direct byte
+    scan confirms no jar contains the string `corn_kernels` or `chocolate_glazed_berries`.
+  - **NeoForge 1.21.1 dev boot** (every compat mod, including the five new ones; 4 boots, 18 suite
+    runs): full `runServer` 14 suites 548/0 — tagtest 14, multi 14, reverse 18, crafttest-reverse 4,
+    crafttest 4, addons 8, origins 11, letsdo 50, brewaqua 24, seedfix 10, collisions 17, milkshim 15,
+    feedback 204, **tagtest-kaleido 155 + 5 expected** — plus tagtest-nofandc 18/3, which is by design
+    on this boot (its three "Farm & Charm absent" lines must fail while F&C is loaded) ·
+    **`-PnoFarmAndCharm`**: nofandc 21/0, feedback 204/0 · **`-PnoCompatMods`**: tagtest-nofd 5/0 ·
+    **GameTests 7/7**.
+  - **NeoForge 1.21.1 dedicated server** (21.1.241, release jar; 12 boots, 17 suite runs): alone,
+    tagtest-neo26 5/0 and tagtest-nofd 4/1 — the one documented failure in the whole matrix: that
+    suite's cake line needs the dev-only test recipe `-Prelease` strips · then eleven gate scenarios
+    S1–S11, one clean boot each, switching the Pam's, Croptopia, Create, Farm & Charm, Cook's
+    Collection, Hearth and Harvest, Kaleidoscope Cookery and Rustic Delight conditions on and off at
+    item level: `tagtest-gates` 19/0 + 7 expected on each of S1–S4, plus s1 7/0 + 4, s2 15/0 + 4,
+    s3 18/0 + 1, s4 9/0 + 1, s5 6/0 + 5, s6 30/0 + 5, s7 16/0 + 4, s8 19/0 + 3, s9 20/0 + 3,
+    s10 7/0 + 3, s11 17/0 + 3. 13 of the 14 overlays get both an open and a closed proof here.
+  - **NeoForge 26.1.2.94** (ATM11's exact build) + Croptopia: neo26-compat 7/0 and
+    `tagtest-neo26-gates` 7/0 + 12 expected; alone: tagtest-neo26 5/0 · **NeoForge 26.2.0.64** +
+    Croptopia: compat262 5/0, neo26-feedback 37/0, neo26-gates 7/0 + 12 expected; alone:
+    tagtest-neo26 5/0. Croptopia is the only rescuer with a NeoForge 26.x build, so exactly three of
+    the fourteen overlays open on those harnesses.
+  - **Fabric** (Fabric Loader 0.19.3, five harnesses): **1.21.1**, **1.21.10**, **26.1.2** and
+    **26.2** each tagtest-fabric 7/0 and `tagtest-fabric-gates` 22/0 + 10 expected · **1.21.11**
+    `tagtest-fabric-fd` 9/0 (the other two suites are scoped by their own headers against a harness
+    with a Croptopia build, and this one has none).
+  - **Fabric without Fabric API** (the `-fabric` jar alone): Fabric Loader refused to start and named
+    `fabric-api`; exit code 1, no world created.
+  - 22 release boots, 33 suite runs, every one at its documented count (the single exception is the
+    documented tagtest-nofd cake line above), on top of the 4 dev boots.
+  - **Publish dry run** `tools\publish.ps1 -Version 0.8.0 -ChangelogFile tools\changelog-current.md
+    -DryRun -SkipCurseForge`, re-run on these jars: exit 0, all four files resolved as
+    `0.8.0+mc1.21.1` (neoforge, 1.21.1), `0.8.0+mc1.21.x-fabric` (fabric, every version 1.21.1
+    through 1.21.11), `0.8.0+mc26-fabric` and `0.8.0+mc26` (both 26.1.2 + 26.2), version type
+    `release`, project `rNg1wypx`. Fabric API (`P7dR8mSH`, `required`) is on the two Fabric files and
+    on neither NeoForge file. It warned again that `CURSEFORGE_PROJECT_ID` is `1616194` and used
+    `1617573` instead — expected, see the hazard note at the end of this file.
+  - **Not covered, stated honestly.** Cultural Delights cannot boot on `tools/neo-server-1211` at all —
+    its `neoforge.mods.toml` requires NeoForge ≥ 21.1.247 and that harness deliberately stays on
+    21.1.241, so the release jars players run are still proven on the older build. So CD's half of the
+    `culturaldelights_or_rusticdelight` gate and its four 1/2 cuts, Bountiful Fares' half of the two
+    `c:flour` gates, the open half of the `create` gate, and Hybrid Delights' three salt bridges (its
+    jar needs HAPI and Kotlin for Forge, and its salt item exists only with Hybrid Aquatic installed)
+    are proven on the dev boot only — Rustic Delight stands in for Cultural Delights on the release
+    matrix. Also not covered: the five new mods on Fabric (no Fabric harness carries them); Sinytra
+    Connector; Quilt.
+- 2026-10-07 (0.8.0 re-cut #2 — the blueberry bridge; the four jars listed at the top of this file).
+  **This is the current release.** The sixth player report (Oh The Biomes We've Gone blueberries)
+  added two generated tag files and four entries to a third, so all four jars were rebuilt and the
+  whole matrix was re-run on the new bytes; nothing is carried over from the block above except the
+  dev-boot results, which run the source tree, and that tree is byte-identical to these jars
+  (measured below). Suite outputs classified by `tools/CountSuite.ps1` (an unannotated "Unknown item
+  tag", a missing answer or a 0/0 suite counts as a failure; "+ N expected" = lines annotated as
+  closed-condition probes, which must answer "Unknown item tag"). Fresh world and fresh logs per
+  boot, stopped via RCON, java confirmed exited and port 25575 free between boots; every harness's
+  Pantrywork jar SHA-1-checked against `dist/0.8.0` first.
+  - **Static:** generator (documented command) **106 tag files** + `pack.mcmeta` (16 conditional, in
+    14 overlays; 42 GATE / 66 EXCLUDE / 11 rescued PASS — unchanged, the blueberry work needed no new
+    verdict), re-run byte-stable · `-SelfTest` passed · AuditRoles full (**720** Pantrywork routes
+    judged, 46 GATE verdicts proven conditional) and `-Minimal` (**664** routes, 42 gates), every
+    counter 0 and both exit 0 · release jars: **146 payload files each** (129 data files +
+    `pack.mcmeta` + 16 conditional-overlay tag files) — re-measured file by file against the
+    regenerated source tree, **0 missing, 0 extra, 0 differing on all four jars**, the only two source
+    files absent from each being the dev-only test recipe and gametest structure that `-Prelease`
+    strips, which is the point · `biomeswevegone` appears in exactly 3 payload files per jar
+    (`c/tags/item/blueberries.json`, `fruits.json`, `fruits/blueberry.json`) and in the 1.21.1
+    `neoforge.mods.toml`, nowhere else.
+  - **NeoForge 1.21.1 dedicated server** (21.1.241, release jar **E61935B3**; 13 boots, 18 suite
+    runs): alone, tagtest-neo26 5/0 and tagtest-nofd 4/1 — the one documented failure in the whole
+    matrix, that suite's cake line needing the dev-only test recipe `-Prelease` strips · then **twelve
+    gate scenarios S1–S12**, one clean boot each: `tagtest-gates` 19/0 + 7 expected on each of S1–S4,
+    plus s1 7/0 + 4, s2 15/0 + 4, s3 18/0 + 1, s4 9/0 + 1, s5 6/0 + 5, s6 30/0 + 5, s7 16/0 + 4,
+    s8 19/0 + 3, s9 20/0 + 3, s10 7/0 + 3, s11 17/0 + 3, and **s12 27/0 + 3**.
+    **S12 is new and is the blueberry scenario** — Farmer's Delight + Hearth and Harvest + Croptopia
+    + EpheroLib + Oh The Biomes We've Gone 2.6.2 and its four hard deps (TerraBlender, CorgiLib, Oh
+    The Trees You'll Grow, GeckoLib). BYG's NeoForge floor is 21.1.173, so unlike Cultural Delights it
+    can boot on this harness. It proves the bridge with **two real crafts** (Hearth and Harvest's
+    blueberry crate from nine BYG berries; Croptopia's blueberry jam from one — three ingredients on
+    purpose, because a lone BYG berry is ambiguous with BYG's own one-slot blue-dye recipe), the
+    `soul_fruit` exclusion (out of `c:fruits` and `pantrywork:bridged/fruit`, still in BYG's own
+    `c:foods/fruit`), and the `c:blueberry`-is-a-seed-tag negative.
+  - **NeoForge 26.1.2.94** (ATM11's exact build, jar **1E2615AF**) + Croptopia: neo26-compat 7/0 and
+    `tagtest-neo26-gates` 7/0 + 12 expected; alone: tagtest-neo26 5/0 · **NeoForge 26.2.0.64** (same
+    jar) + Croptopia: compat262 5/0, neo26-feedback 37/0, neo26-gates 7/0 + 12 expected; alone:
+    tagtest-neo26 5/0.
+  - **Fabric** (Fabric Loader 0.19.3, five harnesses): **1.21.1**, **1.21.10** (jar **0728AF65**),
+    **26.1.2** and **26.2** (jar **EB67143E**) each tagtest-fabric 7/0 and `tagtest-fabric-gates`
+    22/0 + 10 expected · **1.21.11** `tagtest-fabric-fd` 9/0.
+  - **Fabric without Fabric API** (the shipped `-fabric` jar `0728AF65` alone, scratch copy of the
+    1.21.1 harness): "Mod resolution failed", "Incompatible mods found!", "Mod 'Pantrywork'
+    (pantrywork) 0.8.0 requires any version of fabric-api, which is missing!", and **no world
+    directory created**.
+  - **23 release boots, 34 suite runs**, every one at its documented count (the single exception is
+    the documented tagtest-nofd cake line above), on top of the 4 dev boots recorded in the block
+    above, whose source tree is byte-identical to these jars.
+  - **Log scan, all 23 boots:** zero lines matching `pack.mcmeta`, `overlay`, `pantrywork_gate`,
+    `pantrywork:gated`, "Failed to load", "Missing data pack", "Tried to load invalid" or "Couldn't
+    load tag" — **except** exactly two lines on each of the three Kaleidoscope-Cookery scenarios
+    (S7, S9, S10), the documented upstream Quark baseline. S12's scan is clean, so adding BYG and
+    four library mods introduced nothing.
+  - **Publish dry run** `tools\publish.ps1 -Version 0.8.0 -ChangelogFile tools\changelog-current.md
+    -DryRun -SkipCurseForge`, re-run on these jars and this changelog: exit 0, all four files
+    resolved as `0.8.0+mc1.21.1` (neoforge, 1.21.1), `0.8.0+mc1.21.x-fabric` (fabric, every version
+    1.21.1 through 1.21.11), `0.8.0+mc26-fabric` and `0.8.0+mc26` (both 26.1.2 + 26.2), version type
+    `release`, project `rNg1wypx`. Fabric API (`P7dR8mSH`, `required`) is on the two Fabric files and
+    on neither NeoForge file. It warned again that `CURSEFORGE_PROJECT_ID` is `1616194` and used
+    `1617573` instead — expected, see the hazard note at the end of this file.
+  - **Not covered, stated honestly.** Everything in the block above still applies (Cultural Delights
+    cannot boot on `tools/neo-server-1211`; Bountiful Fares' half of the two `c:flour` gates; the open
+    half of the `create` gate; Hybrid Delights' three salt bridges — all dev-boot-only). New with the
+    blueberry work: **no Fabric harness carries BYG**, so the Fabric side of the blueberry bridge is
+    proven by the data and by S12, not by a Fabric boot — the same status as Rustic Delight and Hybrid
+    Delights. BYG does publish Fabric builds (Modrinth lists 2.6.2-Fabric for 1.21.1, 4.2.2 for
+    1.21.10 and 4.3.x/4.4.x for 1.21.11) and **no 26.x build on any loader**, so on the two 26.x files
+    the blueberry entries are simply inert. Only the 1.21.1 Fabric build is the same 2.6.2 whose tags
+    were read here; the 4.x builds were not inspected.
 Version roadmap: no 1.20.x (pre-`c:`-unification). When FD's NeoForge 26.x port lands
 (PR #1374 / Refabricated `neoforge/26.1` branch), boot it on the neo-26 harnesses and add the
 craft-level assert to `tagtest-neo26-compat.txt`.
@@ -153,15 +349,19 @@ craft-level assert to `tagtest-neo26-compat.txt`.
 - [x] **`pantrywork:test/universal_sandwich` must not ship.** Verified 2026-07-19 against a fresh
       `-Prelease` build: jar audit found 0 matches for universal_sandwich / recipe/test / gametest /
       .nbt; the real data files are intact. Re-verify on every release build. Last re-verified
-      2026-09-13 (0.7.0, the staged SHA-1s above): all four jars hold the same 126 payload files (117
-      data files + `pack.mcmeta` + 8 conditional-overlay tag files), byte-identical to source, with no
-      test recipe, structure template or gametest class.
+      2026-10-07 (0.8.0, the staged SHA-1s above): all four jars hold the same 146 payload files (129
+      data files + `pack.mcmeta` + 16 conditional-overlay tag files), with no test recipe, structure
+      template or gametest class. (0.7.0 block, superseded: 126 payload files, same result.)
 - [ ] **Fabric API is a required dependency of both Fabric files, on BOTH stores (from 0.7.0).**
       `publish.ps1` sends it (Modrinth project `P7dR8mSH`, `required`; CurseForge relation slug
       `fabric-api`, `requiredDependency`) and both Fabric jars declare `"fabric-api": "*"` in
-      `fabric.mod.json`. After the upload, open the two Fabric files on Modrinth and on CurseForge and
-      confirm Fabric API is listed as required; add it by hand where a store dropped it. Tick only after
-      looking at the live pages.
+      `fabric.mod.json` — re-read out of the staged 0.8.0 jars in this pass. After the upload, open the
+      two Fabric files on Modrinth and on CurseForge and confirm Fabric API is listed as required; add
+      it by hand where a store dropped it. Tick only after looking at the live pages. **Re-open this
+      for every release**: it was ticked for no version yet, and 0.8.0 ships four new files.
+- [ ] **Gallery 4 is replaced on BOTH stores.** It is the only image that changed at 0.8.0, and it
+      carries the mod count (now twenty-one). The banner and gallery 2 regenerate byte-identical, so leave
+      them alone. Tick after looking at both live galleries.
 - [x] **Branding: DECIDED — Pantrywork** (SapperSquad, 2026-07-19). Mod id `pantrywork` locked and carried
       through code/data/tools/docs the same day; GameTests re-verified green under the new id.
 - [x] Confirm the `-PnoCompatMods` boot is green — it is the regression test proving every cross-mod
@@ -173,9 +373,9 @@ craft-level assert to `tagtest-neo26-compat.txt`.
 
 ## Summary (the short-description field)
 
-> The ore dictionary that food mods never got. Bridges fourteen mods — Farmer's Delight, Croptopia,
-> Pam's, the Let's Do series, Create and more — into one shared tag vocabulary, so one mod's cheese
-> works in another's recipes at a fair price.
+> The ore dictionary that food mods never got. Bridges twenty-one mods — Farmer's Delight, Croptopia,
+> Pam's, the Let's Do series, Create, Kaleidoscope Cookery and more — into one shared tag vocabulary,
+> so one mod's cheese, salt, cooking oil or blueberry works in another's recipes at a fair price.
 
 ---
 
@@ -186,7 +386,9 @@ craft-level assert to `tagtest-neo26-compat.txt`.
 Farmer's Delight has cheese. Croptopia has cheese. Pam's has cheese. Meadow and Brewin' & Chewin'
 have cheese. **None of them are the same cheese** — they all tag their food, in four incompatible
 naming dialects that never reference each other. So the recipe that wants cheese takes exactly one
-of them, and your pack quietly runs parallel food economies that never touch.
+of them, and your pack quietly runs parallel food economies that never touch. Kaleidoscope Cookery's
+wok will not even light unless you hand it *its* cooking oil, with four other mods' oils sitting
+in the same chest.
 
 Pantrywork fixes that. It is pure data: a tag layer that bridges those dialects into the official
 NeoForge / Farmer's Delight `c:foods/*` convention, then adds a second layer describing what an
@@ -200,10 +402,19 @@ needs Fabric API).
 **Identity** — `c:foods/*`. Extends the built-in convention and translates the others into it.
 Croptopia's plural dialect (`c:cheeses`), Pam's concatenated dialect (`c:rawpork`), and Farm &
 Charm's underscored dialect (`c:raw_pork`) all resolve to canonical names (`c:foods/cheese`,
-`c:foods/raw_pork`). Bridges run in **both** directions: 74 dialect tags also gain the other mods'
-equivalent items, so those mods' *own* recipes start accepting foreign ingredients too — Meadow's
+`c:foods/raw_pork`). Bridges run in **both** directions: 72 of those mods' own dialect tags gain the
+other mods' equivalent items (82 tag files in all, the other ten being canonical `c:foods/*` leaves
+like `c:foods/corn` and `c:foods/oranges`), so their *own* recipes accept foreign ingredients — Meadow's
 cheese recipes take Brewin' & Chewin' cheese, Pam's fish recipes take an Aquaculture catch, and
 Croptopia's pineapple recipes take a Fish of Thieves pineapple.
+
+Where a mod reads a tag of its own instead of a shared one, Pantrywork writes that tag. Kaleidoscope
+Cookery's wok checks `#kaleidoscope_cookery:oil` before it will cook, so five mods' cooking oils now
+prime it — and that is the gate in front of all 225 of its wok recipes.
+
+And where a mod grows food but files it in no shared tag at all, Pantrywork files it. Oh The Biomes
+We've Gone's blueberries sat in its own berry tag and in no blueberry tag anywhere, so no other mod
+could see them; they now reach Hearth and Harvest's five blueberry recipes and Croptopia's three.
 
 **Fair swaps only.** An item Pantrywork adds to a recipe tag may be at most 1.5x cheaper than the
 cheapest thing each mod that defines that tag already puts there, counting how it is made (a
@@ -213,7 +424,9 @@ overlay, which the game applies only while that mod is loaded). So a milk bottle
 fills a recipe written for a bucket, a bacon strip never counts as a whole porkchop in Pam's recipes,
 and Refurbished Furniture's six-per-loaf toast stays out of other mods' recipes. The check covers what
 Pantrywork adds; what each mod lists in its own tags is its own call. Version 0.7.0 removed or made
-conditional every older swap that failed it, and its changelog lists them all.
+conditional every older swap that failed it, and its changelog lists them all; 0.8.0 removed nothing,
+and its changelog lists the two swaps that gained a condition and the three conditions that got easier
+to satisfy.
 
 **Role** — `pantrywork:food_component/{protein, starch, dairy, garnish, liquid_base, sweetener}`.
 Tags-of-tags over the identity layer, describing function rather than identity. Author one recipe
@@ -235,7 +448,10 @@ Supported: **Farmer's Delight** (incl. Refabricated on Fabric) · **Croptopia** 
 Refabricated) · **Pam's HarvestCraft 2 Food Core** · **Ocean's Delight** (full identity module) ·
 **End's Delight** (parent joins) · **[Let's Do] Vinery, Farm & Charm, Meadow** ·
 **Aquaculture 2** · **Brewin' & Chewin'** · **Create** · **Bountiful Fares** · **Fish of Thieves** ·
-**Refurbished Furniture** · **Origins** (carnivore/vegetarian diet tags).
+**Refurbished Furniture** · **Kaleidoscope Cookery** · **Hearth and Harvest** · **Cultural Delights** ·
+**Cook's Collection** · **Rustic Delight** · **Hybrid Delights** · **Oh The Biomes We've Gone** (a
+worldgen mod, here for the four fruits it grows) · **Origins** (carnivore/vegetarian
+diet tags).
 
 ## 🧑‍🍳 For pack makers
 
@@ -254,12 +470,20 @@ together and the bridges are exercised for real — Pam's own Grilled Cheese & H
 Farm & Charm butter and Brewin' & Chewin' cheese (and refused with Croptopia's cheaper cheese);
 Farmer's Delight's egg sandwich made from Pam's and Bountiful Fares eggs; Croptopia's pineapple
 chicken made from a Fish of Thieves pineapple on NeoForge 26.2; Croptopia's banana smoothie made
-with Farmer's Delight milk. The Fabric build is booted on 1.21.1, 1.21.10, 1.21.11, 26.1.2 and 26.2;
+with Farmer's Delight milk; Hearth and Harvest's blueberry crate and Croptopia's blueberry jam made
+from Oh The Biomes We've Gone berries. The Fabric build is booted on 1.21.1, 1.21.10, 1.21.11, 26.1.2 and 26.2;
 the NeoForge builds on 1.21.1, 26.1.2 and 26.2 — the 26.1.2 boot on the exact NeoForge build All the
 Mods 11 ships, alongside its Croptopia and Aquaculture 2. Separate runs boot it with **none** of the
-supported mods installed, with Farm & Charm removed, and with and without the mods each conditional
-swap depends on. Automated GameTests cover role tags, cross-mod identity, reverse bridges, cost
-floors, and recipe resolution through `RecipeManager`.
+supported mods installed, with Farm & Charm removed, and with and without the mods the conditional
+swaps depend on — twelve such combinations on the 1.21.1 release jar alone at 0.8.0, which prove
+thirteen of the fourteen conditions both open and closed. The few they cannot reach are proven on the
+development boot instead, and the changelog says which rather than implying full coverage. Automated
+GameTests cover role tags, cross-mod identity, reverse bridges, cost floors, and recipe resolution
+through `RecipeManager`.
+
+Where something *cannot* be fixed with tags, the changelog says so rather than implying otherwise:
+a recipe that names an exact item id cannot be widened by any datapack, and several of the supported
+mods do exactly that.
 
 ---
 
@@ -273,7 +497,35 @@ bridged mods' real item textures (extracted to `tools/work/tex/`; re-extract fro
 **0.4.0: no art changes needed** — the roster is still ten mods, four dialects, both loaders;
 no card carries a Minecraft-version claim (checked `GenPromo.java` headline strings 2026-08-22).
 
-**0.7.0: replace the banner, gallery 2 and gallery 4 on BOTH stores.**
+**0.8.0: replace gallery 4 on BOTH stores. Nothing else.** Regenerated 2026-10-06 with
+`java tools/GenPromo.java` (JDK 21) after `FOOD_MOD_COUNT` went 14 → 20 and the roster gained its six
+new rows, then **regenerated again 2026-10-07** when the blueberry work took the count to 21. Every
+PNG was re-hashed after each run and **only `gallery-4-supported-mods.png` changed** — SHA-1 prefixes
+now: banner `6464C0DC`, gallery 1 `33EEC10C`, gallery 2 `8E75C1B0`, gallery 3 `72811F90`, gallery 4
+`B61D16D4`, icon `B4D3454C`; `git status promo/` lists gallery 4 alone as modified against 0.7.0.
+The icon, banner, gallery 1, gallery 2 and gallery 3 are byte-identical to what is already live, so
+their claims are untouched and they must not be re-uploaded.
+- Gallery 4 is now **three full rows (7/7/7)** instead of two of seven: the slot size and row pitch
+  shrank to fit, and each row is centred on its own count. The
+  render enforces this — a label that would run into the next row or into the footer line throws, as
+  does a roster that disagrees with `FOOD_MOD_COUNT`. Headline: "Twenty-one mods bridged."
+- The seven new icons are the real item textures of items 0.8.0 actually bridges: Kaleidoscope Cookery's
+  fried egg, Hearth and Harvest's butter, Cultural Delights' avocado, Cook's Collection's lemon, Rustic
+  Delight's red bell pepper, Hybrid Delights' salt and Oh The Biomes We've Gone's blueberries.
+  Extracted into `tools/work/tex/` from the jars in `tools/work/jars/` in the same pass.
+- **A judgment, not arithmetic:** Oh The Biomes We've Gone is a *worldgen* mod that happens to grow
+  food. It is counted because the headline number is the 1.21.1 jar's optional-AFTER list and
+  Pantrywork does bridge four of its fruits — but it is not a cooking mod, and the comment beside its
+  roster row says so. If that reads wrong on the live page, drop it from the toml and the roster
+  together; the render refuses to let the two disagree.
+- Gallery 2's craft is unchanged and still true (tagtest-reverse.txt Craft B); gallery 1's "Four
+  dialects" is unchanged and still true — 0.8.0's new mods are Farmer's Delight addons using FD's own
+  naming, and the new shared salt tag (`c:dusts/salt`) is a fifth *tag name*, not a fifth naming
+  dialect. The banner's four cheeses still all reach `#c:foods/cheese`.
+- All three regenerated PNGs that carry content claims (banner, gallery 2, gallery 4) were opened and
+  read after the run: no label collision, no overflow, no text running off a card.
+
+**0.7.0: replaced the banner, gallery 2 and gallery 4 on BOTH stores.**
 - Gallery 4 lists fourteen mods (headline derived from `FOOD_MOD_COUNT`; the render fails if the
   roster disagrees). Its Brewin' & Chewin' icon is a cheese wedge, since the wheels are not food.
 - Gallery 2 showed Croptopia butter/cheese + FD bacon in Pam's Grilled Cheese & Ham, which the 0.7.0
@@ -293,14 +545,14 @@ no card carries a Minecraft-version claim (checked `GenPromo.java` headline stri
   cheese slice, B&C flaxen wedge) all resolve into `#c:foods/cheese` with the 0.7.0 data, with the
   conditional overlays on or off.
 
-| File | Caption | Status at 0.7.0 |
+| File | Caption | Status at 0.8.0 |
 |---|---|---|
-| `promo/icon-512.png` | Project icon: pantry shelf | unchanged |
-| `promo/banner-1920x640.png` | Four mods' cheeses converging into one tag | **REPLACE** — the Brewin' & Chewin' cheese was a wheel (not food); now the wedge |
-| `promo/gallery-1-one-tag.png` | The two layers: identity tags bridging four dialects, role tags on top | unchanged |
-| `promo/gallery-2-four-mod-craft.png` | Pam's Grilled Cheese & Ham crafted with Farm & Charm butter and Brewin' & Chewin' cheese | **REPLACE** — old craft used Croptopia dairy + FD bacon, no longer accepted; headline "Three mods and vanilla. One sandwich."; footer "No food mod required.". The file name keeps "four-mod" so upload scripts and links still match |
-| `promo/gallery-3-role-tags.png` | Recipe JSON targeting `#pantrywork:food_component/protein`, beside the items it accepts | unchanged |
-| `promo/gallery-4-supported-mods.png` | All fourteen bridged mods, with the "install all, some, or none" promise | **REPLACE** — was ten mods |
+| `promo/icon-512.png` | Project icon: pantry shelf | unchanged (byte-identical, B4D3454C) |
+| `promo/banner-1920x640.png` | Four mods' cheeses converging into one tag | unchanged (byte-identical, 6464C0DC) |
+| `promo/gallery-1-one-tag.png` | The two layers: identity tags bridging four dialects, role tags on top | unchanged (byte-identical, 33EEC10C) |
+| `promo/gallery-2-four-mod-craft.png` | Pam's Grilled Cheese & Ham crafted with Farm & Charm butter and Brewin' & Chewin' cheese | unchanged (byte-identical, 8E75C1B0). The file name keeps "four-mod" so upload scripts and links still match |
+| `promo/gallery-3-role-tags.png` | Recipe JSON targeting `#pantrywork:food_component/protein`, beside the items it accepts | unchanged (byte-identical, 72811F90) |
+| `promo/gallery-4-supported-mods.png` | All twenty bridged mods, with the "install all, some, or none" promise | **REPLACE** — was fourteen mods; now 25F0734BA3EB0E8A9AE44E6D6742CE5EA639C06B |
 
 **Gallery uploads are manual.** The Modrinth PAT used by `publish.ps1` carries version scopes only
 (create/delete versions); the gallery API returns 401 without project-edit scope. CurseForge has no
@@ -313,16 +565,30 @@ stale count survives silently. This release is the proof: "Three dialects" was w
 Farm & Charm landed.
 
 No card states a Minecraft version. Three cards carry content claims that go stale: gallery 4 states
-the bridged-mod count ("Fourteen mods bridged", derived from `FOOD_MOD_COUNT`) and the roster; gallery
+the bridged-mod count ("Twenty-one mods bridged", derived from `FOOD_MOD_COUNT`) and the roster; gallery
 2 shows one specific craft, which must be a craft a suite performs (tagtest-reverse.txt Craft B), and
 says "No food mod required."; the banner shows four cheeses reaching `#c:foods/cheese`. Re-check them
-every release — images can't be grepped and go stale invisibly.
+every release — images can't be grepped and go stale invisibly. `FOOD_MOD_COUNT` must equal the number
+of optional AFTER deps in `src/main/templates/META-INF/neoforge.mods.toml` (Origins is a consumer, not
+a bridged food mod, and has the card's footer line to itself): 20 at 0.8.0, checked both ways in this
+pass.
 
 ---
 
 ## Changelog for the uploads
 
-> **0.7.0 — Four more mods, cooked eggs, and swaps that have to be fair.** Paste-ready body in
+> **0.8.0 — Six more mods, and the wok finally lights.** Paste-ready body in
+> `tools/changelog-current.md`: Kaleidoscope Cookery, Hearth and Harvest, Cultural Delights (+ Cook's
+> Collection), Rustic Delight and Hybrid Delights; the wok oil tag that gates all 225 of Kaleidoscope's
+> wok recipes; Hybrid Delights' salt into 75 recipes and a fifth salt spelling bridged into 36; oils
+> and butter into Pam's, Croptopia's and Rustic Delight's slots; **Oh The Biomes We've Gone's
+> blueberries into the shared blueberry tag, 8 recipes across Hearth and Harvest and Croptopia, with
+> the soul-fruit exclusion stated plainly**; four unreported gaps (cabbage, leafy
+> greens, onion, tomato, bell peppers); nothing removed, two swaps newly conditional and three
+> conditions widened, each with its reason; what tags cannot fix (including, explicitly, the Cultural
+> Delights ↔ Hearth and Harvest butter complaint); and three upstream bugs worth filing.
+>
+> **0.7.0 — Four more mods, cooked eggs, and swaps that have to be fair.** (shipped 2026-09-14) Was in
 > `tools/changelog-current.md`: Create, Bountiful Fares, Fish of Thieves and Refurbished Furniture;
 > cooked eggs; four shipped-bug fixes including the `c:milk` dilution and the non-food cheese wheels;
 > the cost-floor rule stated exactly (1.5x, per defining mod, conditional swaps); the full list of swaps
@@ -359,7 +625,11 @@ every release — images can't be grepped and go stale invisibly.
   `MODRINTH_PROJECT_ID` env var is set on this machine; `publish.ps1` picks it up.
 - CurseForge: **LIVE** — project id `1617573` (env vars `CURSEFORGE_PROJECT_ID`/`_TOKEN` were
   setx'd at the 0.2.0 publish; tokens rotated after. publish.ps1 skips CF when unset).
-- Minecraft: 1.21.1 (NeoForge 21.1.241+; FD 1.3.2 needs ≥ 21.1.219, Croptopia ≥ 21.1.80) ·
+- Minecraft: 1.21.1 — Pantrywork's own declared NeoForge range is `[21.1.0,)` and is unchanged at
+  0.8.0; the release jar is still booted on 21.1.241, the build `tools/neo-server-1211` deliberately
+  keeps. What needs a newer NeoForge is the *compat mods*, not Pantrywork: FD 1.3.2 ≥ 21.1.219,
+  Croptopia ≥ 21.1.80, Rustic Delight and Hybrid Delights ≥ 21.1.219, and **Cultural Delights 0.18.x
+  ≥ 21.1.247** (which is why the dev pin moved there) ·
   26.1–26.2 (NeoForge 26.1+, data-only jar) ·
   Fabric loader 0.14+ (data-only jar) **+ Fabric API**: mod data packs are loaded by Fabric API's
   resource loader, which also applies the conditional overlays. Both Fabric jars declare
@@ -380,7 +650,9 @@ every release — images can't be grepped and go stale invisibly.
   summary + description replaced on both stores (Modrinth via the API, CurseForge via the authors
   portal), banner / gallery 2 / gallery 4 replaced on both, the old three deleted, and every gallery
   image titled and captioned identically on both stores (Modrinth's two-layers card had carried the
-  banner's caption; fixed).
+  banner's caption; fixed). **0.8.0 is built, verified and staged in `dist/0.8.0`, and NOT yet
+  published** — awaiting SapperSquad's go. When it goes: four files each, the summary and description
+  below on both stores, and gallery 4 replaced on both (the only image that changed).
 
 ## Publish-time hazard: the store-id env vars are GLOBAL
 
@@ -395,4 +667,5 @@ accepted, Pantrywork's jars would have been published onto another mod's page.
 CurseForge `1617573`, both verified against the live pages) and warns when an env
 var disagrees. Do not "fix" the env var for Pantrywork — that just breaks whichever
 project set it. Pass `-CurseForgeProjectId` / `-ModrinthProjectId` for a one-off. The 2026-09-13 dry
-run warned again: `CURSEFORGE_PROJECT_ID` was `1616194`, and the script used `1617573`.
+run warned again: `CURSEFORGE_PROJECT_ID` was `1616194`, and the script used `1617573`. The 2026-10-06
+0.8.0 dry run is recorded in the verification log above.

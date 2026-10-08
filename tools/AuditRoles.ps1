@@ -73,8 +73,21 @@ $ownedNs = @{}
 $srcMod = @{ 'pantrywork' = 'pantrywork' }
 $definers = @{}    # tag id -> set of mod ids whose scanned jar ships the tag file
 $loadedMods = New-Object System.Collections.Generic.HashSet[string]
+# Own-mod seed/food filing, for Test-IsSeed's third rule (0.8.0 blocker B1). Filled by
+# Add-OwnFiledEntries (CostFloor.ps1, shared with GenerateBridges.ps1) while the jars are
+# scanned: an item lands in $ownSeedFiled when the jar that OWNS its namespace lists it
+# directly in a planting tag, and in $ownFoodFiled when that jar lists it directly in a
+# food-evidence c: tag. Both are empty in -Minimal (no jars), which is correct: with no compat
+# mod installed there is nothing in our tags for rule 3 to classify.
+$ownSeedFiled = New-Object System.Collections.Generic.HashSet[string]
+$ownFoodFiled = New-Object System.Collections.Generic.HashSet[string]
 
-$neoJar = Get-ChildItem "$env:USERPROFILE\.gradle\caches\modules-2\files-2.1\net.neoforged\neoforge" -Recurse -Filter "neoforge-*-universal.jar" -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
+# The platform convention tags come from the NeoForge build gradle.properties pins, resolved by
+# the SAME helper the generator uses (Resolve-PlatformNeoJar in CostFloor.ps1). Until 0.8.0 this
+# line took whatever universal jar the cache happened to list first - 21.1.235 while the generator
+# read a hardcoded 21.1.241 - so the two tools could judge against different platform tag sets.
+$platformNeo = if ($Minimal) { $null } else { Resolve-PlatformNeoJar $root }
+$neoJar = if ($platformNeo) { $platformNeo.path } else { $null }
 $sources = @()
 if (-not $Minimal) {
   if ($neoJar) { $sources += $neoJar }
@@ -88,8 +101,13 @@ foreach ($jar in $sources) {
   # canonical ids (modAliases in cost-floors.json): a croptopia-refabricated jar counts as croptopia
   $srcMod[$src] = if ($ids.Count) { Resolve-ModAlias $costData $ids[0] } else { $src }
   foreach ($m in $ids) { [void]$loadedMods.Add($m); [void]$loadedMods.Add((Resolve-ModAlias $costData $m)) }
+  # the namespaces THIS jar owns: its [[mods]] ids (canonical and alias) plus every
+  # assets/<ns>/lang it ships - what Add-OwnFiledEntries needs so that only a mod's own
+  # classification of its own item counts (same construction as GenerateBridges.ps1).
+  $jarNs = New-Object System.Collections.Generic.HashSet[string]
+  foreach ($m in $ids) { [void]$jarNs.Add($m); [void]$jarNs.Add((Resolve-ModAlias $costData $m)) }
   foreach ($e in $zip.Entries) {
-    if ($e.FullName -match '^assets/([^/]+)/lang/[^/]+\.json$') { [void]$ownedNs[$src].Add($matches[1]) }
+    if ($e.FullName -match '^assets/([^/]+)/lang/[^/]+\.json$') { [void]$ownedNs[$src].Add($matches[1]); [void]$jarNs.Add($matches[1]) }
   }
   foreach ($e in ($zip.Entries | Where-Object { ($_.FullName -replace '[/]','/') -match '/tags/item/' })) {
     $ns = ($e.FullName -split '/')[1]
@@ -97,6 +115,7 @@ foreach ($jar in $sources) {
     $path = $e.FullName -replace "^data/$ns/tags/item/",'' -replace '\.json$',''
     Add-TagJson (Key $ns $path) $j $src $null
     $tid = "${ns}:$path"
+    Add-OwnFiledEntries $tid (ConvertFrom-Json $j).values $jarNs $ownSeedFiled $ownFoodFiled
     if (-not $definers.ContainsKey($tid)) { $definers[$tid] = New-Object System.Collections.Generic.HashSet[string] }
     [void]$definers[$tid].Add($srcMod[$src])
   }
@@ -260,19 +279,36 @@ function Get-Provenance($key) {
   return $provCache[$key]
 }
 
-# Mirrors Test-IsSeed in GenerateBridges.ps1 - keep the two in step.
-# "_seed"/"_sapling" is unambiguous; "_seeds" only counts when the ecosystem also
-# files it under c:seeds (so roasted_pumpkin_seeds stays food); and c:seeds
-# membership alone is not enough (plantable foods like onion live there too).
 $seedSet = New-Object System.Collections.Generic.HashSet[string]
 foreach ($st in @('seeds', 'seeds/', 'villager_plantable_seeds')) {
   foreach ($i in (Resolve-Members $st (New-Object System.Collections.Generic.HashSet[string]))) { [void]$seedSet.Add($i) }
 }
+# ===== Test-IsSeed: KEEP THIS BLOCK BYTE-IDENTICAL IN GenerateBridges.ps1 AND AuditRoles.ps1 =====
+# No single signal is sufficient, so three rules are combined:
+#   1. a name ending "_seed"/"_sapling" is unambiguous; no mod ships food named that.
+#   2. "_seeds" is ambiguous (croptopia:roasted_pumpkin_seeds and roasted_sunflower_seeds
+#      are real food), so it only counts as a seed when the ecosystem ALSO files it in c:seeds.
+#   3. 0.8.0 (blocker B1): a name rule cannot see "corn_kernels", "avocado_pit", "kernels",
+#      "wild_rice" or "sweet_berry_pips" at all, and culturaldelights:corn_kernels and
+#      hearthandharvest:corn_kernels shipped inside c:crops/corn, c:foods/corn and the whole
+#      grain family because of it. For those the item's OWN mod is the authority: a mod that
+#      files its own item in a planting tag (c:seeds, c:seeds/<crop>,
+#      minecraft:villager_plantable_seeds) and in NO food tag of its own has called it seed
+#      stock. Both halves are measured from the jars - Add-OwnFiledEntries,
+#      Test-IsPlantingTag and Test-IsFoodEvidenceTag in CostFloor.ps1.
+# Plain c:seeds membership is still not sufficient on its own, and rule 3's second half is what
+# keeps every plantable FOOD bridging, out of its own mod's own files: farm_and_charm:onion
+# (c:vegetables + c:crops/onion), farmersdelight:rice and kaleidoscope_cookery:rice
+# (c:crops/rice, c:crops/grain, c:grain/rice), hearthandharvest:peanut and its red/green grapes
+# (c:foods, c:foods/fruit, c:foods/berry, c:nuts, c:fruits/grape), rusticdelight:coffee_beans
+# (c:crops/coffee). Croptopia's roasted seeds are in no planting tag at all, so no rule sees them.
 function Test-IsSeed($id) {
   if ($id -match '_seed$|_sapling$') { return $true }
   if ($id -match '_seeds$' -and $seedSet.Contains($id)) { return $true }
+  if ($ownSeedFiled.Contains($id) -and -not $ownFoodFiled.Contains($id)) { return $true }
   return $false
 }
+# ===== end of the shared Test-IsSeed block =====
 # Audit every tag Pantrywork itself asserts - the role tags AND the canonical
 # c: identity tags it defines - because a seed sitting in c:foods/vegetable is
 # just as wrong as one in a role tag, even if no role currently surfaces it.
@@ -298,12 +334,30 @@ function Test-IsCanonical($key) {
   return ($key -like 'pantrywork:*' -or $key -match '^foods($|/)' -or $key -match '^drinks($|/)' -or $key -eq 'eggs')
 }
 "=== PANTRYWORK TAG AUDIT ($($roles.Count) tags asserted by this mod; $($overlayGates.Count) gated overlays, active: $(@($overlayGates.Keys | Where-Object { @($overlayGates[$_] | Where-Object { $loadedMods.Contains($_) }).Count }).Count)) ==="
+if ($platformNeo) { "  platform convention tags: neoforge $($platformNeo.version)$(if ($platformNeo.exact) { ' (the gradle.properties pin)' } else { " (pin $($platformNeo.pinned) is not in the gradle cache; newest cached build on that line used)" })" }
+else { "  platform convention tags: none (-Minimal)" }
 $violations = 0
 $upstream = New-Object System.Collections.ArrayList
 foreach ($r in $roles) {
   $members = Resolve-Members $r (New-Object System.Collections.Generic.HashSet[string])
   $bad = @($members | Where-Object { Test-IsSeed $_ } | Sort-Object)
   $canon = Test-IsCanonical $r
+  if ($canon) {
+    # An id another mod files in ITS OWN copy of a canonical c: tag cannot be subtracted by a datapack,
+    # and re-classifying another mod's own choice is against the project's rules - the same reasoning
+    # checks 3 and 4 already apply to c:foods. Each id below is edible AND plantable (so Test-IsSeed
+    # flags it, correctly, for bridging: it must never cross into another mod's food slot), reaches the
+    # tag only through that mod's own entry, and sits on NO Pantrywork path. Listed one by one so a NEW
+    # seed in a canonical tag - or any seed WE route - still fails the build.
+    #   hearthandharvest:sunflower_seeds (0.8.0): real food (HHFoodValues.SUNFLOWER_SEEDS) that H&H lists
+    #     in its own data/c/tags/item/foods.json, and also in c:seeds and minecraft:villager_plantable_seeds.
+    #     Pantrywork's c:foods holds only #c:foods/cooked_rice + #c:foods/cheese, neither of which reaches it.
+    $upstreamCanonicalSeeds = @('hearthandharvest:sunflower_seeds')
+    foreach ($e in @($bad | Where-Object { $upstreamCanonicalSeeds -contains $_ })) {
+      [void]$upstream.Add("$r : $e (the item's own mod lists it in its own copy of this canonical tag)")
+    }
+    $bad = @($bad | Where-Object { $upstreamCanonicalSeeds -notcontains $_ })
+  }
   $mark = ""
   if ($bad.Count) { $mark = if ($canon) { "   <-- $($bad.Count) VIOLATIONS" } else { "   (upstream: $($bad.Count))" } }
   "{0,-46} {1,4} members{2}" -f $r, $members.Count, $mark
@@ -379,7 +433,7 @@ if ($tags.ContainsKey('foods/milk')) {
 #               know holds a block is the same mistake as copying the block.
 #   upstream  - it arrives only through other mods' own declarations. Reported.
 #
-# Two scopes, because one denylist cannot serve both kinds of item:
+# Three scopes, because one denylist cannot serve every kind of item:
 #   GENERAL  - blocks, a sapling item, a seed-pit, a processed treat, Brewin' &
 #              Chewin's food-less cheese wheel BlockItems. Wrong in any food tag, so
 #              checked in EVERY tag Pantrywork asserts.
@@ -391,19 +445,42 @@ if ($tags.ContainsKey('foods/milk')) {
 #              recipes they would undercut, so they are checked only in the tags a
 #              Pantrywork bridge writes that concept into: c:toast, c:toasts,
 #              c:jams and every c:jellies/*.
+#   FRUIT    - create:chocolate_glazed_berries (0.8.0 review M3), for exactly the same
+#              reason, one dialect over. The harm is a candied treat satisfying another
+#              mod's FRUIT ingredient slot, so it is checked in the fruit dialects a
+#              Pantrywork bridge writes into: c:fruits, c:fruits/*, c:foods/fruit and
+#              the pantrywork:bridged/fruit enumeration. It is NOT a general check,
+#              because `pantrywork:food_component/garnish` references #c:foods/berry -
+#              Create's own tag, where Create itself files the item - to pick up Hearth
+#              and Harvest's five real berries. Surfacing another mod's classification of
+#              its own item in one of our ROLE tags is upstream's call (rule 2, the same
+#              reasoning checks 1, 3 and 4 already apply to c:foods); passing it to a
+#              recipe slot is ours. Its sibling create:honeyed_apple is in the GENERAL
+#              list and still passes there: no Pantrywork tag references #c:foods/fruit.
+#
+# biomeswevegone:soul_fruit (0.8.0) is in the GENERAL list, not the fruit one, and that is
+# deliberate: unlike Create's glazed berries it is NOT in anyone's c:foods/berry, so no
+# Pantrywork role tag surfaces it and the general scope costs nothing. It arrives only
+# through BYG's own c:foods/fruit entry, so it is reported `upstream` there (BYG's call on
+# BYG's item) while FAILING anywhere a Pantrywork path would deliver it - which is exactly
+# what the generator's blacklist line prevents in c:fruits.
 "=== NON-FOOD / DILUTION-CLASS ITEMS ==="
 $nonFoodFail = 0
 # fishofthieves:mango_pit is a future-upstream guard, not a live check: FoT files the
 # pit only under c:seeds, so no tag path reaches it today and deleting the generator's
 # blacklist entry still passes here. GenerateBridges.ps1 -SelfTest is the live proof.
 $generalDeny = @('minecraft:melon', 'minecraft:pumpkin', 'bountifulfares:coconut', 'create:honeyed_apple', 'fishofthieves:mango_pit',
-                 'brewinandchewin:flaxen_cheese_wheel', 'brewinandchewin:scarlet_cheese_wheel')
+                 'brewinandchewin:flaxen_cheese_wheel', 'brewinandchewin:scarlet_cheese_wheel',
+                 'biomeswevegone:soul_fruit')
 $scopedDeny = @('refurbished_furniture:toast', 'refurbished_furniture:bread_slice', 'refurbished_furniture:sweet_berry_jam', 'refurbished_furniture:glow_berry_jam')
 $scopedTags = @(@('toast', 'toasts', 'jams') + @($tags.Keys | Where-Object { $_ -like 'jellies/*' }) | Where-Object { $tags.ContainsKey($_) } | Sort-Object -Unique)
+$fruitDeny = @('create:chocolate_glazed_berries')
+$fruitTags = @(@('fruits', 'foods/fruit', 'pantrywork:bridged/fruit') + @($tags.Keys | Where-Object { $_ -like 'fruits/*' }) | Where-Object { $tags.ContainsKey($_) } | Sort-Object -Unique)
 $nonFoodUp = New-Object System.Collections.ArrayList
 $checks = @()
 foreach ($t in $roles) { foreach ($d in $generalDeny) { $checks += ,@($t, $d) } }
 foreach ($t in $scopedTags) { foreach ($d in $scopedDeny) { $checks += ,@($t, $d) } }
+foreach ($t in $fruitTags) { foreach ($d in $fruitDeny) { $checks += ,@($t, $d) } }
 foreach ($c in $checks) {
   $t = $c[0]; $d = $c[1]
   $p = Get-Provenance $t
@@ -412,7 +489,7 @@ foreach ($c in $checks) {
   if ($p[$d].pw) { $nonFoodFail++; "  FAIL  $label <- $d (through a Pantrywork entry)" }
   else { [void]$nonFoodUp.Add("  upstream  $label <- $d (declared by $(($p[$d].up | Sort-Object) -join ', '))") }
 }
-if ($nonFoodFail -eq 0) { "  none routed by Pantrywork (general denylist over $($roles.Count) tags; dilution-class over $($scopedTags -join ', '))" }
+if ($nonFoodFail -eq 0) { "  none routed by Pantrywork (general denylist over $($roles.Count) tags; dilution-class over $($scopedTags -join ', '); fruit-dialect over $($fruitTags -join ', '))" }
 $nonFoodUp | Sort-Object -Unique
 ""
 # --- path conditions (used by checks 5 and 7) --------------------------------------
@@ -491,12 +568,47 @@ function Format-Path($path) {
 #                 Pam's two-apple and two-slice juice tags (bottle returned, FC1-1), FD's
 #                 cabbage leaf (1/2 cabbage) as a vegetable. NOT here: the melon slice in
 #                 c:fruits (raw gathered produce = 1 unit, a PASS since FC2-4)
+#
+# 0.8.0 PHASE C re-cut. Six rows moved because five new jars (Kaleidoscope Cookery, Hearth
+# and Harvest, Cultural Delights + Cook's Collection, Rustic Delight) each DEFINE tags this
+# table guards, so their own floors joined the rescuer sets. Every number below was re-derived
+# from those jars' recipes, not copied out of cost-floors.json:
+#   c:flour <- create:wheat_flour     + kaleidoscope_cookery (its millstone flour is exactly
+#                                     1 wheat, so Create's 2/3 is x1.50 and inside tolerance)
+#   c:salts <- pamhc2foodcore:saltitem + cookscollection (its c:salts is literally
+#                                     #c:dusts/salt, chased to H&H's 1/32 salt)
+#   c:vegetables <- the 1/2 cuts      + kaleidoscope_cookery (1/2, chased via its own optional
+#                                     #c:crops/cabbage ref), and the cut list itself grew by
+#                                     Cultural Delights' 4 cuts and Rustic Delight's 9 bell
+#                                     pepper slices + potato_slices, all 1/2 produce
+#   c:foods/vegetable <- cabbage_leaf EXCLUDE became GATE: Cultural Delights (cut cucumber)
+#                                     and Rustic Delight (potato slices) both floor it at 1/2
+#   c:raw_fishes <- FD's cod/salmon   EXCLUDE became GATE kaleidoscope_cookery (its own
+#                   slices             chopping-board sashimi is 1/3 of a fish). Ocean's
+#                                     Delight's 1/6 and 1/9 slices stay NEVER - nothing
+#                                     rescues them - so that row is split, not widened.
+# Rows ADDED in the same pass (same derivation, new items): the three new 1/2 fish cuts and
+# KC's 1/3 sashimi out of c:rawfish / c:fishes, and sashimi into c:foods/raw_fish only behind
+# the farmersdelight/rusticdelight gate that the new pantrywork:bridged/raw_fishes enumeration
+# exists to enforce.
 "=== DILUTION GUARD (items below a tag's cost floor) ==="
 $dilution = 0
 $dilutionOk = 0
-$rawFishCuts = @('farmersdelight:cod_slice', 'farmersdelight:salmon_slice', 'oceansdelight:fugu_slice', 'oceansdelight:elder_guardian_slice')
+# 1/2-fish cuts (knife/chopping board, 1 whole fish -> 2) and KC's 1/3 sashimi
+$fdFishCuts = @('farmersdelight:cod_slice', 'farmersdelight:salmon_slice')
+$odFishCuts = @('oceansdelight:fugu_slice', 'oceansdelight:elder_guardian_slice')
+$newFishCuts = @('culturaldelights:raw_calamari', 'rusticdelight:calamari_slice', 'kaleidoscope_cookery:sashimi')
+$rawFishCuts = $fdFishCuts + $odFishCuts
 $cookedFishCuts = @('farmersdelight:cooked_cod_slice', 'farmersdelight:cooked_salmon_slice', 'oceansdelight:cooked_elder_guardian_slice', 'aquaculture:fish_fillet_cooked')
 $wheels = @('brewinandchewin:flaxen_cheese_wheel', 'brewinandchewin:scarlet_cheese_wheel')
+# 1/2-produce cuts: FD's cabbage leaf, Cultural Delights' four cuts, Rustic Delight's nine
+# bell pepper slices and its potato slices. Every one of them is half of a whole vegetable.
+$halfVegCuts = @('farmersdelight:cabbage_leaf',
+                 'culturaldelights:cut_cucumber', 'culturaldelights:cut_eggplant',
+                 'culturaldelights:cut_pickle', 'culturaldelights:smoked_cut_eggplant',
+                 'rusticdelight:potato_slices') +
+               @('black', 'blue', 'green', 'orange', 'pink', 'purple', 'red', 'white', 'yellow' |
+                 ForEach-Object { "rusticdelight:bell_pepper_slice_$_" })
 $dilutionGuard = @(
   @{ tag = 'milk';          never = @('croptopia:milk_bottle', 'croptopia:soy_milk') },
   @{ tag = 'milk';          gated = @('pamhc2foodcore'); ids = @('farmersdelight:milk_bottle') },
@@ -513,26 +625,32 @@ $dilutionGuard = @(
   @{ tag = 'doughs';        gated = @('farm_and_charm'); ids = @('create:dough', 'farmersdelight:wheat_dough', 'pamhc2foodcore:doughitem') },
   @{ tag = 'foods/dough';   never = @('farm_and_charm:dough') },
   @{ tag = 'foods/dough';   gated = @('create'); ids = @('pamhc2foodcore:doughitem') },
-  @{ tag = 'flour';         gated = @('bountifulfares', 'farm_and_charm', 'pamhc2foodcore'); ids = @('create:wheat_flour') },
+  @{ tag = 'flour';         gated = @('bountifulfares', 'farm_and_charm', 'kaleidoscope_cookery', 'pamhc2foodcore'); ids = @('create:wheat_flour') },
   @{ tag = 'foods/pasta';   never = @('farm_and_charm:raw_pasta', 'pamhc2foodcore:pastaitem') },
   @{ tag = 'foods/bread';   never = @('farm_and_charm:farmers_bread') },
-  @{ tag = 'salts';         gated = @('croptopia'); ids = @('pamhc2foodcore:saltitem') },
+  @{ tag = 'salts';         gated = @('cookscollection', 'croptopia'); ids = @('pamhc2foodcore:saltitem') },
   @{ tag = 'olive_oils';    never = @('pamhc2foodcore:cookingoilitem') },
   @{ tag = 'toasts';        never = @('pamhc2foodcore:toastitem') },
   @{ tag = 'juices/applejuice'; never = @('croptopia:apple_juice') },
   @{ tag = 'juices/melonjuice'; never = @('croptopia:melon_juice') },
-  @{ tag = 'vegetables';    gated = @('croptopia'); ids = @('farmersdelight:cabbage_leaf') },
-  @{ tag = 'foods/vegetable'; never = @('farmersdelight:cabbage_leaf') },
+  @{ tag = 'vegetables';    gated = @('croptopia', 'kaleidoscope_cookery'); ids = $halfVegCuts },
+  @{ tag = 'foods/vegetable'; gated = @('culturaldelights', 'rusticdelight'); ids = @('farmersdelight:cabbage_leaf') },
   @{ tag = 'rawpork';       never = @('farmersdelight:bacon', 'farm_and_charm:bacon') },
   @{ tag = 'rawbeef';       never = @('farmersdelight:minced_beef') },
   @{ tag = 'raw_beef';      never = @('farmersdelight:minced_beef') },
   @{ tag = 'rawchicken';    never = @('farmersdelight:chicken_cuts', 'farm_and_charm:chicken_parts') },
   @{ tag = 'rawmutton';     never = @('farmersdelight:mutton_chops') },
   @{ tag = 'raw_mutton';    never = @('farmersdelight:mutton_chops') },
-  @{ tag = 'rawfish';       never = $rawFishCuts },
-  @{ tag = 'fishes';        never = $rawFishCuts },
-  @{ tag = 'raw_fishes';    never = $rawFishCuts },
-  @{ tag = 'foods/raw_fish'; never = @('oceansdelight:fugu_slice', 'oceansdelight:elder_guardian_slice') },
+  @{ tag = 'rawfish';       never = $rawFishCuts + $newFishCuts },
+  @{ tag = 'fishes';        never = $rawFishCuts + $newFishCuts },
+  # c:raw_fishes is defined by Farm & Charm (a whole fish) AND, since 0.8.0, by Kaleidoscope
+  # Cookery, whose own 1/3 sashimi is cheaper than any of these cuts - so the 1/2 cuts are a
+  # GATE there, not a NEVER. Ocean's Delight's 1/6 fugu and 1/9 guardian slices are below even
+  # that and stay NEVER.
+  @{ tag = 'raw_fishes';    never = $odFishCuts },
+  @{ tag = 'raw_fishes';    gated = @('kaleidoscope_cookery'); ids = $fdFishCuts + @('culturaldelights:raw_calamari', 'rusticdelight:calamari_slice') },
+  @{ tag = 'foods/raw_fish'; never = $odFishCuts },
+  @{ tag = 'foods/raw_fish'; gated = @('farmersdelight', 'rusticdelight'); ids = @('kaleidoscope_cookery:sashimi') },
   @{ tag = 'cookedpork';    never = @('farmersdelight:cooked_bacon', 'farm_and_charm:bacon_with_eggs') },
   @{ tag = 'cookedbeef';    never = @('farmersdelight:beef_patty') },
   @{ tag = 'cookedchicken'; never = @('farmersdelight:cooked_chicken_cuts', 'farm_and_charm:roasted_chicken') },

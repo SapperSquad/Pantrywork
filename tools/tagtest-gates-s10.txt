@@ -1,0 +1,39 @@
+# Gate scenario S10 (tools/neo-server-1211), NEW in 0.8.0.
+# Pantrywork release jar + Let's Do Farm & Charm 1.1.23 + Architectury + Kaleidoscope
+# Cookery 1.6.0. NO Farmer's Delight. Do NOT run tagtest-gates.txt here.
+# Expected: 7 passed / 0 failed / 3 expected.
+#
+# What this boot proves:
+#   gate _10 (farmersdelight) CLOSED while BOTH halves of the problem are present: Farm &
+#            Charm's 1/3-chicken `chicken_parts` exists, and Kaleidoscope Cookery - a reader
+#            of c:foods/raw_chicken, and the mod whose whole-chicken floor created this gate
+#            in 0.8.0 - is loaded. Without Farmer's Delight's own 1/2 cuts to rescue it, the
+#            cut must not reach that tag. S11 is the same assertion with FD added.
+#   gate _9  (farm_and_charm) OPEN at item level with KC's raw dough.
+#   gate _11 CLOSED with KC's sashimi present.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- gate _10 CLOSED ---
+item replace block 8 -60 8 container.0 with farm_and_charm:chicken_parts
+execute unless items block 8 -60 8 container.0 #c:foods/raw_chicken
+item replace block 8 -60 8 container.0 with minecraft:chicken
+execute if items block 8 -60 8 container.0 #c:foods/raw_chicken
+# --- gate _9 OPEN: KC's dough into Croptopia's c:doughs dialect, rescued by Farm & Charm ---
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:raw_dough
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farm_and_charm/c/doughs
+execute if items block 8 -60 8 container.0 #c:doughs
+execute if items block 8 -60 8 container.0 #c:dough
+# --- gate _11 CLOSED ---
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:sashimi
+execute unless items block 8 -60 8 container.0 #c:foods/raw_fish
+# --- overlay level ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+# gate _1 is OPEN here (Farm & Charm is a rescuer); its members are Hearth and Harvest's
+# flour and corn meal, absent on this boot, so the tag exists and is empty
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/bountifulfares_or_farm_and_charm/c/flour
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight/bridged/foods_raw_chicken
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight_or_rusticdelight/bridged/raw_fishes
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/pamhc2foodcore/c/milk

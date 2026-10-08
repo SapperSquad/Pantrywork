@@ -1,22 +1,32 @@
 # Gate scenario S3 (tools/neo-server-1211): S2 + Croptopia (+ EpheroLib) - Pam's AND
-# Croptopia. See tools/tagtest-gates.txt for setup. Expected: 16 passed / 0 failed.
+# Croptopia. See tools/tagtest-gates.txt for setup.
+# Expected: 18 passed / 0 failed / 1 expected.
 forceload add 0 0
 setblock 8 -60 8 minecraft:chest
-# both milk gates OPEN
+# both milk gates OPEN (_14 pamhc2foodcore, _6 croptopia)
 item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
 execute if items block 8 -60 8 container.0 #c:milk
 execute if items block 8 -60 8 container.0 #c:milks
 item replace block 8 -60 8 container.0 with pamhc2foodcore:freshmilkitem
 execute if items block 8 -60 8 container.0 #c:milks
-# croptopia gate OPEN for Pam's cheese and salt in the plural tags. Croptopia's c:cheeses has no
-# other path to Pam's cheese, so that line proves the gate. Pam's salt ALSO reaches c:salts
-# without the overlay (Croptopia's c:salts -> #c:salt -> Pam's #c:salt/salt), so the salt gate is
-# proven on the overlay's own tag and the #c:salts line is reachability only (review TV-1)
+# gate _6 OPEN for Pam's cheese in the plural tag. Croptopia's c:cheeses has no other path to
+# Pam's cheese, so that line proves the gate. Pam's salt ALSO reaches c:salts without any
+# overlay (Croptopia's c:salts -> #c:salt -> Pam's #c:salt/salt), so gate _4 is proven on the
+# overlay's OWN tag and the #c:salts line is reachability only (review TV-1). 0.8.0 renamed
+# that overlay from `croptopia` to `cookscollection_or_croptopia`: Cook's Collection files
+# c:salts as exactly #c:dusts/salt, which with Hearth and Harvest loaded carries a 1/32 salt,
+# so Cook's rescues Pam's 1/8 salt there too.
 item replace block 8 -60 8 container.0 with pamhc2foodcore:cheeseitem
 execute if items block 8 -60 8 container.0 #c:cheeses
 item replace block 8 -60 8 container.0 with pamhc2foodcore:saltitem
-execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/salts
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection_or_croptopia/c/salts
 execute if items block 8 -60 8 container.0 #c:salts
+# gate _12 CLOSED (no Hearth and Harvest): neither Pam's nor Croptopia's salt reaches the
+# c:dusts/salt dialect, whose own definers (Cook's, CD, H&H) are all absent here - the tag
+# exists only through Pantrywork's generated dusts/salt.json
+execute unless items block 8 -60 8 container.0 #c:dusts/salt
+item replace block 8 -60 8 container.0 with croptopia:salt
+execute unless items block 8 -60 8 container.0 #c:dusts/salt
 # EXCLUDEs with both mods present: no rescuer exists, whatever is loaded
 item replace block 8 -60 8 container.0 with pamhc2foodcore:toastitem
 execute unless items block 8 -60 8 container.0 #c:toasts
@@ -33,11 +43,16 @@ item replace block 8 -60 8 container.0 with croptopia:milk_bottle
 execute unless items block 8 -60 8 container.0 #c:milk
 item replace block 8 -60 8 container.0 with croptopia:cheese
 execute unless items block 8 -60 8 container.0 #c:cheese
-# croptopia gate OPEN: the overlay's own tag holds FD's leaf. #c:vegetables is reachability only:
-# Croptopia's c:vegetables -> #c:cabbage -> #c:crops/cabbage (FD's own) reaches the leaf anyway
+# gate _7 OPEN by Croptopia: the overlay's own tag holds FD's leaf. #c:vegetables is
+# reachability only: Croptopia's c:vegetables -> #c:cabbage -> #c:crops/cabbage (FD's own)
+# reaches the leaf anyway. 0.8.0 renamed the overlay to croptopia_or_kaleidoscope_cookery.
 item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
-execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/vegetables
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia_or_kaleidoscope_cookery/c/vegetables
 execute if items block 8 -60 8 container.0 #c:vegetables
+# --- overlay level: gate _12's tag is undefined without Hearth and Harvest ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/hearthandharvest/c/dusts/salt
 # --- CRAFT: Croptopia's grilled cheese with Pam's cheese - a GATEd entry in a real recipe ---
 kill @e[type=item]
 setblock 8 -60 12 minecraft:air

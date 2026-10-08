@@ -236,10 +236,21 @@ public class PantryworkGameTests {
         assertInTag(helper, fdMilk, gatedTag("croptopia/c/milks"));
         assertInTag(helper, fdDough, gatedTag("farm_and_charm/c/doughs"));
         assertInTag(helper, pamDough, gatedTag("create/bridged/foods_dough"));
-        assertInTag(helper, createFlour, gatedTag("bountifulfares_or_farm_and_charm_or_pamhc2foodcore/c/flour"));
+        // 0.8.0 phase C renamed three of these gate sets (the rescuer list is part of the tag
+        // id): Kaleidoscope Cookery's millstone flour is exactly 1 wheat, so Create's 2/3 flour
+        // hits x1.50 and KC joins the c:flour rescuers; Cook's Collection's c:salt / c:salts are
+        // literally #c:dusts/salt, so it rescues c:salts; KC floors c:vegetables at 1/2 through
+        // its own #c:crops/cabbage ref, so it joins Croptopia there.
+        assertInTag(helper, createFlour,
+            gatedTag("bountifulfares_or_farm_and_charm_or_kaleidoscope_cookery_or_pamhc2foodcore/c/flour"));
         assertInTag(helper, modItem(helper, "pamhc2foodcore:cheeseitem"), gatedTag("croptopia/c/cheeses"));
-        assertInTag(helper, modItem(helper, "pamhc2foodcore:saltitem"), gatedTag("croptopia/c/salts"));
-        assertInTag(helper, modItem(helper, "farmersdelight:cabbage_leaf"), gatedTag("croptopia/c/vegetables"));
+        assertInTag(helper, modItem(helper, "pamhc2foodcore:saltitem"), gatedTag("cookscollection_or_croptopia/c/salts"));
+        Item cabbageLeaf = modItem(helper, "farmersdelight:cabbage_leaf");
+        assertInTag(helper, cabbageLeaf, gatedTag("croptopia_or_kaleidoscope_cookery/c/vegetables"));
+        // NEW in 0.8.0: Cultural Delights and Rustic Delight both floor c:foods/vegetable at 1/2
+        // (cut cucumber, potato slices), so FD's 1/2 leaf stopped being an EXCLUDE there and
+        // became a GATE on those two mods.
+        assertInTag(helper, cabbageLeaf, gatedTag("culturaldelights_or_rusticdelight/bridged/vegetable"));
         // ...and reachability through the base tags' optional refs
         assertInTag(helper, fdMilk, commonTag("milk"));
         assertInTag(helper, fdMilk, commonTag("milks"));
@@ -269,7 +280,10 @@ public class PantryworkGameTests {
         assertNotInTag(helper, modItem(helper, "farm_and_charm:farmers_bread"), commonTag("foods/bread"));
         assertNotInTag(helper, modItem(helper, "farm_and_charm:roasted_chicken"), commonTag("foods/cooked_chicken"));
         assertNotInTag(helper, modItem(helper, "farm_and_charm:bacon_with_eggs"), commonTag("cookedpork"));
-        assertNotInTag(helper, modItem(helper, "farmersdelight:cabbage_leaf"), commonTag("foods/vegetable"));
+        // the cabbage leaf is NO LONGER an EXCLUDE here: 0.8.0's Cultural Delights and Rustic
+        // Delight floors turned it into a GATE, proven on its own overlay tag above. This is the
+        // reachability half (c:foods/vegetable -> #pantrywork:bridged/vegetable -> the overlay).
+        assertInTag(helper, cabbageLeaf, commonTag("foods/vegetable"));
         // PASS, not EXCLUDE: a melon slice is raw gathered produce (the melon block's drop), one
         // base unit like an apple (SapperSquad, FC2-4)
         assertInTag(helper, Items.MELON_SLICE, commonTag("fruits"));

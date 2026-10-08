@@ -28,6 +28,8 @@
     { "id": "aquaculture:synodontis", "required": false },
     { "id": "aquaculture:tambaqui", "required": false },
     { "id": "aquaculture:tuna", "required": false },
+    { "id": "culturaldelights:glow_squid", "required": false },
+    { "id": "culturaldelights:squid", "required": false },
     { "id": "fishofthieves:ancientscale", "required": false },
     { "id": "fishofthieves:battlegill", "required": false },
     { "id": "fishofthieves:devilfish", "required": false },
@@ -42,6 +44,7 @@
     { "id": "minecraft:salmon", "required": false },
     { "id": "minecraft:tropical_fish", "required": false },
     { "id": "oceansdelight:guardian", "required": false },
-    { "id": "oceansdelight:guardian_tail", "required": false }
+    { "id": "oceansdelight:guardian_tail", "required": false },
+    { "id": "rusticdelight:calamari", "required": false }
   ]
 }

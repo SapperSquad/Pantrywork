@@ -1,5 +1,6 @@
 {
   "values": [
+    { "id": "culturaldelights:cooked_squid", "required": false },
     { "id": "fishofthieves:cooked_ancientscale", "required": false },
     { "id": "fishofthieves:cooked_battlegill", "required": false },
     { "id": "fishofthieves:cooked_devilfish", "required": false },
@@ -13,6 +14,7 @@
     { "id": "minecraft:cooked_cod", "required": false },
     { "id": "minecraft:cooked_salmon", "required": false },
     { "id": "oceansdelight:cooked_guardian_tail", "required": false },
-    { "id": "oceansdelight:kelp_encrusted_cod", "required": false }
+    { "id": "oceansdelight:kelp_encrusted_cod", "required": false },
+    { "id": "rusticdelight:cooked_calamari", "required": false }
   ]
 }

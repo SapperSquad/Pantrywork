@@ -1,0 +1,19 @@
+{
+  "values": [
+    { "id": "culturaldelights:cut_cucumber", "required": false },
+    { "id": "culturaldelights:cut_eggplant", "required": false },
+    { "id": "culturaldelights:cut_pickle", "required": false },
+    { "id": "culturaldelights:smoked_cut_eggplant", "required": false },
+    { "id": "farmersdelight:cabbage_leaf", "required": false },
+    { "id": "rusticdelight:bell_pepper_slice_black", "required": false },
+    { "id": "rusticdelight:bell_pepper_slice_blue", "required": false },
+    { "id": "rusticdelight:bell_pepper_slice_green", "required": false },
+    { "id": "rusticdelight:bell_pepper_slice_orange", "required": false },
+    { "id": "rusticdelight:bell_pepper_slice_pink", "required": false },
+    { "id": "rusticdelight:bell_pepper_slice_purple", "required": false },
+    { "id": "rusticdelight:bell_pepper_slice_red", "required": false },
+    { "id": "rusticdelight:bell_pepper_slice_white", "required": false },
+    { "id": "rusticdelight:bell_pepper_slice_yellow", "required": false },
+    { "id": "rusticdelight:potato_slices", "required": false }
+  ]
+}

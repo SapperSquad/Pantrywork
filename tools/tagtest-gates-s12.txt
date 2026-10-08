@@ -1,0 +1,116 @@
+# Gate scenario S12 (tools/neo-server-1211), NEW in 0.8.0 - THE BLUEBERRY SCENARIO.
+# Pantrywork release jar + Farmer's Delight 1.3.2 + Hearth and Harvest 1.3.4 + Croptopia 4.2.4
+# + EpheroLib + Oh The Biomes We've Gone 2.6.2 + TerraBlender + CorgiLib + Oh The Trees You'll
+# Grow + GeckoLib. The only release-jar scenario that carries BYG, and the only place the sixth
+# player report ("blueberries from BYG are incompatible with any other modded blueberry") is
+# proven on the shipped bytes rather than on the dev classpath.
+# Do NOT run tagtest-gates.txt here. Expected: 27 passed / 0 failed / 3 expected.
+#
+# BYG boots here because its floor is NeoForge 21.1.173 and this harness is 21.1.241. (Cultural
+# Delights, which needs 21.1.247, still cannot - that is why S6..S11 use Rustic Delight for it.)
+#
+# WHAT THIS BOOT PROVES
+#   * `biomeswevegone:blueberries` ships in NO blueberry dialect of its own - BYG files it only
+#     in its own c:foods/berry, minecraft:fox_food, biomeswevegone:dye/makes_blue and
+#     sereneseasons:summer_crops. Pantrywork puts it in c:fruits/blueberry (the tag Hearth and
+#     Harvest's five blueberry recipes read), in c:blueberries (Croptopia's dialect, which also
+#     reaches it through Croptopia's own #c:fruits/blueberry reference) and in c:fruits.
+#   * Two REAL crafts that only work because of that: Hearth and Harvest's blueberry crate and
+#     Croptopia's blueberry jam, both made from BYG berries.
+#   * The soul_fruit exclusion. BYG's own c:foods/fruit lists soul_fruit beside its three other
+#     fruits; it inflicts blindness, so Pantrywork's blacklist keeps it out of c:fruits and out
+#     of pantrywork:bridged/fruit while its three siblings cross. It stays in BYG's own
+#     c:foods/fruit, because no datapack can remove a member - asserted here, not glossed.
+#   * The c:blueberry (SINGULAR) trap: that is Croptopia's SEED tag, and nothing of BYG's is
+#     allowed into it or into c:seeds/blueberry.
+#   * Gate overlays behave normally in a mod set nobody had booted before: _12 and _6 and _10
+#     applied (hearthandharvest, croptopia, farmersdelight all present), _13, _3 and _9 absent.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- THE FIX: BYG blueberries reach the three blueberry/fruit tags ---
+item replace block 8 -60 8 container.0 with biomeswevegone:blueberries
+execute if items block 8 -60 8 container.0 #c:fruits/blueberry
+execute if items block 8 -60 8 container.0 #c:blueberries
+execute if items block 8 -60 8 container.0 #c:fruits
+# ...and was already in BYG's own berry tag, hence already in the garnish role. Not our doing.
+execute if items block 8 -60 8 container.0 #c:foods/berry
+execute if items block 8 -60 8 container.0 #pantrywork:food_component/garnish
+# ...but NOT the canonical fruit axis: BYG does not file its berry as a fruit and neither do we.
+execute unless items block 8 -60 8 container.0 #c:foods/fruit
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/fruit
+# ...and NEVER the singular seed dialects (c:blueberry is [croptopia:blueberry_seed]).
+execute unless items block 8 -60 8 container.0 #c:blueberry
+execute unless items block 8 -60 8 container.0 #c:seeds/blueberry
+# --- the two mods that already interoperated still do (this release changed neither) ---
+item replace block 8 -60 8 container.0 with hearthandharvest:blueberries
+execute if items block 8 -60 8 container.0 #c:fruits/blueberry
+execute if items block 8 -60 8 container.0 #c:blueberries
+execute if items block 8 -60 8 container.0 #pantrywork:bridged/fruit
+item replace block 8 -60 8 container.0 with croptopia:blueberry
+execute if items block 8 -60 8 container.0 #c:fruits/blueberry
+execute if items block 8 -60 8 container.0 #c:blueberries
+# --- the soul_fruit exclusion: out of ours, still in BYG's own (a datapack cannot subtract) ---
+item replace block 8 -60 8 container.0 with biomeswevegone:soul_fruit
+execute unless items block 8 -60 8 container.0 #c:fruits
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/fruit
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+# --- its three siblings DO cross into Croptopia's fruit dialect ---
+item replace block 8 -60 8 container.0 with biomeswevegone:green_apple
+execute if items block 8 -60 8 container.0 #c:fruits
+item replace block 8 -60 8 container.0 with biomeswevegone:baobab_fruit
+execute if items block 8 -60 8 container.0 #c:fruits
+item replace block 8 -60 8 container.0 with biomeswevegone:yucca_fruit
+execute if items block 8 -60 8 container.0 #c:fruits
+# --- BYG's oddion bulb is in its own bare c:crops, which is NOT food evidence: stays out ---
+item replace block 8 -60 8 container.0 with biomeswevegone:oddion_bulb
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+execute unless items block 8 -60 8 container.0 #pantrywork:bridged/vegetable
+# --- gate overlays in a never-booted mod set: _12 OPEN with a real member ---
+item replace block 8 -60 8 container.0 with croptopia:salt
+execute if items block 8 -60 8 container.0 #pantrywork:gated/hearthandharvest/c/dusts/salt
+# --- _10 and _6 OPEN (tag resolves; stone is simply not a member) ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight/bridged/foods_raw_chicken
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/croptopia/c/cheeses
+# --- _13, _3 and _9 CLOSED: no Kaleidoscope Cookery, no Cook's Collection, no Farm & Charm ---
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/kaleidoscope_cookery/c/raw_fishes
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection/c/salt
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farm_and_charm/c/doughs
+# --- CRAFT 1: Hearth and Harvest's blueberry crate, 9x BYG berries (reads c:fruits/blueberry) ---
+kill @e[type=item]
+setblock 8 -60 12 minecraft:air
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with biomeswevegone:blueberries
+item replace block 8 -60 12 container.1 with biomeswevegone:blueberries
+item replace block 8 -60 12 container.2 with biomeswevegone:blueberries
+item replace block 8 -60 12 container.3 with biomeswevegone:blueberries
+item replace block 8 -60 12 container.4 with biomeswevegone:blueberries
+item replace block 8 -60 12 container.5 with biomeswevegone:blueberries
+item replace block 8 -60 12 container.6 with biomeswevegone:blueberries
+item replace block 8 -60 12 container.7 with biomeswevegone:blueberries
+item replace block 8 -60 12 container.8 with biomeswevegone:blueberries
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if items entity @e[type=minecraft:item] contents hearthandharvest:blueberry_crate
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air
+# --- CRAFT 2: Croptopia's blueberry jam from a BYG berry (reads c:blueberries). Three
+#     ingredients on purpose - a lone BYG berry is ambiguous with BYG's own
+#     blue_dye_from_bwg_dye_tag, which is also a one-slot shapeless. ---
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with biomeswevegone:blueberries
+item replace block 8 -60 12 container.1 with minecraft:sugar
+item replace block 8 -60 12 container.2 with croptopia:cooking_pot
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if items entity @e[type=minecraft:item] contents croptopia:blueberry_jam
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air

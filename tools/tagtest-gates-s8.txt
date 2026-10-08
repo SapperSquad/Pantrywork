@@ -1,0 +1,62 @@
+# Gate scenario S8 (tools/neo-server-1211), NEW in 0.8.0.
+# Pantrywork release jar + Farmer's Delight 1.3.2 + Rustic Delight 1.7.1 + Pam's HarvestCraft 2
+# Food Core. No Kaleidoscope Cookery, no Croptopia, no Meadow. (Rustic Delight hard-requires
+# farmersdelight.) Do NOT run tagtest-gates.txt here.
+# Expected: 19 passed / 0 failed / 3 expected.
+#
+# What this boot proves:
+#   item 11, cleanly: Rustic Delight's WHOLE bell peppers are in c:vegetables (23 readers:
+#           Pam's 21, KC 2) UNGATED, while gate _7 is CLOSED - so its 1/2 slices and potato
+#           slices are NOT. The whole-vs-cut split, in one boot.
+#   gate _8 (culturaldelights|rusticdelight) OPEN by Rustic Delight: FD's cabbage leaf into
+#           c:foods/vegetable. This is the 0.8.0 churn row that turned an EXCLUDE into a GATE.
+#           Cultural Delights cannot be booted on this harness (it requires neoforge
+#           >= 21.1.247 and neo-server-1211 is 21.1.241), so the CD half is dev-boot only.
+#   item 8: Pam's 1/2 cooking oil inside Rustic Delight's OWN #rusticdelight:cooking_oil tag
+#           (10 readers). RD's oil is 3/4, so Pam's is exactly x1.50 - the knife-edge PASS
+#           the 0.8.0 refutation accepted rather than invent a mechanism to drop.
+#   gates _4, _12, _13 CLOSED; gate _14 OPEN.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+# --- item 11: whole peppers in, cuts out (gate _7 closed: no Croptopia, no KC) ---
+item replace block 8 -60 8 container.0 with rusticdelight:bell_pepper_red
+execute if items block 8 -60 8 container.0 #c:vegetables
+execute if items block 8 -60 8 container.0 #c:foods/vegetable
+item replace block 8 -60 8 container.0 with rusticdelight:bell_pepper_slice_red
+execute unless items block 8 -60 8 container.0 #c:vegetables
+item replace block 8 -60 8 container.0 with rusticdelight:potato_slices
+execute unless items block 8 -60 8 container.0 #c:vegetables
+# --- gate _8 OPEN by Rustic Delight, gate _7 still CLOSED, for the same cabbage leaf ---
+item replace block 8 -60 8 container.0 with farmersdelight:cabbage_leaf
+execute unless items block 8 -60 8 container.0 #c:vegetables
+execute if items block 8 -60 8 container.0 #pantrywork:gated/culturaldelights_or_rusticdelight/bridged/vegetable
+execute if items block 8 -60 8 container.0 #c:foods/vegetable
+# --- item 8: the foreign oils inside Rustic Delight's own tag ---
+item replace block 8 -60 8 container.0 with rusticdelight:cooking_oil
+execute if items block 8 -60 8 container.0 #rusticdelight:cooking_oil
+execute if items block 8 -60 8 container.0 #c:cookingoil
+execute unless items block 8 -60 8 container.0 #c:olive_oils
+execute if items block 8 -60 8 container.0 #kaleidoscope_cookery:oil
+item replace block 8 -60 8 container.0 with pamhc2foodcore:cookingoilitem
+execute if items block 8 -60 8 container.0 #rusticdelight:cooking_oil
+execute if items block 8 -60 8 container.0 #kaleidoscope_cookery:oil
+execute unless items block 8 -60 8 container.0 #c:olive_oils
+# --- gate _13 CLOSED: the 1/2-fish cuts stay out of c:raw_fishes without Kaleidoscope Cookery
+item replace block 8 -60 8 container.0 with farmersdelight:cod_slice
+execute unless items block 8 -60 8 container.0 #c:raw_fishes
+item replace block 8 -60 8 container.0 with rusticdelight:calamari_slice
+execute unless items block 8 -60 8 container.0 #c:raw_fishes
+# --- gate _14 OPEN (Pam's); gates _4 and _12 CLOSED (no Cook's, Croptopia or H&H) ---
+item replace block 8 -60 8 container.0 with farmersdelight:milk_bottle
+execute if items block 8 -60 8 container.0 #c:milk
+item replace block 8 -60 8 container.0 with pamhc2foodcore:saltitem
+execute unless items block 8 -60 8 container.0 #c:salts
+execute unless items block 8 -60 8 container.0 #c:dusts/salt
+# --- overlay level ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/croptopia_or_kaleidoscope_cookery/c/vegetables
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/kaleidoscope_cookery/c/raw_fishes
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/cookscollection_or_croptopia/c/salts

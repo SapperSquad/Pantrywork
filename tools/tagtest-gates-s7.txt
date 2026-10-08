@@ -1,0 +1,59 @@
+# Gate scenario S7 (tools/neo-server-1211), NEW in 0.8.0.
+# Pantrywork release jar + Create 6.0.10 + Kaleidoscope Cookery 1.6.0. Nothing else - both
+# mods require only minecraft/neoforge, so this is the cheapest boot in the matrix.
+# Do NOT run tagtest-gates.txt here. Expected: 16 passed / 0 failed / 4 expected.
+#
+# What this boot proves:
+#   gate _2 OPEN with KALEIDOSCOPE COOKERY AS THE ONLY RESCUER - the 0.8.0 churn row that
+#           renamed the flour overlay. KC's millstone flour is exactly 1 wheat, so Create's
+#           2/3 flour is x1.50, inside tolerance. S5 is the same item with the gate CLOSED.
+#   gate _13 and gate _7 OPEN at overlay level (their items all belong to mods not loaded here)
+#   gate _9  CLOSED with Create's AND KC's dough present
+#   gate _11 CLOSED with KC's sashimi present (its rescuers FD and Rustic Delight are absent)
+#   plus the ungated 0.8.0 phase-A/B bridges that need no other mod: KC's fried egg into
+#   c:foods/cooked_egg, its tomato into FD's narrowed c:foods/tomato slot, its raw dough into
+#   c:foods/dough, and its own oil in the wok tag Pantrywork hand-authors.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+item replace block 8 -60 8 container.0 with create:wheat_flour
+# Create is loaded (its own c:flours holds the flour), or the lines below prove nothing
+execute if items block 8 -60 8 container.0 #c:flours
+# gate _2 OPEN: the overlay's own tag first, then the dialect tag it feeds
+execute if items block 8 -60 8 container.0 #pantrywork:gated/bountifulfares_or_farm_and_charm_or_kaleidoscope_cookery_or_pamhc2foodcore/c/flour
+execute if items block 8 -60 8 container.0 #c:flour
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:flour
+execute if items block 8 -60 8 container.0 #c:flour
+# gate _9 CLOSED: neither Create's nor KC's dough reaches Croptopia's c:doughs dialect
+item replace block 8 -60 8 container.0 with create:dough
+execute unless items block 8 -60 8 container.0 #c:doughs
+execute if items block 8 -60 8 container.0 #c:foods/dough
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:raw_dough
+execute unless items block 8 -60 8 container.0 #c:doughs
+execute if items block 8 -60 8 container.0 #c:dough
+execute if items block 8 -60 8 container.0 #c:foods/dough
+# ungated 0.8.0 bridges that need nothing else loaded
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:fried_egg
+execute if items block 8 -60 8 container.0 #c:foods/cooked_egg
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:tomato
+execute if items block 8 -60 8 container.0 #c:foods/tomato
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:oil
+execute if items block 8 -60 8 container.0 #kaleidoscope_cookery:oil
+# gate _11 CLOSED: KC's 1/3-fish sashimi stays out of c:foods/raw_fish without FD or RD
+item replace block 8 -60 8 container.0 with kaleidoscope_cookery:sashimi
+execute unless items block 8 -60 8 container.0 #c:foods/raw_fish
+# --- overlay level ---
+item replace block 8 -60 8 container.0 with minecraft:stone
+# OPEN because Kaleidoscope Cookery is loaded (both tags are empty here: their members are
+# Farmer's Delight / Cultural Delights / Rustic Delight cuts, none of which is installed)
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/kaleidoscope_cookery/c/raw_fishes
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/croptopia_or_kaleidoscope_cookery/c/vegetables
+# OPEN because Create is loaded
+execute unless items block 8 -60 8 container.0 #pantrywork:gated/create/bridged/foods_dough
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight_or_rusticdelight/bridged/raw_fishes
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farm_and_charm/c/doughs
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/farmersdelight/bridged/foods_raw_chicken
+# expect: Unknown item tag
+execute if items block 8 -60 8 container.0 #pantrywork:gated/bountifulfares_or_farm_and_charm/c/flour
