@@ -383,11 +383,11 @@ craft-level assert to `tagtest-neo26-compat.txt`.
 
 # 🍞 One cheese. Every recipe.
 
-Farmer's Delight has cheese. Croptopia has cheese. Pam's has cheese. Meadow and Brewin' & Chewin'
-have cheese. **None of them are the same cheese** — they all tag their food, in four incompatible
+Croptopia has cheese. Pam's has cheese. Meadow has cheese. Brewin' & Chewin' has cheese. **None of
+them are the same cheese** — they all tag their food, in four incompatible
 naming dialects that never reference each other. So the recipe that wants cheese takes exactly one
 of them, and your pack quietly runs parallel food economies that never touch. Kaleidoscope Cookery's
-wok will not even light unless you hand it *its* cooking oil, with four other mods' oils sitting
+wok will not even light unless you hand it *its* cooking oil, with five other mods' oils sitting
 in the same chest.
 
 Pantrywork fixes that. It is pure data: a tag layer that bridges those dialects into the official
@@ -460,12 +460,15 @@ players have installed, plus the ones they install later.
 
 ## 🛠️ For mod authors
 
-`PantryworkTagKeys` exposes every tag as a constant, so you can reference the taxonomy without
-hardcoding strings or taking a dependency on the mods being bridged.
+`PantryworkTagKeys` (NeoForge jar) exposes the role tags and the most-asked-for identity tags —
+cheese, butter, dough, cooked rice, flour — as compile-time constants, so you can reference the
+taxonomy without hardcoding strings or taking a dependency on the mods being bridged. Anything else
+in the layer is a plain `c:` tag id you can write directly.
 
 ## ✅ Verified, not assumed
 
-Every claim here was checked on a running server, not inferred. The supported mods are loaded
+Every bridge claimed here was checked on a running server, not inferred — recipe *counts* are read
+out of the mods' own files, but whether a swap works is always measured. The supported mods are loaded
 together and the bridges are exercised for real — Pam's own Grilled Cheese & Ham crafted with
 Farm & Charm butter and Brewin' & Chewin' cheese (and refused with Croptopia's cheaper cheese);
 Farmer's Delight's egg sandwich made from Pam's and Bountiful Fares eggs; Croptopia's pineapple

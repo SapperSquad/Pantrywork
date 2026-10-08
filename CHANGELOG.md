@@ -627,8 +627,13 @@ already there being right.
 
 - **New: Let's Do compat** — Vinery, Farm & Charm, and Meadow.
   - *Meadow* is the headline: its cheese and salt recipes now accept
-    Croptopia's, Pam's, and Farmer's Delight's equivalents, and its cheeses
+    Croptopia's and Pam's equivalents, and its cheeses
     and buffalo meat feed the role tags.
+    *Corrected 2026-10-07: this said "Croptopia's, Pam's, and Farmer's
+    Delight's equivalents". Farmer's Delight ships neither cheese nor salt —
+    re-checked item by item against `FarmersDelight-1.21.1-1.3.2.jar`, whose
+    only cheese-ish entry is `sweet_berry_cheesecake` and which has no salt at
+    all. The bridge itself was never wrong; the sentence was.*
   - *Farm & Charm* introduced a third meat dialect (flat-underscored
     `c:raw_pork` vs Pam's `c:rawpork`); every canonical meat tag now bridges
     all three, both directions.
