@@ -816,8 +816,15 @@ it can never be removed, so do not promote it as the primary fix.
 ### Footnote: Let's Do Vinery ships its `c:` tags at an unreadable path
 
 TAXONOMY records Vinery as shipping "zero `c:` tags". That is right in effect but
-wrong in cause: it ships twelve of them under `data/*/tags/items/` (PLURAL, the
-1.21.2+ layout), and the 1.21.1 loader reads only the singular `tags/item`. They
-are dead data on this line — which is why Vinery still needs its per-item module.
-Re-check this if Vinery is ever added to a 26.x harness, where the plural path
-does load and those tags would suddenly go live.
+wrong in cause, and the earlier wording of this footnote ("twelve of them") was
+wrong in detail. Re-counted out of `letsdo-vinery-neoforge-1.5.3.jar` on
+2026-10-07: it ships **9** files under the PLURAL `data/*/tags/items/` path (the
+1.21.2+ layout) — **6 of them `c:`** (`berries`, `grapes`, `milk`, `seeds`,
+`stripped_logs`, `stripped_wood`), plus two `candlelight:` and one `create:` — while
+its **36** item-tag files under the singular `data/*/tags/item/` are all
+`minecraft:` and `vinery:`. The 1.21.1 loader reads only the singular path, so not
+one of those six `c:` tags loads here. They are dead data on this line — which is
+why Vinery still needs its per-item module. Re-check this if Vinery is ever added
+to a 26.x harness, where the plural path does load and `c:berries`, `c:grapes`,
+`c:milk` and `c:seeds` would suddenly go live (`c:seeds` in particular feeds the
+seed rule).
