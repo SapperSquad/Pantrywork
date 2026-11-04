@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "croptopia:oat", "required": false }
+    { "id": "croptopia:oat", "required": false },
+    { "id": "pamhc2crops:oatsitem", "required": false }
   ]
 }

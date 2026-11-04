@@ -11,6 +11,18 @@
     { "id": "farmersdelight:rice", "required": false },
     { "id": "hearthandharvest:corn", "required": false },
     { "id": "kaleidoscope_cookery:rice", "required": false },
-    { "id": "minecraft:wheat", "required": false }
+    { "id": "minecraft:wheat", "required": false },
+    { "id": "pamhc2crops:amaranthitem", "required": false },
+    { "id": "pamhc2crops:barleyitem", "required": false },
+    { "id": "pamhc2crops:beanitem", "required": false },
+    { "id": "pamhc2crops:chickpeaitem", "required": false },
+    { "id": "pamhc2crops:cornitem", "required": false },
+    { "id": "pamhc2crops:lentilitem", "required": false },
+    { "id": "pamhc2crops:oatsitem", "required": false },
+    { "id": "pamhc2crops:quinoaitem", "required": false },
+    { "id": "pamhc2crops:riceitem", "required": false },
+    { "id": "pamhc2crops:ryeitem", "required": false },
+    { "id": "pamhc2crops:sorghumitem", "required": false },
+    { "id": "pamhc2crops:soybeanitem", "required": false }
   ]
 }

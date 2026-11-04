@@ -1,4 +1,4 @@
-# Pantrywork — publishing kit (current as of v0.8.0)
+# Pantrywork — publishing kit (current as of v0.9.0)
 
 Store copy for the Modrinth / CurseForge project pages. Bump this file in the same pass as
 `CHANGELOG.md` and `README.md` — never one alone.
@@ -7,12 +7,12 @@ Store copy for the Modrinth / CurseForge project pages. Bump this file in the sa
 
 | Upload as version | File | Game version tags | Loader | Dependencies |
 |---|---|---|---|---|
-| `0.8.0+mc1.21.1` | `dist/0.8.0/pantrywork-0.8.0.jar` | 1.21.1 | neoforge | none |
-| `0.8.0+mc1.21.x-fabric` | `dist/0.8.0/pantrywork-0.8.0-fabric.jar` | 1.21.1–1.21.11 (booted on 1.21.1, 1.21.10, 1.21.11) | fabric | Fabric API, required |
-| `0.8.0+mc26-fabric` | `dist/0.8.0/pantrywork-0.8.0-fabric-mc26.jar` | 26.1.2, 26.2 | fabric | Fabric API, required |
-| `0.8.0+mc26` | `dist/0.8.0/pantrywork-0.8.0-neoforge-mc26.jar` | 26.1.2, 26.2 | neoforge | none |
+| `0.9.0+mc1.21.1` | `dist/0.9.0/pantrywork-0.9.0.jar` | 1.21.1 | neoforge | none |
+| `0.9.0+mc1.21.x-fabric` | `dist/0.9.0/pantrywork-0.9.0-fabric.jar` | 1.21.1–1.21.11 (booted on 1.21.1, 1.21.10, 1.21.11) | fabric | Fabric API, required |
+| `0.9.0+mc26-fabric` | `dist/0.9.0/pantrywork-0.9.0-fabric-mc26.jar` | 26.1.2, 26.2 | fabric | Fabric API, required |
+| `0.9.0+mc26` | `dist/0.9.0/pantrywork-0.9.0-neoforge-mc26.jar` | 26.1.2, 26.2 | neoforge | none |
 
-Publish: `tools\publish.ps1 -Version 0.8.0 -ChangelogFile tools\changelog-current.md` (dry-run first).
+Publish: `tools\publish.ps1 -Version 0.9.0 -ChangelogFile tools\changelog-current.md` (dry-run first).
 The version names above are exactly what `publish.ps1` generates (`<Version>+mc<label>[-fabric]`).
 
 **Fabric API, on BOTH stores:** `publish.ps1` sends **Fabric API** as a required dependency of the two
@@ -361,6 +361,59 @@ Version roadmap: no 1.20.x (pre-`c:`-unification). When FD's NeoForge 26.x port 
 (PR #1374 / Refabricated `neoforge/26.1` branch), boot it on the neo-26 harnesses and add the
 craft-level assert to `tagtest-neo26-compat.txt`.
 
+## 0.9.0 — verification record (2026-11-03)
+
+Four jars in `dist/0.9.0`, staged into all eight harness mods folders (the 0.8.0 jars moved to
+scratch, not deleted). SHA-1s:
+`pantrywork-0.9.0.jar` **26302D0887306C04FDBB6869FCA0F803AE9F8360** ·
+`-fabric` **31DCC8922B39721C3D1D5A115992D700C9A9D5E9** ·
+`-fabric-mc26` **843A48F62C0421F9695B66FD4DD20E6537E6EAEC** ·
+`-neoforge-mc26` **6056F2EA136B01199A183A4D01A4AF3526EEF10E**.
+These are the REBUILD of 2026-11-04. The first cut (D03A9021 / 46626DF6 / 4FA521B0 / C34D0B34)
+carried a cost-floor leak and **must not be uploaded** — see "The rebuild" below.
+
+**151 payload files** per jar (134 data + `pack.mcmeta` + 16 overlay tag files, 14 overlays),
+identical across the four and matching the source tree except the two dev-only files
+`-Prelease` strips. **24** optional AFTER deps in the 1.21.1 jar (was 21: added `pamhc2crops`,
+`pamhc2trees`, `pamhc2foodextended`); the 26.x jar is unchanged at **12**, since none of the
+three has a 26.x build. Version `0.9.0`, authors `SapperSquad`.
+
+Static gates: generator exit 0 and byte-stable on re-run, `-SelfTest` PASSED, `AuditRoles.ps1`
+full and `-Minimal` both exit 0 with every counter at 0.
+
+**27 boots, every suite at its documented count, zero regressions.** 4 dev (full `runServer`
+9742 recipes with 15 suites plus the new `tagtest-pams` **119/0**; `-PnoFarmAndCharm`;
+`-PnoCompatMods`; `runGameTestServer` 7/7) and 23 release (neo-server-1211 solo + the full
+S1–S12 gate matrix; neo-server-2612 and -262 compat, gates and solo; all five Fabric harnesses;
+and the no-Fabric-API boot, which refuses to start and names `fabric-api`). The full table is in
+`CLAUDE.md` under "0.9.0 BOOT MATRIX 2026-11-03".
+
+**The rebuild (2026-11-04).** Writing up `docs/TAXONOMY.md` turned up a cost-floor leak in the
+first 0.9.0 cut: Pam's Food Extended's `rawtofishitem` — a plant analogue made from one pressed
+soybean, no fish at any step — had no row in `tools/cost-floors.json`, so it fell through to the
+fish tags' `default: 1`, was priced as a whole cod, and shipped into `c:rawfish`, `c:fishes`,
+`c:raw_fishes` and canonical `c:foods/raw_fish`. Fixed with a 0-fish cost row and by routing
+`c:foods/raw_fish` through the judged enumeration the three raw meats already use. The payload
+difference between the two builds is **5 entries in 4 of the 151 files**, and the only item that
+leaves any tag anywhere is that one. Re-verified on the new bytes: all static gates, the full dev
+boot with all 16 suites at their documented counts, three release-jar scenarios (solo, S1, and S9
+— the fish cut gates at item level) and the Fabric 1.21.1 harness. The remaining release boots in
+`CLAUDE.md`'s matrix ran on the superseded bytes; re-run the full matrix if a uniform record is
+wanted before upload.
+
+**Store-copy audit for this release** (the 0.8.0 pass found three claims that had been false on
+the live pages since 0.1.0, so this is now a standing step):
+- The roster count moved 21 → 24 in the summary, in gallery 4 (`FOOD_MOD_COUNT`, which the
+  render refuses to disagree with) and in the mod list below. The count IS the 1.21.1 jar's
+  optional-AFTER list, re-counted out of the built jar: 24.
+- **Do not claim Pantrywork bridges Pam's Food Extended's items.** It bridges none of them —
+  725 of its 871 items carry no `c:` tag at all, and the rest are tofu/soy analogues the cost
+  floor excludes. Its value is the other direction: 743 of its recipe ingredient slots now
+  accept other mods' food. Phrase it as inbound, which is what the boots proved.
+- The two crafts quoted anywhere in copy must be ones a suite actually performs. For 0.9.0 those
+  are `tagtest-pams.txt` phase F: fried onions from Croptopia's onion + Cultural Delights'
+  butter, and cheese on toast from Croptopia's toast + Meadow's cheese slice.
+
 ## RELEASE BLOCKERS — clear these before first upload
 
 - [x] **`pantrywork:test/universal_sandwich` must not ship.** Verified 2026-07-19 against a fresh
@@ -404,9 +457,9 @@ craft-level assert to `tagtest-neo26-compat.txt`.
 ## Summary (the short-description field)
 
 **HARD LIMIT 256 CHARACTERS on Modrinth** — the API rejects a longer one. Measure before pasting;
-the first 0.8.0 draft was 295 and would have failed. The line below is **246**.
+the first 0.8.0 draft was 295 and would have failed. The line below is **247** (twenty-one -> twenty-four cost one character; re-measure on every roster change).
 
-> The ore dictionary that food mods never got. Bridges twenty-one mods — Farmer's Delight, Croptopia,
+> The ore dictionary that food mods never got. Bridges twenty-four mods — Farmer's Delight, Croptopia,
 > Pam's, the Let's Do series and more — into one shared tag vocabulary, so one mod's cheese, salt or
 > oil works in another's recipes at a fair price.
 
@@ -478,7 +531,8 @@ names the missing dependency.
 Works in singleplayer too (your game runs an internal server; just install it normally).
 
 Supported: **Farmer's Delight** (incl. Refabricated on Fabric) · **Croptopia** (incl. Croptopia
-Refabricated) · **Pam's HarvestCraft 2 Food Core** · **Ocean's Delight** (full identity module) ·
+Refabricated) · **Pam's HarvestCraft 2 — all four modules: Food Core, Crops, Trees and Food Extended** ·
+**Ocean's Delight** (full identity module) ·
 **End's Delight** (parent joins) · **[Let's Do] Vinery, Farm & Charm, Meadow** ·
 **Aquaculture 2** · **Brewin' & Chewin'** · **Create** · **Bountiful Fares** · **Fish of Thieves** ·
 **Refurbished Furniture** · **Kaleidoscope Cookery** · **Hearth and Harvest** · **Cultural Delights** ·
@@ -686,9 +740,52 @@ pass.
   summary + description replaced on both stores (Modrinth via the API, CurseForge via the authors
   portal), banner / gallery 2 / gallery 4 replaced on both, the old three deleted, and every gallery
   image titled and captioned identically on both stores (Modrinth's two-layers card had carried the
-  banner's caption; fixed). **0.8.0 is built, verified and staged in `dist/0.8.0`, and NOT yet
-  published** — awaiting SapperSquad's go. When it goes: four files each, the summary and description
-  below on both stores, and gallery 4 replaced on both (the only image that changed).
+  banner's caption; fixed). **0.8.0 was published to both stores on 2026-10-08** —
+  four files each; the full record and its three gotchas are in the release log above. (This
+  paragraph read "built, verified and staged … NOT yet published" until 2026-11-03: it described the
+  pre-publish state and the publish pass did not come back to it. Audit this section against the
+  release log every release — a stale "not yet published" line here is the same failure mode as the
+  three store claims the 0.8.0 audit found had been false on the live pages since 0.1.0.)
+
+## Why no Forge build? (paste-ready answer to a recurring question)
+
+Asked again by a player 2026-11-01 ("a Forge 1.20.1 version"). The answer has been the project's
+position since the 2026-08-29 roadmap note ("no 1.20.x, pre-`c:`-unification"); the evidence below
+was re-checked against the NeoForge/Forge docs on 2026-11-01 so the reply can cite facts, not taste.
+
+**The short reply, paste as-is:**
+
+> Short answer: there won't be a Forge 1.20.1 build, and it's not a packaging decision — on 1.20.1
+> the thing this mod does doesn't exist yet.
+>
+> Pantrywork works by extending the shared `c:` tag convention, so that one mod's cheese satisfies
+> another mod's recipe. The `c:` namespace only became the convention in **NeoForge 1.20.5**. On
+> 1.20.1 the equivalent namespace is `forge:`, and the `forge:` vocabulary has no food tags at all —
+> its crop tags are beetroot, carrot, nether wart, potato and wheat, full stop. There is no
+> `forge:foods/*` for a mod like this to extend. 1.20.1 also uses the plural `tags/items/` folder
+> where 1.21+ uses singular `tags/item/`, so every file would also be in the wrong place.
+>
+> So a 1.20.1 build wouldn't be a port — it would be inventing a food-tag vocabulary from scratch
+> and hoping twenty other mods adopt it. That's a different mod, and a worse bet for you: on 1.21.1
+> the mods you'd want bridged already agree on `c:`.
+>
+> If you're on 1.20.1 and want cross-mod food recipes working, the honest recommendation is a
+> handful of hand-written tag files for your own pack — happy to point at how the tags are laid out
+> here so you can copy the shape.
+
+**The facts behind it, if pressed:**
+
+| Claim | Evidence |
+|---|---|
+| `c:` is a 1.20.5+ convention | NeoForge docs: the 1.20.3/1.20.4 pages say `forge`, the 1.20.6 pages say `c` |
+| 1.20.1 has no food tags to extend | the documented `forge:` crop set is beetroot, carrot, nether_wart, potato, wheat |
+| path differs too | 1.20.1 `data/<ns>/tags/items/`, 1.21+ `data/<ns>/tags/item/` (singular) |
+| it is not a repackage | all 146 payload files would change namespace AND path, and every bridged mod's 1.20.1 jar would need re-reading and re-costing (186 item costs, 196 floors, 14 gates re-derived) |
+
+**One caveat to keep honest:** nobody has proven that *no* 1.20.1 Forge mod reads `c:` tags. The
+2026-11-01 check could not reach MinecraftForge's own 1.20.x source, so this rests on documented
+convention, not an exhaustive survey. It does not change the conclusion — there is still no
+`forge:` food vocabulary to extend — but do not claim "`c:` does not work on 1.20.1" as a fact.
 
 ## Publish-time hazard: the store-id env vars are GLOBAL
 

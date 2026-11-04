@@ -1,6 +1,5 @@
 {
   "values": [
-    { "id": "#c:rawmutton", "required": false },
-    { "id": "#c:raw_mutton", "required": false }
+    { "id": "#pantrywork:bridged/foods_raw_mutton", "required": false }
   ]
 }

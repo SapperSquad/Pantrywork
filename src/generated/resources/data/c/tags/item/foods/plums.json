@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "croptopia:plum", "required": false }
+    { "id": "croptopia:plum", "required": false },
+    { "id": "pamhc2trees:plumitem", "required": false }
   ]
 }

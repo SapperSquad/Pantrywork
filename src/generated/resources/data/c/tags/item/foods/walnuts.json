@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "croptopia:walnut", "required": false }
+    { "id": "croptopia:walnut", "required": false },
+    { "id": "pamhc2trees:walnutitem", "required": false }
   ]
 }

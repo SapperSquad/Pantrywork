@@ -1,6 +1,5 @@
 {
   "values": [
-    { "id": "#c:rawbeef", "required": false },
-    { "id": "#c:raw_beef", "required": false }
+    { "id": "#pantrywork:bridged/foods_raw_beef", "required": false }
   ]
 }

@@ -55,7 +55,15 @@ $jarsDir = Join-Path $root "tools\work\jars"
 $genRoot = Join-Path $root "src\generated\resources"
 $reportFile = Join-Path $root "tools\work\bridges-report.txt"
 if ($SelfTest) {
-  $selfTestDir = Join-Path ([IO.Path]::GetTempPath()) ("pantrywork-selftest-" + [guid]::NewGuid().ToString('N'))
+  # Keep this directory name SHORT. The longest generated path is
+  # <root>\pantrywork_gate_<n>\data\pantrywork\tags\item\gated\<mods joined by _or_>\c\<tag>.json,
+  # and the gate key alone can exceed 95 chars (the c:flour gate names five rescuer mods). The old
+  # name here - "pantrywork-selftest-" plus a full 32-char GUID - added 52 chars on top of %TEMP%
+  # and pushed that path past what PS 5.1's Get-ChildItem can enumerate, so -SelfTest died with
+  # DirectoryNotFound on the gate_2 directory while the same payload generated fine into the repo
+  # (measured 2026-11-03, when Pam's Food Extended became the fifth rescuer on that gate). 8 hex
+  # chars are plenty of uniqueness for a directory that is deleted at the end of the run.
+  $selfTestDir = Join-Path ([IO.Path]::GetTempPath()) ("pw-st-" + [guid]::NewGuid().ToString('N').Substring(0, 8))
   $genRoot = Join-Path $selfTestDir "resources"
   $reportFile = Join-Path $selfTestDir "report.txt"
   New-Item -ItemType Directory -Force $genRoot | Out-Null
@@ -506,15 +514,40 @@ $forwardSanitized = @(
   # vanilla chicken in its own c:foods/raw_chicken (its 1/3 cut small meats live in c:raw_meats), so that
   # tag's floor is a whole chicken and Farm & Charm's 1/3 chicken_parts has to be gated on Farmer's Delight.
   @{ target = 'foods_raw_chicken'; sources = @('rawchicken', 'raw_chicken', 'chicken_replacements'); judgeAs = 'c:foods/raw_chicken' },
-  # 0.8.0, PARTIAL on purpose: only the c:raw_fishes dialect is enumerated. Kaleidoscope Cookery's sashimi
-  # is 1/3 of a fish (chopping board, 1 cod -> 3) and reaches c:raw_fishes through KC's own ref to its
-  # c:foods/tropical_fish, so a hand ref from c:foods/raw_fish straight to #c:raw_fishes delivered it
-  # unconditionally, below the platform's own whole-cod floor. The hand file keeps its LIVE #c:rawfish and
-  # #c:fishes refs (so minecraft:pufferfish and any unscanned mod's fish still reach the canonical tag) and
-  # routes only #c:raw_fishes through this enumeration. Invariant: nothing dropped here may come back via
-  # those two refs - sashimi is EXCLUDEd from c:rawfish and c:fishes by their own floors and KC defines
-  # neither tag, so it cannot (re-check this line if a future jar moves a cheap cut into c:rawfish/c:fishes).
-  @{ target = 'raw_fishes'; sources = @('raw_fishes'); judgeAs = 'c:foods/raw_fish' }
+  # 0.9.0: the other three raw meats, for exactly the reason the rule exists. Pam's Food Extended files
+  # four tofu meat analogues (tofeak / tofiken / tofutton / tofacon) into Pam's OWN c:rawbeef, c:rawpork
+  # and c:rawmutton. Each is mixing bowl + firm tofu + soy sauce + a flavouring, and firm tofu is a
+  # pressed soybean, so the chain contains no meat at any step and each costs 0 meat. The hand files used
+  # to carry a live '#c:rawbeef' / '#c:rawpork' / '#c:rawmutton' ref, which delivered all four into the
+  # canonical tags - and on into c:foods/raw_meat - unconditionally and free, under every real floor
+  # (Farmer's Delight 1/2, Kaleidoscope Cookery 1/3, the platform's whole 1). AuditRoles check 7 caught it
+  # as six EXCLUDE failures. Enumerating the dialects here judges every member instead, so the analogues
+  # are dropped and the real meats keep their verdicts. Chicken was already done at 0.8.0, above.
+  # Tradeoff taken knowingly, the same one 0.8.0 took for chicken and the OPPOSITE of the raw_fishes entry
+  # below: a full enumeration means an UNSCANNED mod's raw beef sitting in c:rawbeef or c:raw_beef no longer
+  # reaches the canonical tag on its own - it has to be added to tools/work/jars and judged first. Nothing
+  # is lost from the current set (the report shows 2 members each and zero dropped unvetted), and letting an
+  # unjudged item through is the dilution hole the cost floor exists to close. The fish entry keeps live refs
+  # instead only because minecraft:pufferfish reaches c:foods/raw_fish through c:rawfish/c:fishes.
+  @{ target = 'foods_raw_beef';   sources = @('rawbeef', 'raw_beef');     judgeAs = 'c:foods/raw_beef' },
+  @{ target = 'foods_raw_pork';   sources = @('rawpork', 'raw_pork');     judgeAs = 'c:foods/raw_pork' },
+  @{ target = 'foods_raw_mutton'; sources = @('rawmutton', 'raw_mutton'); judgeAs = 'c:foods/raw_mutton' },
+  # 0.8.0, then WIDENED at 0.9.0. It began as a deliberate partial: only the c:raw_fishes dialect was
+  # enumerated, because Kaleidoscope Cookery's sashimi is 1/3 of a fish (chopping board, 1 cod -> 3) and
+  # reached c:raw_fishes through KC's own ref to its c:foods/tropical_fish, so a hand ref from
+  # c:foods/raw_fish straight to #c:raw_fishes delivered it unconditionally, below the platform's own
+  # whole-cod floor. The hand file kept LIVE #c:rawfish and #c:fishes refs, under this invariant:
+  # "nothing dropped here may come back via those two refs - re-check this line if a future jar moves a
+  # cheap cut into c:rawfish/c:fishes". Pam's Food Extended is exactly that jar. It files its 0-cost
+  # tofish (mixing bowl + firm tofu + soy sauce + kelp -> 2, no fish at any step) into its OWN c:rawfish,
+  # so the live ref carried it straight into the canonical tag for free - the invariant violated by the
+  # case it warned about. So all three fish dialects are enumerated now and the hand file holds neither
+  # live ref. Nothing vanilla is lost: the PLATFORM's own c:foods/raw_fish lists cod, salmon,
+  # tropical_fish AND pufferfish directly (read out of neoforge-21.1.247-universal.jar), so the live refs
+  # were never what delivered them. The container keeps the name 'raw_fishes' on purpose even though it
+  # now covers all three dialects: eight test suites assert the tag id
+  # pantrywork:bridged/raw_fishes, and a rename would invalidate them for nothing.
+  @{ target = 'raw_fishes'; sources = @('raw_fishes', 'rawfish', 'fishes'); judgeAs = 'c:foods/raw_fish' }
 )
 
 # ============================================================================

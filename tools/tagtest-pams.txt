@@ -1,0 +1,213 @@
+# 0.9.0 - the other three Pam's HarvestCraft 2 modules (Crops, Trees, Food Extended),
+# from a player asking for "all of Pam's mods".
+#
+# FULL BOOT ONLY: `./gradlew runServer` with every compat jar loaded. Every `pamhc2crops:`,
+# `pamhc2trees:` and `pamhc2foodextended:` id needs its jar, and the two crafts at the end
+# need Croptopia, Cultural Delights, Meadow and Pam's Food Core on the same boot, so this
+# file is NOT meaningful on -PnoCompatMods, -PnoFarmAndCharm, -PnoHybridDelights or -PnoByg.
+#
+#   tools\rcon.ps1 -File tools\tagtest-pams.txt > pams.out
+#   powershell -File tools\CountSuite.ps1 -Suite tools\tagtest-pams.txt -Output pams.out
+#
+# Expected on the full boot: 119 passed / 0 failed / 0 expected.
+# Every membership claim below was checked statically against the jars + src/main +
+# src/generated before the first boot (tools scratch build_suite.py), so a live failure
+# means the pack did not load what the files say.
+#
+# A `unless` line that answers "Test passed" means the item is correctly ABSENT. Each one
+# guards a real hazard: a planting seed presented as food, or a plant analogue taking a free
+# pass into a canonical meat/dairy tag. The analogue lines in PHASE D deliberately assert the
+# analogue IS still in Pam's own c:rawbeef / c:butter / c:milk - that is upstream's own file
+# and a datapack cannot subtract a tag member; what matters is that it stops there.
+forceload add 0 0
+setblock 8 -60 8 minecraft:chest
+
+# ============================== PHASE A - Pam's Crops produce reaches the canonical and dialect tags ==============================
+item replace block 8 -60 8 container.0 with pamhc2crops:cornitem
+execute if items block 8 -60 8 container.0 #c:foods/corn
+execute if items block 8 -60 8 container.0 #c:grains/corn
+execute if items block 8 -60 8 container.0 #c:grain
+execute if items block 8 -60 8 container.0 #c:grains
+execute if items block 8 -60 8 container.0 #c:crops/grain
+execute if items block 8 -60 8 container.0 #c:vegetables
+execute if items block 8 -60 8 container.0 #c:foods/vegetable
+execute if items block 8 -60 8 container.0 #c:crops/corn
+execute unless items block 8 -60 8 container.0 #c:seeds
+execute unless items block 8 -60 8 container.0 #c:fruits
+item replace block 8 -60 8 container.0 with pamhc2crops:onionitem
+execute if items block 8 -60 8 container.0 #c:foods/onion
+execute if items block 8 -60 8 container.0 #c:onions
+execute if items block 8 -60 8 container.0 #c:crops/onion
+execute if items block 8 -60 8 container.0 #c:vegetables
+execute if items block 8 -60 8 container.0 #c:foods/vegetable
+execute unless items block 8 -60 8 container.0 #c:seeds
+execute unless items block 8 -60 8 container.0 #c:fruits
+item replace block 8 -60 8 container.0 with pamhc2crops:blueberryitem
+execute if items block 8 -60 8 container.0 #c:blueberries
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+execute if items block 8 -60 8 container.0 #c:fruits/blueberry
+execute unless items block 8 -60 8 container.0 #c:seeds
+execute unless items block 8 -60 8 container.0 #c:vegetables
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+item replace block 8 -60 8 container.0 with pamhc2crops:tomatoitem
+execute if items block 8 -60 8 container.0 #c:crops/tomato
+execute if items block 8 -60 8 container.0 #c:vegetables
+execute if items block 8 -60 8 container.0 #c:foods/vegetable
+execute unless items block 8 -60 8 container.0 #c:seeds
+item replace block 8 -60 8 container.0 with pamhc2crops:barleyitem
+execute if items block 8 -60 8 container.0 #c:grain
+execute if items block 8 -60 8 container.0 #c:grains
+execute if items block 8 -60 8 container.0 #c:crops/grain
+execute if items block 8 -60 8 container.0 #c:grains/barleys
+execute unless items block 8 -60 8 container.0 #c:seeds
+execute unless items block 8 -60 8 container.0 #c:fruits
+
+# ============================== PHASE B - Pam's Trees fruit and nuts ==============================
+item replace block 8 -60 8 container.0 with pamhc2trees:bananaitem
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+execute if items block 8 -60 8 container.0 #c:fruits/banana
+execute unless items block 8 -60 8 container.0 #c:seeds
+execute unless items block 8 -60 8 container.0 #c:vegetables
+item replace block 8 -60 8 container.0 with pamhc2trees:lemonitem
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+execute if items block 8 -60 8 container.0 #c:fruits/lemon
+execute unless items block 8 -60 8 container.0 #c:seeds
+execute unless items block 8 -60 8 container.0 #c:vegetables
+item replace block 8 -60 8 container.0 with pamhc2trees:mangoitem
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+execute if items block 8 -60 8 container.0 #c:fruits/mango
+execute unless items block 8 -60 8 container.0 #c:seeds
+item replace block 8 -60 8 container.0 with pamhc2trees:orangeitem
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+execute if items block 8 -60 8 container.0 #c:fruits/orange
+execute unless items block 8 -60 8 container.0 #c:seeds
+item replace block 8 -60 8 container.0 with pamhc2trees:plumitem
+execute if items block 8 -60 8 container.0 #c:fruits
+execute if items block 8 -60 8 container.0 #c:foods/fruit
+execute if items block 8 -60 8 container.0 #c:fruits/plum
+execute unless items block 8 -60 8 container.0 #c:seeds
+item replace block 8 -60 8 container.0 with pamhc2trees:walnutitem
+execute if items block 8 -60 8 container.0 #c:foods/walnuts
+execute if items block 8 -60 8 container.0 #c:nuts/walnut
+execute unless items block 8 -60 8 container.0 #c:seeds
+execute unless items block 8 -60 8 container.0 #c:vegetables
+item replace block 8 -60 8 container.0 with pamhc2trees:avocadoitem
+execute if items block 8 -60 8 container.0 #c:vegetables
+execute if items block 8 -60 8 container.0 #c:foods/vegetable
+execute unless items block 8 -60 8 container.0 #c:seeds
+
+# ============================== PHASE C - the seed rule: ...seeditem is a planting seed, not food ==============================
+item replace block 8 -60 8 container.0 with pamhc2crops:cornseeditem
+execute if items block 8 -60 8 container.0 #c:seeds
+execute if items block 8 -60 8 container.0 #c:seeds/corn
+execute if items block 8 -60 8 container.0 #c:grain
+execute unless items block 8 -60 8 container.0 #c:foods/corn
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+execute unless items block 8 -60 8 container.0 #c:crops/grain
+execute unless items block 8 -60 8 container.0 #c:grains/corn
+item replace block 8 -60 8 container.0 with pamhc2crops:cabbageseeditem
+execute if items block 8 -60 8 container.0 #c:seeds
+execute if items block 8 -60 8 container.0 #c:seeds/cabbage
+execute if items block 8 -60 8 container.0 #c:vegetables
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+execute unless items block 8 -60 8 container.0 #c:foods/cabbage
+execute unless items block 8 -60 8 container.0 #c:foods/leafy_green
+item replace block 8 -60 8 container.0 with pamhc2crops:lettuceseeditem
+execute if items block 8 -60 8 container.0 #c:seeds
+execute if items block 8 -60 8 container.0 #c:vegetables
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+execute unless items block 8 -60 8 container.0 #c:foods/leafy_green
+item replace block 8 -60 8 container.0 with pamhc2crops:riceseeditem
+execute if items block 8 -60 8 container.0 #c:seeds
+execute if items block 8 -60 8 container.0 #c:grain
+execute if items block 8 -60 8 container.0 #c:rice
+execute unless items block 8 -60 8 container.0 #c:foods/vegetable
+execute unless items block 8 -60 8 container.0 #c:crops/grain
+item replace block 8 -60 8 container.0 with pamhc2crops:riceitem
+execute if items block 8 -60 8 container.0 #c:rice
+execute if items block 8 -60 8 container.0 #c:grain
+execute unless items block 8 -60 8 container.0 #c:seeds
+
+# ============================== PHASE D - the cost floor: tofu/soy analogues stay upstream, never canonical ==============================
+item replace block 8 -60 8 container.0 with pamhc2foodextended:rawtofeakitem
+execute if items block 8 -60 8 container.0 #c:rawbeef
+execute unless items block 8 -60 8 container.0 #c:foods/raw_beef
+execute unless items block 8 -60 8 container.0 #c:foods/raw_meat
+execute unless items block 8 -60 8 container.0 #c:raw_beef
+item replace block 8 -60 8 container.0 with pamhc2foodextended:rawtofaconitem
+execute if items block 8 -60 8 container.0 #c:rawpork
+execute unless items block 8 -60 8 container.0 #c:foods/raw_pork
+execute unless items block 8 -60 8 container.0 #c:foods/raw_meat
+execute unless items block 8 -60 8 container.0 #c:raw_pork
+item replace block 8 -60 8 container.0 with pamhc2foodextended:rawtofuttonitem
+execute if items block 8 -60 8 container.0 #c:rawmutton
+execute unless items block 8 -60 8 container.0 #c:foods/raw_mutton
+execute unless items block 8 -60 8 container.0 #c:foods/raw_meat
+execute unless items block 8 -60 8 container.0 #c:raw_mutton
+item replace block 8 -60 8 container.0 with pamhc2foodextended:rawtofickenitem
+execute if items block 8 -60 8 container.0 #c:rawchicken
+execute unless items block 8 -60 8 container.0 #c:foods/raw_chicken
+execute unless items block 8 -60 8 container.0 #c:foods/raw_meat
+item replace block 8 -60 8 container.0 with pamhc2foodextended:silkentofuitem
+execute if items block 8 -60 8 container.0 #c:butter
+execute if items block 8 -60 8 container.0 #c:cheese
+execute unless items block 8 -60 8 container.0 #c:butters
+execute unless items block 8 -60 8 container.0 #c:cheeses
+execute unless items block 8 -60 8 container.0 #c:foods/milk
+execute unless items block 8 -60 8 container.0 #c:drinks/milk
+item replace block 8 -60 8 container.0 with pamhc2foodextended:soymilkitem
+execute if items block 8 -60 8 container.0 #c:milk
+execute unless items block 8 -60 8 container.0 #c:milks
+execute unless items block 8 -60 8 container.0 #c:drinks/milk
+execute unless items block 8 -60 8 container.0 #c:foods/milk
+
+# ============================== PHASE E - Food Extended's own pressed oils DO bridge ==============================
+item replace block 8 -60 8 container.0 with pamhc2foodextended:sesameoilitem
+execute if items block 8 -60 8 container.0 #c:cookingoil
+execute unless items block 8 -60 8 container.0 #c:olive_oils
+item replace block 8 -60 8 container.0 with pamhc2foodextended:mushroomoilitem
+execute if items block 8 -60 8 container.0 #c:cookingoil
+execute unless items block 8 -60 8 container.0 #c:olive_oils
+
+# ====================== PHASE F - Food Extended as a CONSUMER ======================
+# The point of adding Food Extended: Pantrywork bridges none of its own items, but its 887
+# recipes make 3472 tag reads (against only 178 exact-item reads) and 743 of those land in
+# 31 tags Pantrywork writes. Both crafts below are its own shapeless recipes, made entirely
+# from OTHER mods' food reaching its ingredient tags.
+#
+# Craft 1: friedonionsitem = c:tool_pot + c:crops/onion + c:butter,
+# built from CROPTOPIA's onion and CULTURAL DELIGHTS' butter.
+kill @e[type=item]
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with pamhc2foodcore:potitem
+item replace block 8 -60 12 container.1 with croptopia:onion
+item replace block 8 -60 12 container.2 with culturaldelights:butter
+setblock 9 -60 12 minecraft:redstone_block
+# tick pad: with Create/BF/FoT/Refurbished loaded the crafter tick lands after the next
+# RCON command, so an unpadded contents check races it (see CLAUDE.md).
+time query gametime
+time query gametime
+execute if items entity @e[type=minecraft:item,limit=1] contents pamhc2foodextended:friedonionsitem
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air
+#
+# Craft 2: cheeseontoastitem = c:tool_bakeware + c:toast + c:cheese,
+# built from CROPTOPIA's toast and MEADOW's cheese slice.
+kill @e[type=item]
+setblock 8 -60 12 minecraft:crafter[orientation=up_north]
+item replace block 8 -60 12 container.0 with pamhc2foodcore:bakewareitem
+item replace block 8 -60 12 container.1 with croptopia:toast
+item replace block 8 -60 12 container.2 with meadow:cheese_slice
+setblock 9 -60 12 minecraft:redstone_block
+time query gametime
+time query gametime
+execute if items entity @e[type=minecraft:item,limit=1] contents pamhc2foodextended:cheeseontoastitem
+kill @e[type=item]
+setblock 9 -60 12 minecraft:air
+setblock 8 -60 12 minecraft:air

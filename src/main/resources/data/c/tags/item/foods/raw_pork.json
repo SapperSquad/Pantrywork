@@ -1,6 +1,5 @@
 {
   "values": [
-    { "id": "#c:rawpork", "required": false },
-    { "id": "#c:raw_pork", "required": false }
+    { "id": "#pantrywork:bridged/foods_raw_pork", "required": false }
   ]
 }

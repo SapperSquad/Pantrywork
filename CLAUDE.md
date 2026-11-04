@@ -60,16 +60,187 @@ Furniture 1.0.22+Framework, and since 0.8.0 Kaleidoscope Cookery 1.6.0, Hearth
 and Harvest 1.3.4, Cultural Delights 0.18.1 + Cook's Collection 0.6.1, Rustic
 Delight 1.7.1, Hybrid Delights 1.3.1 (+ HAPI, Kotlin for Forge) and Oh The Biomes
 We've Gone 2.6.2 (+ TerraBlender 4.1.0.8, CorgiLib 5.0.0.9, Oh The Trees You'll
-Grow 5.3.4, GeckoLib 4.9.3). Farm & Charm is listed on its own so
+Grow 5.3.4, GeckoLib 4.9.3), and since 0.9.0 the other three Pam's
+HarvestCraft 2 modules: Crops 1.0.9, Trees 1.0.9 and Food Extended 1.0.0 (that IS the newest
+1.21.1 NeoForge build of Food Extended - only two were ever published for this line, while
+Crops and Trees are on 1.0.9). None declares a dependency on the others or on Food Core
+despite the store page saying Food Extended requires Crops and Trees, none needs an extra
+library, and each declares only neoforge [21.1.0,), so unlike Cultural Delights all three are
+eligible for tools/neo-server-1211. Farm & Charm is listed on its own so
 `-PnoFarmAndCharm` can drop it; the neoforge.mods.toml templates declare every
-food mod as an optional AFTER dep: 21 ids in the 1.21.1 template (0.8.0 added
+food mod as an optional AFTER dep: **24** ids in the 1.21.1 template since 0.9.0 (which added pamhc2crops, pamhc2trees and
+pamhc2foodextended; 0.8.0 had added
 kaleidoscope_cookery, hearthandharvest, culturaldelights, cookscollection,
 rusticdelight, hybrid_delights and biomeswevegone), 12 in the 26.x one
-(the 1.21.1 list minus create, bountifulfares and ALL SEVEN of the 0.8.0 ids — none of
+(the 1.21.1 list minus create, bountifulfares, the THREE 0.9.0 Pam's ids and ALL SEVEN of the 0.8.0 ids — none of
 those eight has a 26.x build. It still names Pam's, Farm & Charm, Meadow and the other
 mods with no 26.x build, which is harmless for optional deps. Counted out of the staged
 jars' neoforge.mods.toml each release; `FOOD_MOD_COUNT` in tools/GenPromo.java must
 equal the 1.21.1 number, and the promo render throws if its roster disagrees).
+
+## 0.9.0 - the rest of Pam's HarvestCraft (2026-11-03)
+
+Added Pam's HarvestCraft 2 Crops, Trees and Food Extended from a player request. Shape of the
+work, so nobody re-derives it: all three ship `c:` tags (424 / 139 / 393 item-tag files) and
+**none files anything into `c:foods/*`** - the identical dialect shape to Food Core, so this
+needed no new machinery. Pam's dialect is two-level (`c:<family>` is pure refs to
+`c:<family>/<leaf>`, each leaf holds exactly ONE item), which is why so few items touch judged
+tags: **53 floor rows and 9 item costs**, not the hundreds the item counts suggest.
+
+Four things worth keeping:
+
+- **The seed rule needed no change and proved itself.** Pam's Crops plants its FOOD items, so
+  every one of its produce items is in `minecraft:villager_plantable_seeds` and `oatsitem` is
+  also in `c:seeds/oat`; its real seeds are named `...seeditem`, matching neither the `_seed` nor
+  the `_seeds` name rule. The third signal added at 0.8.0 dropped all 16 real seeds on its own
+  and kept every produce item. Read the report's "dropped seeds:" lines on any future Pam's jar
+  bump - a Pam's produce item that is NOT in one of its own mod's food tags would be eaten.
+- **A plant analogue is never a floor, and on a tag where it is the ONLY member the mod declares
+  `{"none"}`.** Food Extended lists silken tofu in `c:butter`/`c:cheese`, soy milk in `c:milk`,
+  firm tofu in `c:groundmeats` and four tofu meats in `c:rawbeef`/`c:rawpork`/`c:rawmutton`/
+  `c:rawfish`. All cost 0, so naming one as the floor would set a 0 floor that rescues every item
+  for free - the degenerate-floor hole `Test-FloorDefiners` exists to catch. Nine tags take
+  `{"none"}`, the same shape as Farmer's Delight on `c:foods/milk`.
+- **A mod that lists only items it does not own states no floor.** On twelve more tags Food
+  Extended re-declares the tag with exactly one member that is a `pamhc2foodcore` item. Counting
+  it made Food Extended a redundant rescuer (it can never open a gate Food Core does not), and on
+  `c:flour` that fifth rescuer grew the overlay directory to 238 chars - 22 under MAX_PATH - and
+  broke `-SelfTest` outright. Both judgments are written up in `tools/cost-floors.json`.
+- **MAX_PATH is close, and the gate key is what eats it.** The overlay DIRECTORIES are already
+  numbered (`pantrywork_gate_<n>`) for this reason, but the tag id inside still spells out every
+  rescuer, and a datapack tag id IS its file path. Longest generated path is now **216 chars**
+  (44 of headroom). `-SelfTest` generates into `%TEMP%` under a deliberately SHORT directory name
+  (`pw-st-<8 hex>`) - it used to use a 32-char GUID and died with DirectoryNotFound the moment
+  that gate gained a fifth mod. If a gate ever legitimately needs 5+ rescuers, the fix is to
+  shorten the gate key scheme, which changes tag ids pack makers can reference - a design call,
+  not a mechanical one.
+
+**A TAG DEFAULT CAN RESCUE AN UNCOSTED ITEM, AND ONE DID (found 2026-11-04, writing up
+TAXONOMY).** `pamhc2foodextended:rawtofishitem` is the sixth analogue and the same recipe as the
+four meat ones (mixing bowl + firm tofu + soy sauce + kelp -> 2, no fish at any step). The Food
+Extended plant-analogue judgment in cost-floors.json already NAMED tofish among the 0-cost
+analogues whose routes "resolve to EXCLUDE, which is the intended outcome" - but **the item row was
+never written**. The fish tags carry `default: 1` (FC2-4), so tofish inherited the price of a whole
+cod, PASSed every fish floor, and shipped into c:rawfish, c:fishes, c:raw_fishes and - through the
+hand file's live `#c:rawfish` ref - canonical c:foods/raw_fish. A free plant item satisfying every
+fish recipe in three dialects, in the first 0.9.0 build.
+- **This is the one place in the cost model where a missing row fails OPEN.** An uncosted item in a
+  tag with no default STOPS the generator; an uncosted item in a tag WITH a default passes in
+  silence. A default is right for raw gathered produce and wrong for a processed item. When adding
+  any analogue or processed food, write the row even if a default would cover it.
+- **A judgment naming an item is not a row costing it.** The prose and the data disagreed for a
+  whole release cycle and nothing compared them. Neither audit caught this: check 7 re-derives the
+  verdict from the same data, so it agreed.
+- Nothing in any suite mentions tofish - `tagtest-pams.txt` phase D covers the meat and dairy
+  analogues and missed the fish one. If that suite is ever extended, start there.
+- Fix: one 0-fish item row, and the 0.8.0 `raw_fishes` forward-sanitized entry widened from
+  `@('raw_fishes')` to `@('raw_fishes','rawfish','fishes')` with the hand file's two live refs
+  removed. That retired the 0.8.0 invariant whose own comment said "re-check this line if a future
+  jar moves a cheap cut into c:rawfish/c:fishes" - Food Extended was that jar. The container keeps
+  the name `bridged/raw_fishes` deliberately: EIGHT suites assert that tag id.
+- Membership effect, resolved item by item over every scanned jar plus the platform: tofish leaves
+  c:foods/raw_fish (56 members -> 55), c:fishes and c:raw_fishes, and we no longer add it to
+  c:rawfish where Food Extended's own file keeps it. **Nothing else anywhere changed.** All 27
+  Aquaculture fish, Fish of Thieves' ten and minecraft:pufferfish are listed DIRECTLY by their own
+  mods (read out of neoforge-21.1.247-universal.jar for pufferfish), so the live refs were never
+  what delivered them.
+
+Canonical `c:foods/raw_beef`, `raw_pork` and `raw_mutton` now route through
+`pantrywork:bridged/foods_raw_*` enumerations instead of live `#c:rawbeef` / `#c:raw_beef` refs
+(raw chicken already did since 0.8.0) - a live ref handed Food Extended's tofu a free pass into
+the canonical tags, which AuditRoles check 7 caught as six EXCLUDE failures. Tradeoff taken
+knowingly: an UNSCANNED mod's raw beef in those dialects no longer reaches the canonical tag by
+itself. The `raw_fishes` entry deliberately does the opposite and says why.
+
+**Food Extended is on the roster for the opposite reason to every other mod.** Pantrywork
+bridges none of its own items - 725 of its 871 items are in no `c:` tag at all and the rest are
+analogues the floor excludes. It earns its place as a CONSUMER: 887 recipes, 3472 tag reads
+against only 178 exact-item reads, and **743 of those reads land in 31 tags Pantrywork writes**
+(c:dough 105, c:crops/onion 74, c:toast 64, c:cheese 61, c:cookingoil 51, c:butter 50,
+c:rawpork 46, c:flour 31, c:salt 31 ...). Keep that straight in store copy: its value is inbound.
+
+**STATUS: built, statically verified and FULLY BOOT-TESTED 2026-11-03.** Static first:
+generator exit 0 (111 tag files, 16 gated in 14 overlays, 42 GATE / 87 EXCLUDE / 12 rescued
+PASS), re-run byte-stable, `-SelfTest` PASSED, AuditRoles full and `-Minimal` both exit 0 with
+every counter 0. Promo re-rendered at 24 mods (8/8/8) and read. Four jars at 0.9.0, **151
+payload files** each (134 data + pack.mcmeta + 16 overlay), 0 missing / 0 extra / 0 differing
+across the four and against src apart from the two dev-only files `-Prelease` strips; 24
+optional AFTER deps, authors SapperSquad.
+
+**REBUILT 2026-11-04 for the tofish fix (below). The CURRENT jars are:**
+`pantrywork-0.9.0.jar` **26302D0887306C04FDBB6869FCA0F803AE9F8360**, -fabric
+**31DCC8922B39721C3D1D5A115992D700C9A9D5E9**, -fabric-mc26
+**843A48F62C0421F9695B66FD4DD20E6537E6EAEC**, -neoforge-mc26
+**6056F2EA136B01199A183A4D01A4AF3526EEF10E**. Staged in dist/0.9.0 and in all eight harness mods
+folders; the superseded first-cut jars (D03A9021 / 46626DF6 / 4FA521B0 / C34D0B34, which is what
+the 27-boot matrix below ran on) are in scratch, not deleted.
+
+**0.9.0 BOOT MATRIX 2026-11-03 - 4 dev boots + 23 release boots, EVERY suite at its documented
+count, zero regressions.** Fresh world + deleted latest.log/debug.log before every boot, stopped
+via RCON, java confirmed exited and 25575 free between boots, every suite classified with
+tools\CountSuite.ps1.
+DEV, 4 boots: full `runServer` (**9742 recipes** - Pam's three modules add ~1141) tagtest 14/0,
+multi 14/0, reverse 18/0, crafttest-reverse 4/0, crafttest 4/0, addons 8/0, origins 11/0, letsdo
+50/0, brewaqua 24/0, seedfix 10/0, collisions 17/0, milkshim 15/0, feedback 204/0, kaleido 212/0
++ 5 expected, nofandc 18/3 (the three documented open-gate `unless #c:doughs` lines) and the NEW
+**tagtest-pams 119/0 + 0 expected**; `-PnoFarmAndCharm` (9572) nofandc 21/0 + feedback 204/0;
+`-PnoCompatMods` (1291) tagtest-nofd 5/0; `runGameTestServer` "All 7 required tests passed".
+RELEASE, 23 boots: neo-server-1211 (21.1.241, D03A9021) solo tagtest-neo26 5/0 + tagtest-nofd
+4/1 (the cake line, by design - the dev recipe is stripped); S1-S4 each tagtest-gates **19/0 + 7
+expected** plus s1 7/0+4, s2 15/0+4, s3 18/0+1, s4 9/0+1; S5 6/0+5; S6 30/0+5; S7 16/0+4; S8
+19/0+3; S9 20/0+3; S10 7/0+3; S11 17/0+3; S12 27/0+3. neo-server-2612 (26.1.2.94, C34D0B34):
+neo26-compat 7/0, neo26-gates 7/0 + 12 expected, solo neo26 5/0. neo-server-262 (26.2.0.64,
+C34D0B34): compat262 5/0, neo26-feedback 37/0, neo26-gates 7/0 + 12 expected, solo neo26 5/0.
+Fabric (Loader 0.19.3): fabric-server 1.21.1, -12110, -2612 and -262 each tagtest-fabric 7/0 +
+**fabric-gates 22/0 + 10 expected** (46626DF6 on the 1.21.x harnesses, 4FA521B0 on the 26.x
+ones); -12111 tagtest-fabric-fd 9/0. No-Fabric-API boot (fabric-server with its other mods moved
+aside, the dist -fabric jar alone): exit 1, "Mod resolution failed", "Incompatible mods found!",
+`HARD_DEP pantrywork 0.9.0 {depends fabric-api @ [*]}`, no world directory created; the harness
+was restored and re-verified at 5 jars afterwards.
+Log scan, all 27 boots: ZERO lines matching pack.mcmeta, overlay, pantrywork_gate,
+pantrywork:gated, "Failed to load", "Missing data pack", "Tried to load invalid" or "Couldn't
+load tag" - EXCEPT exactly the two documented KC-without-Quark TagLoader lines on the three
+Kaleidoscope scenarios (S7, S9, S10) and on the two dev boots that carry it. The only recipe
+parse error anywhere is the documented `brewinandchewin:pizza_from_dough` baseline.
+
+**RE-VERIFICATION OF THE REBUILD 2026-11-04 - 5 boots on the NEW bytes, every suite at its
+documented count.** The 27-boot matrix above ran on the superseded jars, so read it with this.
+Payload delta between the two builds, measured entry by entry across all 151 files: **5 entries
+lost, 0 gained, in 4 files** - `pamhc2foodextended:rawtofishitem` out of c/tags/item/rawfish.json,
+fishes.json and raw_fishes.json, and the two live refs out of c/tags/item/foods/raw_fish.json. All
+four jars still 151 payload files and still byte-identical to each other. Static gates re-run:
+generator exit 0 (111 tag files, 16 gated in 14 overlays, 42 GATE / **91** EXCLUDE / 12 rescued
+PASS - three more EXCLUDEs, all tofish), `-SelfTest` PASSED, AuditRoles full (**891 routes**, 45
+gates proven conditional) and `-Minimal` both exit 0 with every counter 0.
+Boots re-run on 26302D08 / 31DCC892: full dev `runServer` **9742 recipes** and all 16 suites at
+their documented counts (tagtest 14/0, multi 14/0, reverse 18/0, crafttest-reverse 4/0, crafttest
+4/0, addons 8/0, origins 11/0, letsdo 50/0, brewaqua 24/0, seedfix 10/0, collisions 17/0, milkshim
+15/0, feedback 204/0, kaleido 212/0+5, nofandc 18/3 by design, pams 119/0); neo-server-1211 solo
+(5/0 + 4/1 cake by design), S1 (gates 19/0+7, s1 7/0+4) and **S9 (20/0+3, the fish cut gates at
+item level)**; fabric-server (tagtest-fabric 7/0, fabric-gates 22/0+10). Log scans clean except the
+documented KC-without-Quark pair. NOT re-booted on the new bytes: S2-S8, S10-S12, both NeoForge
+26.x harnesses and four of the five Fabric harnesses - their results above stand on bytes whose
+only difference is the five entries listed, and the membership resolution shows no item they assert
+can have moved. Re-run the full matrix before publishing if a uniform record is wanted.
+
+**TWO NEW UPSTREAM BASELINES, both Pam's and neither ours:**
+- **Pam's Crops ships an unreadable `minecraft:rabbit_food`.** The dev log carries
+  `Couldn't read tag list minecraft:rabbit_food ... in data pack mod/pamhc2crops`, and the
+  GameTest log spells out why: its
+  `data/minecraft/tags/item/rabbit_food.json` contains four invalid resource locations -
+  `"pamhc2crops: blackberryitem"` (a space after the colon) and `minecraft:MELON`,
+  `minecraft:SWEET_BERRIES`, `minecraft:GLOW_BERRIES` (uppercase, apparently pasted from Java
+  enum constants). One bad id voids the whole list, so Pam's ENTIRE rabbit_food contribution is
+  dropped. A scan of every jar in tools/work/jars found invalid ids in that one file and nowhere
+  else. Pantrywork does not write rabbit_food and cannot fix it; treat the line as baseline on any
+  boot carrying Pam's Crops.
+- **Three malformed recipe files in Food Extended 1.0.0 that log NOTHING.**
+  `cookedtofabbititem_campfire/forge/smoker.json` each close the JSON object one brace early, so
+  `"experience"` and `"cookingtime"` are trailing garbage. Minecraft's GSON is lenient and stops at
+  the first complete object, so the three recipes LOAD with default experience and cooking time
+  and no log line at all - the earlier prediction that these would throw RecipeManager parse
+  errors was WRONG, and the boots proved it. Nothing to chase in the logs; noted so nobody
+  re-derives it from the jar.
 
 ## Tag audit (release gate)
 
@@ -309,6 +480,21 @@ reported the result; tagtest-multi/-reverse, crafttest and tagtest-nofd were pad
   asserted IN BYG's own c:foods/fruit, and the singular c:blueberry / c:seeds/blueberry seed-tag
   negatives. Every `biomeswevegone:` line needs the BYG jar, which is the second reason the file
   is full-boot-only
+- `tools/tagtest-pams.txt` — **NEW at 0.9.0**, the other three Pam's HarvestCraft 2 modules
+  (Crops, Trees, Food Extended). **FULL dev boot only**: every `pamhc2crops:`/`pamhc2trees:`/
+  `pamhc2foodextended:` id needs its jar, and the two crafts need Croptopia, Cultural Delights,
+  Meadow and Pam's Food Core on the same boot. **119 passed / 0 failed / 0 expected** (117
+  membership assertions + 2 crafts). Phases: A Crops produce into the canonical and dialect
+  tags; B Trees fruit and nuts; C the seed rule (`...seeditem` out of every tag Pantrywork
+  controls, while openly asserting it IS still in c:seeds and — upstream, via Croptopia's own
+  `#c:seeds/<crop>` refs — in c:vegetables / c:grain / c:rice, which a datapack cannot undo);
+  D the cost floor (the tofu/soy analogues stay in Pam's OWN c:rawbeef / c:butter / c:milk and
+  never reach the canonical tags); E Food Extended's own pressed oils, which DO pass the floor.
+  Phase F is the point of the release: two of Food Extended's own shapeless recipes built
+  entirely from other mods' food — fried onions from **Croptopia's onion + Cultural Delights'
+  butter**, and cheese on toast from **Croptopia's toast + Meadow's cheese slice**. Every
+  membership claim was checked statically against the jars + src/main + src/generated before
+  the first boot, so a live failure means the pack did not load what the files say
 - `tools/tagtest-nofandc.txt` — Farm & Charm independence; only meaningful on a
   `runServer -PnoFarmAndCharm` boot (21/0 there), incl. Pam's bread from croptopia:dough
   without F&C and the Farm & Charm GATE closed live: Create, FD and Pam's dough OUT of

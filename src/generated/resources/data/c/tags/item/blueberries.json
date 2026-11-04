@@ -1,6 +1,7 @@
 {
   "values": [
     { "id": "biomeswevegone:blueberries", "required": false },
-    { "id": "hearthandharvest:blueberries", "required": false }
+    { "id": "hearthandharvest:blueberries", "required": false },
+    { "id": "pamhc2crops:blueberryitem", "required": false }
   ]
 }

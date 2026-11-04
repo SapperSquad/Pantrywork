@@ -2,6 +2,7 @@
   "values": [
     { "id": "farm_and_charm:tomato", "required": false },
     { "id": "farmersdelight:tomato", "required": false },
-    { "id": "kaleidoscope_cookery:tomato", "required": false }
+    { "id": "kaleidoscope_cookery:tomato", "required": false },
+    { "id": "pamhc2crops:tomatoitem", "required": false }
   ]
 }

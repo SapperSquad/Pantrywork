@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "croptopia:orange", "required": false }
+    { "id": "croptopia:orange", "required": false },
+    { "id": "pamhc2trees:orangeitem", "required": false }
   ]
 }

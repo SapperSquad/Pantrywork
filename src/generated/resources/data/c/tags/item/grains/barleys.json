@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "croptopia:barley", "required": false }
+    { "id": "croptopia:barley", "required": false },
+    { "id": "pamhc2crops:barleyitem", "required": false }
   ]
 }

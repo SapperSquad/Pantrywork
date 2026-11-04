@@ -1,6 +1,7 @@
 {
   "values": [
     { "id": "cookscollection:lemon", "required": false },
-    { "id": "croptopia:lemon", "required": false }
+    { "id": "croptopia:lemon", "required": false },
+    { "id": "pamhc2trees:lemonitem", "required": false }
   ]
 }

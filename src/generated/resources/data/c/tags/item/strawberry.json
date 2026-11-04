@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "croptopia:strawberry", "required": false }
+    { "id": "croptopia:strawberry", "required": false },
+    { "id": "pamhc2crops:strawberryitem", "required": false }
   ]
 }

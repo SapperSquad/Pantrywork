@@ -1,0 +1,6 @@
+{
+  "values": [
+    { "id": "farm_and_charm:bacon", "required": false },
+    { "id": "minecraft:porkchop", "required": false }
+  ]
+}

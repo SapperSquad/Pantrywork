@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "fishofthieves:coconut", "required": false }
+    { "id": "fishofthieves:coconut", "required": false },
+    { "id": "pamhc2trees:coconutitem", "required": false }
   ]
 }

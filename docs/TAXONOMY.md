@@ -20,6 +20,11 @@ naming dialects that never reference each other:
 | flour | (none) | `c:flour` | `c:flour` ← natural collision between these two (Create's `c:flours` still needed a bridge — 0.7.0) |
 | fruit | `c:foods/fruit` | `c:fruits/*` | `c:fruits/*` |
 
+0.9.0 measured one more thing about the Pam's column: it is **two levels deep**, a parent
+`c:<category>` holding nothing but references and one `c:<category>/<item>` leaf per item. See
+"Pam's is a two-level dialect" below — it is why bridging three more Pam's modules cost 8 item
+costs rather than a price per crop.
+
 So Pantrywork is a **dialect bridge**: each canonical tag (official naming)
 includes the dialect tags as optional tag references. No per-item
 enumeration for bridged categories, and any items those mods add later
@@ -30,12 +35,13 @@ making dialect tags also include canonical ones would create tag
 reference cycles, which fail to load. The reverse direction — a Croptopia
 recipe requiring `c:cheeses` accepting Pam's cheese — is handled by
 `tools/GenerateBridges.ps1`, which emits **item-level** optional entries
-into each dialect tag (106 tag files in `src/generated/resources` as of 0.8.0, 16 of
-them in conditional pack overlays,
+into each dialect tag (111 tag files in `src/generated/resources` as of 0.9.0, 16 of
+them in fourteen conditional pack overlays,
 report in `tools/work/bridges-report.txt`; rerun after any compat-jar update,
 always with `-ExtraJarDirs tools\work\jars-26x`). Its
 category map was chosen from what the mods' recipes actually consume
-(488 Croptopia + 200 Pam's recipes scanned). A blacklist keeps items the
+(488 Croptopia + 200 Pam's Food Core recipes scanned; 0.9.0 added the other three
+HarvestCraft 2 modules, 177 + 77 + 887). A blacklist keeps items the
 target mods plausibly excluded on purpose (pufferfish, golden foods) out
 of every injection; 0.7.0 widened it to non-food blocks and saplings (see
 "What a bridge may add"). Verified live 2026-07-19: Croptopia's grilled
@@ -144,6 +150,129 @@ adoption (migration is mechanical).
 | Rustic Delight 1.7.1 (0.8.0) | yes — singular FD-style paths; its oil lives behind its own `rusticdelight:cooking_oil` (10 readers) | that oil tag is the second hand-authored foreign-namespace file. Nine whole bell peppers into the vegetable tags ungated, the nine slices and potato slices GATEd; calamari into the fish dialects; it repairs the two FD recipes it overrides and narrows (fried rice onion, baked cod stew tomato) via the new `c:foods/onion` and `c:foods/tomato` targets. **NeoForge 1.21.1 + Fabric 1.21.x + Fabric 26.x.** Its oil recipe, 9 of its 10 oil readers and its slice recipes sit behind its own config flags (default on), which the cost model cannot see |
 | Hybrid Delights 1.3.1 (0.8.0) | **no** — ships only `c:tools/knife` | salt by name via `extra` into `c:salt`, `c:salts` and `c:dusts/salt`, unconditional (75 + 36 recipes). Its salt item exists only with Hybrid Aquatic installed; the entry is inert otherwise. Its own 11 salt recipes name exact ids, so the reverse direction needs its author. NeoForge + Fabric 1.21.1 |
 | Oh The Biomes We've Gone 2.6.2 (0.8.0) | partial — generic only (`c:foods/berry`, `c:foods/fruit`, `c:foods/pie`, `c:foods/soup`, bare `c:crops`), and **no blueberry dialect at all** | the only **worldgen** mod in the table: it is here for the four fruits it grows, not for cooking. `blueberries` by name via `extra` into `c:fruits/blueberry` (5 Hearth and Harvest readers, plus Croptopia's 3 through Croptopia's own `#c:fruits/blueberry` ref) and into `c:blueberries` as belt and braces; its three other fruits ride the fruits union into `c:fruits`. `soul_fruit` denylisted (a blindness food — see rule 4). Its own pies name their fruit by id, so the reverse is impossible. Zero new floor rows were needed: its three judged tags are all moot. Modrinth lists Fabric builds too (2.6.2-Fabric on 1.21.1 — the same version read here — plus 4.2.2 on 1.21.10 and 4.3.x/4.4.x on 1.21.11, whose tags were **not** inspected), and **no 26.x build on any loader**, so the entries are inert on the two 26.x files. No Fabric harness carries BYG, so the Fabric side is proven by the data and by `tagtest-gates-s12.txt`, not by a Fabric boot |
+| Pam's HC2 Crops 1.0.9 (0.9.0) | yes — 424 `c:` files in the same concatenated dialect, **two levels deep** (`c:fruits` + one `c:fruits/<fruit>` leaf per item), plus 7 `minecraft:` feed tags | the producer half: **75 of its items into 22 tags** — 46 into `c:vegetables`, 20 into `c:fruits`, 12 each into `c:grain`/`c:grains`/`c:crops/grain` — and tomato, onion, scallion, cabbage and corn into the per-crop canonical tags. **16 of its seeds were dropped** by the seed rule; it ships `c:seeds` plus ~110 `c:seeds/<crop>` leaves, so rule 3 does real work here. The reverse direction is near-nil: of its 81 tag ingredient slots only 6 land in a tag Pantrywork writes. NeoForge 1.21.1 only. Its `minecraft:rabbit_food` is unreadable upstream — see the footnote |
+| Pam's HC2 Trees 1.0.9 (0.9.0) | yes — 139 `c:` files, same two-level dialect; 2 `minecraft:` feed tags | **35 items into 7 tags**, all 35 into `c:fruits`, with lemon/orange/plum/walnut also reaching Bountiful Fares' plural leaves, coconut `c:fruits/coconut`, and avocado + olive into `c:vegetables`. **Zero** reverse value, and that is structural rather than an omission: its 77 recipes name ingredients by exact id 427 times and read not one tag Pantrywork writes, the same dead end as BYG's pies. NeoForge 1.21.1 only |
+| Pam's HC2 Food Extended 1.0.0 (0.9.0) | yes — 393 `c:` files, every one of them `c:`, and it **re-declares the dialect parents with only its own plant analogues** (see below) | the consumer half, and the biggest beneficiary in the whole set: 887 recipes read a tag in **3472** ingredient slots against 178 exact ids, and **743 of those slots are in 31 tags Pantrywork writes** (`c:dough` 105, `c:crops/onion` 74, `c:toast` 64, `c:cheese` 61, `c:cookingoil` 51, `c:butter` 50, `c:rawpork` 46, `c:flour` 31). Outbound it gives almost nothing: **725 of its 871 items carry no `c:` tag at all**, and of the 11 that reach a judged tag only **2** ship — its two 1-unit pressed oils, into `c:cookingoil` — while **9** are EXCLUDEd as 0-cost plant analogues. It defines 31 judged tags: 10 real floors, **21 `{"none"}`** declarations. NeoForge 1.21.1 only |
+
+### Pam's is a two-level dialect, and its modules split producer from consumer (0.9.0)
+
+Bridging the remaining three HarvestCraft 2 modules measured something the Food Core row only
+hinted at. Pam's files every category **twice**: a parent `c:<category>` whose entries are all
+tag references, and one `c:<category>/<item>` leaf per item holding the item itself. Every
+`c:fruits` parent in all four modules contains nothing but references — 5 in Food Core, 27 in
+Crops, 29 in Trees, 5 in Food Extended — so the parent Pantrywork already bridged grows from 5
+entries to **66** when all four are installed, without Pantrywork writing a line.
+
+That is why bridging three more mods cost **9** new item costs and not the hundred-odd a per-item
+estimate predicted: few of their items touch a judged tag directly, and the produce tags carry a
+`default` of 1 under rule FC2-4 (raw gathered produce is 1 base unit) rather than a price per crop.
+An earlier estimate in this project of "~80 crops and ~40 fruits each needing a price" was wrong
+for exactly this reason.
+
+The three modules are not alike, and the measurement is lopsided enough to be worth a table:
+
+| Module | Own recipes | Tag ingredient slots | Exact-id slots | Slots in a tag Pantrywork writes | Items bridged out |
+|---|---|---|---|---|---|
+| Crops 1.0.9 | 177 | 81 | 110 | 6, in 2 tags | 75, into 22 tags |
+| Trees 1.0.9 | 77 | 50 | 427 | 0 | 35, into 7 tags |
+| Food Extended 1.0.0 | 887 | 3472 | 178 | **743, in 31 tags** | 2, into 1 tag |
+
+Crops and Trees are **producers**: they grow food and barely read a tag, so their value is
+one-directional — their produce reaches other mods' recipes and little comes back. Food Extended
+is the exact opposite, and the mod this release actually serves. It cooks almost entirely against
+tags — 3472 tag slots against 178 exact ids, 95% of its ingredient references — and 743 of those
+slots, better than one in five, are in a tag Pantrywork writes into.
+
+**A working note from early in this release, that Food Extended "mostly rides along and claims
+little", was backwards and is withdrawn.** It is the single biggest beneficiary in the
+twenty-four-mod set. Store copy must phrase its value **inbound** — its recipes now accept other
+mods' food — and must not claim Pantrywork bridges its items out, because it bridges two:
+its two pressed oils, and nothing else.
+
+### Food Extended re-declares the dialect parents with its own analogues (0.9.0)
+
+Food Extended's own files, under `data/c/tags/item/`, say that its plant analogues **are** the
+dialect. Each of these parents contains nothing else:
+
+| Its file | Its entire contents |
+|---|---|
+| `c:cheese`, `c:butter`, `c:cream` | one ref each to `c:<name>/silkentofu` — its silken tofu |
+| `c:milk` | `#c:milk/soymilk` — its soy milk |
+| `c:rawbeef` / `rawpork` / `rawmutton` / `rawchicken` / `rawrabbit` / `rawfish` | the matching tofu analogue: tofeak, tofacon, tofutton, tofiken, tofabbit, tofish |
+| `c:rawmeats` | all six analogues at once |
+| `c:groundmeats` | `#c:groundmeats/firmtofu` |
+
+Those parents are precisely the Pam's dialect tags that Pantrywork's canonical files reference.
+Tags merge additively and a datapack cannot subtract a member, so **installing Food Extended by
+itself puts a 0-cost plant analogue into the meat and dairy dialect**. Two consequences, pulling
+in opposite directions.
+
+**It became a defining mod of 31 judged tags, and on 21 of them it may not set a floor.** Nine
+list nothing but a plant analogue, and the convention already stated for plant milks holds here:
+an analogue contains no milk or meat, costs 0, and is never used as a floor — a 0 floor would
+rescue every item in that tag for free. Twelve more are pure pass-throughs, where it re-declares
+`c:flour`, `c:dough`, `c:salt`, `c:toast`, `c:stock`, `c:pasta`, `c:groundmeats/groundpork` and
+five jelly/juice leaves using **Food Core's** item and listing nothing of its own. Both kinds get
+the `{"none": "<why>"}` row that "Empty definers" introduced, which records a mod as imposing no
+floor without inventing a degenerate zero. The ten tags where it does set a real floor are its
+cooked meats, cookies, fishes, fruits, vegetables and `c:cookingoil`.
+
+The pass-throughs were not cosmetic. Left as floors they made Food Extended a **redundant
+rescuer** — it cannot open a gate that Food Core does not already open — and on `c:flour` that
+grew the gate key to a fifth mod id. The key is both the tag id and the directory path, so the
+generated overlay path reached 238 characters, 22 under MAX_PATH, and `-SelfTest`, which writes
+under a longer temp root, broke outright with a `DirectoryNotFound`. With the twelve declared
+`{"none"}` the key reverted to its 0.8.0 value and **the gate table below is unchanged from
+0.8.0** — same fourteen overlays, same rescuer lists, same sixteen files. The self-test temp root
+was shortened anyway, from 52 characters of prefix and GUID to 14, so the next gate that grows has
+44 characters of headroom instead of none.
+
+**Where a canonical tag is read by a recipe the analogue had to be kept out; where it is not, it is
+upstream's business.** `c:foods/cheese` and `c:foods/butter` are marked `moot` — no scanned recipe
+consumes them — so silken tofu arriving there through the live `#c:cheese` and `#c:butter`
+references changes no craft, and the audit reports it as `upstream` and moves on. `c:foods/raw_beef`,
+`c:foods/raw_pork` and `c:foods/raw_mutton` are floored at Farmer's Delight's and Kaleidoscope
+Cookery's cuts, and there the identical upstream route was a real failure: a free tofu steak
+satisfying any recipe written against canonical raw beef, and through Farmer's Delight's own parent
+references against `c:foods/raw_meat` as well. `AuditRoles.ps1` failed the build on **six** such
+paths. The fix is the forward-sanitization mechanism below, applied to those three tags.
+`c:foods/raw_chicken` needed nothing, having been sanitized in 0.8.0 already. `c:foods/raw_fish`
+needed the same treatment and nearly did not get it — see the next section.
+
+That asymmetry is the strongest case yet for marking a tag `moot` rather than floored. The same
+upstream fact is a build failure in one tag and harmless in another, and the only thing that
+differs is whether a recipe reads it.
+
+**A tag `default` can rescue an item that should have been excluded, and one did.** Food Extended's
+sixth analogue, `rawtofishitem`, is the same recipe as its four meat siblings — mixing bowl + firm
+tofu + soy sauce + kelp, two per craft, no fish at any step — and `cost-floors.json`'s own Food
+Extended judgment named it in the list of 0-cost plant analogues whose routes "resolve to EXCLUDE,
+which is the intended outcome". But the **item row was missing**. The fish tags carry `default: 1`
+under FC2-4, so tofish silently inherited the price of a whole cod, PASSed every fish floor, and was
+emitted into `c:rawfish`, `c:fishes` and `c:raw_fishes` — and, through the live `#c:rawfish`
+reference, into canonical `c:foods/raw_fish`. A free plant item satisfying every fish recipe in three
+dialects: exactly what the cost floor exists to prevent, shipped in the first 0.9.0 build and found
+while writing this document up rather than by any check.
+
+Two lessons worth keeping, because neither tool caught it:
+
+- **A tag default is right for raw gathered produce and wrong for a processed item.** FC2-4 exists so
+  that eighty crops do not each need a price. A crafted analogue is not gathered produce, and letting
+  it fall through to the default prices it as the thing it imitates. An uncosted item in a tag with
+  no default stops the generator outright; an uncosted item in a tag *with* a default passes in
+  silence. That is the only place in the cost model where a missing row fails open.
+- **A judgment naming an item is not the same as a row costing it.** The prose and the data
+  disagreed for a whole release cycle and nothing compared them.
+
+The fix is one item row at 0 fish, and `c:foods/raw_fish` joining the three raw meats in the
+enumeration below. It also retired the 0.8.0 invariant that kept that tag's live refs — which had
+been written down with the words "re-check this line if a future jar moves a cheap cut into
+`c:rawfish`/`c:fishes`". Food Extended was that jar. The whole membership effect, resolved item by
+item over every scanned jar plus the platform, is that `pamhc2foodextended:rawtofishitem` leaves
+`c:foods/raw_fish` (56 members to 55), `c:fishes` and `c:raw_fishes`, and is no longer added by us to
+`c:rawfish`, where Food Extended's own file keeps it. Nothing else in any tag changed: all 27
+Aquaculture fish, Fish of Thieves' ten and `minecraft:pufferfish` are listed directly by their own
+mods, so the live references were never what delivered them.
 
 ### The generator follows non-`c:` tags now
 
@@ -275,6 +404,20 @@ and kernels satisfied food recipes. The generator now prints a per-category
 `dropped seeds:` line, which is how two seeds shipped with nobody reading a line
 about them.
 
+**0.9.0 sanitized four more canonical tags, for the opposite reason.** `c:foods/raw_beef`,
+`c:foods/raw_pork` and `c:foods/raw_mutton` each referenced two live dialect tags (`#c:rawbeef`
+and `#c:raw_beef`, and so on), and `c:foods/raw_fish` referenced `#c:rawfish` and `#c:fishes`.
+Food Extended declares its 0-cost tofu analogues *inside* those dialect parents, so each canonical
+file now routes through a judged enumeration instead — `#pantrywork:bridged/foods_raw_*` for the
+meats, and the existing `#pantrywork:bridged/raw_fishes` container widened from one dialect to all
+three for the fish. (That container keeps its 0.8.0 name although it now covers more than
+`c:raw_fishes`: eight test suites assert the tag id, and renaming it would cost those proofs
+nothing in return.) The trade is the one above and it was taken knowingly: raw beef added by a
+future version of an **unscanned** mod no longer flows in automatically and must wait for a
+generator re-run. Seven cost-floor failures are why — six tofu-meat paths the audit caught, and the
+tofish path it could not, because that one PASSed on a tag default. A free tofu steak in every
+canonical meat recipe is worse than a stale enumeration.
+
 Tags belonging to another mod are exempt from this rule. If Croptopia keeps a
 seed in its own `c:fruits`, that is its call — the audit reports it as `upstream`
 and moves on. What matters is that nothing of ours reaches it.
@@ -342,7 +485,8 @@ tag level on NeoForge 26.1.2 and 26.2 (`tagtest-neo26-gates`, 7 passed + 12 clos
 harness has no Croptopia and its suite probes no overlay tag. On Fabric the overlays, like all mod
 data, need Fabric API.
 
-**The fourteen gates (0.8.0).** 0.7.0 shipped five overlays; the five new mods took it to fourteen,
+**The fourteen gates (0.8.0, unchanged in 0.9.0).** 0.7.0 shipped five overlays; the five new mods
+took it to fourteen,
 and the directory numbering is re-cut whenever a gate set is added or removed — so a test suite must
 assert the *tag id*, which carries the rescuer list, and never the overlay number.
 
@@ -392,7 +536,9 @@ classification, not a recipe slot. 0.8.0 added two more for the same reason — 
 and `c:foods/raw_fish` — because Kaleidoscope Cookery now defines both at a whole-animal floor while
 Pam's and Farm & Charm's dialect tags hold cuts below it. Membership was diffed item by item before
 and after: nothing was lost, since NeoForge's own `c:foods/raw_fish` lists `minecraft:pufferfish`
-directly and the `#c:rawfish` and `#c:fishes` references stayed live.
+directly and the `#c:rawfish` and `#c:fishes` references stayed live. **0.9.0 removed those two
+references too** — see "A tag `default` can rescue an item" above — and re-diffed the membership to
+confirm that pufferfish and every scanned mod's fish still arrive through their own mods' files.
 
 **Empty definers (0.8.0).** A mod can declare a tag with an empty `values` list purely so its own
 reference to that tag resolves — Kaleidoscope Cookery ships `data/c/tags/item/doughs.json` and
@@ -508,6 +654,33 @@ required: without it Fabric Loader refuses to start and names the missing depend
 conditional entry can load without its condition. Costs are measured on the scanned mod
 versions (`tools/work/jars`, `jars-26x`, `jars-12110`); a recipe change upstream can move a floor
 until the generator is re-run with the new jar.
+
+### What changed for players (0.9.0 against 0.8.0)
+
+Measured 2026-11-03 against the 0.8.0 tree at `HEAD`, and boot-proven on 27 servers (4 dev, 23
+release; the matrix is in `CLAUDE.md`).
+
+**Nothing was removed and no gate moved.** The gate table is identical to 0.8.0 — fourteen
+overlays, the same rescuer lists, the same sixteen gated files. The only entries that disappeared
+are structural: the six live dialect references in `c:foods/raw_beef`, `c:foods/raw_pork` and
+`c:foods/raw_mutton`, each pair replaced by one judged enumeration.
+
+**One thing that would have worked now deliberately does not.** With Food Extended installed, a
+recipe written against canonical `c:foods/raw_beef`, `raw_pork`, `raw_mutton`, `raw_meat` or
+`raw_fish` would have accepted its free tofu analogue. It no longer does. Those analogues also left
+`c:fishes` and `c:raw_fishes`. Resolved item by item, that is the **only** membership loss anywhere:
+no other item left any tag.
+
+**Everything else is addition, and it is large.** 75 of Pam's Crops' items into 22 tags and 35 of
+Pam's Trees' into 7, with 16 of Crops' seeds correctly dropped on the way. But the headline for
+players runs the other way: Food Extended's 887 recipes gained **743 ingredient slots that now
+accept other mods' food**, which is what `tools/tagtest-pams.txt` phase F proves live — fried
+onions from Croptopia's onion and Cultural Delights' butter, cheese on toast from Croptopia's toast
+and Meadow's cheese slice.
+
+Two upstream bugs were found on the way and neither is ours: see the footnotes.
+
+Listed in full in `CHANGELOG.md` 0.9.0 and in `tools/work/bridges-report.txt` with ratios.
 
 ### What changed for players (0.8.0 against 0.7.0)
 
@@ -828,3 +1001,29 @@ why Vinery still needs its per-item module. Re-check this if Vinery is ever adde
 to a 26.x harness, where the plural path does load and `c:berries`, `c:grapes`,
 `c:milk` and `c:seeds` would suddenly go live (`c:seeds` in particular feeds the
 seed rule).
+
+### Footnote: Pam's Crops ships an unreadable `minecraft:rabbit_food`
+
+Found on the 0.9.0 dev boot, which logs `Couldn't read tag list minecraft:rabbit_food ... in data
+pack mod/pamhc2crops`. Its `data/minecraft/tags/item/rabbit_food.json` holds four invalid resource
+locations: `"pamhc2crops: blackberryitem"`, with a space after the colon, and `minecraft:MELON`,
+`minecraft:SWEET_BERRIES` and `minecraft:GLOW_BERRIES` in uppercase, apparently pasted from Java
+enum constants. One bad id voids the whole list, so Pam's **entire** rabbit-food contribution is
+dropped, valid entries included. A scan of every jar in `tools/work/jars` found invalid ids in that
+one file and nowhere else. Pantrywork does not write `rabbit_food`, and no datapack can repair
+another pack's unreadable file, so treat the line as baseline on any boot carrying Pam's Crops; it
+is worth an upstream report, not a workaround.
+
+### Footnote: three Food Extended recipe files are malformed and log nothing
+
+`cookedtofabbititem_campfire.json`, `_forge.json` and `_smoker.json` each close the JSON object one
+brace early, leaving `"experience"` and `"cookingtime"` as trailing garbage. Minecraft's GSON is
+lenient: it stops at the first complete object and ignores the rest, so all three recipes load with
+default experience and cooking time and produce **no log line at all**. A prediction during this
+release that they would throw RecipeManager parse errors was wrong, and the 27 boots proved it — the
+logs are silent. They are also why the exact-id slot count above is 178 and not 175: all three cook
+one ingredient each, and the game reads them. Strict JSON readers reject the files outright, which
+is how they were found in the first place, and it is the
+same leniency that hid 15 raw-newline artifacts inside `tools/cost-floors.json`'s own judgment
+strings until a strict parser was pointed at it (repaired in 0.9.0; the generated data was
+byte-identical before and after).

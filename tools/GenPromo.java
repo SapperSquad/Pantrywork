@@ -51,6 +51,11 @@ public class GenPromo {
     static final Color C_RUSTIC  = new Color(0xB5342C);
     static final Color C_HYBRID  = new Color(0x5FA8C9);
     static final Color C_BYG     = new Color(0x5A62B8);
+    // 0.9.0: the other three Pam's HarvestCraft 2 modules. Kept in the same yellow-green
+    // family as C_PAMS (Food Core) so the four read as one family on the roster card.
+    static final Color C_PAMS_CROPS = new Color(0x7FA33C);
+    static final Color C_PAMS_TREES = new Color(0x9BBF4A);
+    static final Color C_PAMS_EXT   = new Color(0xC2A33F);
 
     // Bumped whenever a compat module ships. Baked into gallery art, so it must
     // be re-checked every release - images can't be grepped when they go stale.
@@ -58,11 +63,12 @@ public class GenPromo {
     // 0.8.0: 14 -> 20, matching the optional AFTER deps in
     // src/main/templates/META-INF/neoforge.mods.toml (Origins is a consumer, not a
     // bridged food mod, and has the card's footer line to itself).
-    static final int FOOD_MOD_COUNT = 21;
+    static final int FOOD_MOD_COUNT = 24;
     static final int DIALECT_COUNT = 4;
     static final String[] NUMBER_WORDS = {"Zero", "One", "Two", "Three", "Four", "Five",
         "Six", "Seven", "Eight", "Nine", "Ten", "Eleven", "Twelve", "Thirteen", "Fourteen",
-        "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty", "Twenty-one"};
+        "Fifteen", "Sixteen", "Seventeen", "Eighteen", "Nineteen", "Twenty", "Twenty-one",
+        "Twenty-two", "Twenty-three", "Twenty-four"};
 
     static final String TEX = "tools/work/tex/";
 
@@ -502,7 +508,7 @@ public class GenPromo {
 
         String[][] roster = {
             {"cheese",                              "Croptopia"},
-            {"cheeseitem",                          "Pam's HarvestCraft 2"},
+            {"cheeseitem",                          "Pam's HC2: Food Core"},
             {"cooked_bacon",                        "Farmer's Delight"},
             {"cooked_guardian_tail",                "Ocean's Delight"},
             {"roasted_dragon_meat",                 "End's Delight"},
@@ -524,13 +530,25 @@ public class GenPromo {
             // 0.8.0: a WORLDGEN mod that happens to grow food. It is counted here because
             // the count is the 1.21.1 toml's optional-AFTER list, and Pantrywork bridges
             // four of its fruits - not because it is a cooking mod.
-            {"biomeswevegone__blueberries",         "Oh The Biomes We've Gone"}
+            {"biomeswevegone__blueberries",         "Oh The Biomes We've Gone"},
+            // 0.9.0: the other three Pam's HarvestCraft 2 modules (player request: "add all of
+            // Pam's mods"). Corn and banana are items Pantrywork genuinely bridges (c:grain/corn
+            // and c:crops/corn; c:fruits/banana). Food Extended is the one roster entry whose own
+            // items Pantrywork does NOT bridge - its 871 items are either in no c: tag at all
+            // (725 of them) or are tofu/soy analogues the cost floor EXCLUDEs. It earns its place
+            // the other way round, as by far the biggest CONSUMER of what Pantrywork fills: its
+            // 887 recipes make 3472 tag reads, and 743 of those reads land in 31 tags Pantrywork
+            // writes into (c:dough 105, c:crops/onion 74, c:toast 64, c:cheese 61, c:cookingoil 51,
+            // c:butter 50, c:rawpork 46 ...). The sushi is an identifying icon, not a bridge claim.
+            {"pamhc2crops__cornitem",               "Pam's HC2: Crops"},
+            {"pamhc2trees__bananaitem",             "Pam's HC2: Trees"},
+            {"pamhc2foodextended__sushiitem",       "Pam's HC2: Food Extended"}
         };
         Color[] cols = {C_CROP, C_PAMS, C_FD, C_OCEANS, C_ENDS,
                         C_VINERY, C_FARM, C_MEADOW, C_AQUA, C_BREW,
                         C_CREATE, C_BOUNTY, C_FOT, C_REFURB,
                         C_KALEIDO, C_HEARTH, C_CULTURE, C_COOKS, C_RUSTIC, C_HYBRID,
-                        C_BYG};
+                        C_BYG, C_PAMS_CROPS, C_PAMS_TREES, C_PAMS_EXT};
         // The headline count is derived, never typed: a roster that disagrees with
         // FOOD_MOD_COUNT stops the render instead of shipping a stale number.
         if (roster.length != FOOD_MOD_COUNT || cols.length != roster.length) {
@@ -542,13 +560,15 @@ public class GenPromo {
         g.setColor(BODY);
         g.drawString("Install all of them, a few of them, or none - Pantrywork bridges whatever it finds.", 80, 250);
 
-        // Rows of seven (0.8.0: three FULL rows, 7/7/7), each row centered on its own
+        // Rows of eight (0.9.0: three FULL rows, 8/8/8 - at 0.8.0 this was 7/7/7, and the
+        // three Pam's modules would have started a fourth row that overflows the 900px
+        // canvas; the lowestLabel guard below catches exactly that), each row centered on its own
         // count so a short last row is not left-aligned. Every label line must fit
         // its column with a gutter - measured and enforced here, because a label
         // collision is exactly the kind of defect that survives when art is only
         // eyeballed. The slot size and row pitch shrank at 0.8.0 to fit the third
         // row above the footer; the guard below still proves it.
-        int perRow = 7, s = 92, pitch = 205, y0 = 296, gapY = 186;
+        int perRow = 8, s = 92, pitch = 182, y0 = 296, gapY = 186;
         int maxLabel = pitch - 20;
         int lowestLabel = 0;
         for (int i = 0; i < roster.length; i++) {

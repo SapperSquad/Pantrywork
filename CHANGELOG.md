@@ -1,5 +1,90 @@
 # Changelog
 
+## 0.9.0 — 2026-11-03
+
+**The rest of Pam's HarvestCraft, and a free lunch taken off the menu.**
+
+What you get: the other three Pam's HarvestCraft 2 modules — Crops, Trees and Food Extended —
+join Food Core, which has been bridged since 0.1.0. That is 24 mods on the roster, up from 21.
+Pam's Crops and Trees put roughly 250 new fruits, vegetables, grains and nuts into tags the rest
+of your pack already reads. Food Extended is the quiet one: Pantrywork bridges none of its own
+items, but it is by far the biggest consumer of what Pantrywork fills — 743 of its recipe
+ingredient slots now accept other mods' food. What you lose: five tofu analogues that never
+should have counted as meat or fish, and four canonical raw-meat and raw-fish tags now list their
+members explicitly instead of pointing at a dialect. Both are explained below.
+
+### New
+
+- **Pam's HarvestCraft 2 — Crops, Trees and Food Extended**, from a player asking for "all of
+  Pam's mods". All three are NeoForge 1.21.1 only, like Food Core; none has a 26.x build, so the
+  26.x files are unchanged. All three ship `c:` tags of their own (424, 139 and 393 item-tag
+  files), none of them touches `c:foods/*`, and that is exactly the Food Core shape Pantrywork
+  has bridged since 0.1.0 — so this needed no new machinery, only 53 cost floors and 8 item
+  costs read out of the jars.
+- **Crops and Trees land where your pack already looks.** 193 of Crops' 197 tagged items and 47
+  of Trees' 48 sit in tag families Pantrywork already bridges, so their corn, barley, oats,
+  onions, cabbage, tomato, blueberries, elderberries, pineapple, bananas, lemons, mangoes,
+  oranges, plums and walnuts arrive in `c:fruits`, `c:vegetables`, `c:grain`, `c:onions` and the
+  per-crop leaves without any new plumbing.
+- **Food Extended's 887 recipes open up.** It is the most tag-driven mod on the roster: 3,472 of
+  its ingredient slots are tag reads and only 178 name an exact item. Pantrywork writes into 31
+  of the tags it reads, covering **743 of those slots** — `c:dough` (105), `c:crops/onion` (74),
+  `c:toast` (64), `c:cheese` (61), `c:cookingoil` (51), `c:butter` (50), `c:rawpork` (46),
+  `c:flour` and `c:salt` (31 each) and more. Any cheese, dough, butter or oil Pantrywork already
+  bridges now feeds Pam's extended cookbook.
+
+### Changed
+
+- **Five tofu analogues no longer count as meat or fish, and two no longer count as dairy.** Food
+  Extended files tofeak, tofiken, tofutton, tofacon and tofish in Pam's own `c:rawbeef` /
+  `c:rawpork` / `c:rawmutton` / `c:rawfish`, and silken tofu and soy milk in `c:butter`,
+  `c:cheese` and `c:milk`. Every one
+  is mixing bowl + firm tofu + soy sauce + a flavouring, and firm tofu is a pressed soybean, so
+  the chain contains no meat, no fish and no milk at any step. Pantrywork's cost floor costs them at 0 and
+  excludes them, the same call it has made on Croptopia's soy milk since 0.7.0. They stay in
+  Pam's own tags — that is upstream's choice and a data pack cannot remove a tag member — they
+  just no longer reach the canonical `c:foods/raw_*` and dairy tags through us.
+- **`c:foods/raw_beef`, `c:foods/raw_pork`, `c:foods/raw_mutton` and `c:foods/raw_fish` now list
+  their members.** They used to point straight at `#c:rawbeef` / `#c:raw_beef` and so on, which
+  handed every member of those dialects a free pass into the canonical tag — which is how the tofu
+  got in. They now go through a judged `pantrywork:bridged/*` enumeration, the same way raw chicken
+  has since 0.8.0. Current members are unchanged (Farm & Charm's minced beef, bacon and lamb ham,
+  plus the vanilla cuts; and for fish, every one of Aquaculture's 27 species, Fish of Thieves' ten
+  and vanilla's four, which their own mods list directly). The tradeoff, taken knowingly: an unscanned mod's raw beef sitting in
+  those dialects no longer reaches the canonical tag by itself — it has to be read and judged
+  first, which is the whole point of the cost floor.
+
+### Fixed
+
+- **Tofish no longer counts as a whole cod.** Food Extended's sixth analogue is the same pressed
+  soybean as the other five, but it had no price of its own, so it inherited the fish tags'
+  default — the price of a whole fish — and passed every floor. It reached `c:rawfish`,
+  `c:fishes`, `c:raw_fishes` and canonical `c:foods/raw_fish`, where any recipe asking for raw
+  fish would have taken it. It is now priced at 0 like its siblings and excluded like them. If
+  you cooked with it in the first 0.9.0 build, that is why it worked.
+- **Pam's Food Extended is no longer counted as a rescuer it cannot be.** On twelve judged tags
+  (`c:dough`, `c:flour`, `c:salt`, `c:stock`, `c:toast`, `c:pasta`, both `c:juices/*`, all three
+  `c:jellies/*` and `c:groundmeats/groundpork`) Food Extended re-declares the tag with exactly
+  one member, and that member is a Food Core item it does not own. Counting it as a defining mod
+  made it a redundant gate rescuer — it can never open a gate Food Core does not already open —
+  and on `c:flour` that pushed the gated overlay path to 238 characters, 22 short of Windows'
+  MAX_PATH, which broke the generator's own self-test outright. Those twelve now declare no floor
+  of their own and the gate names are unchanged from 0.8.0.
+
+### Under the hood
+
+- 111 generated tag files (was 106), 151 payload files per jar (was 146): 134 data +
+  `pack.mcmeta` + 16 overlay tag files, identical across all four jars.
+- 53 new cost floors and 9 new item costs, every number read out of a recipe in the jar.
+  Verdicts: 42 GATE (unchanged), 87 EXCLUDE (was 66), 12 rescued PASS (was 11). No new gates and
+  no new overlays — still 16 gated entries in 14 overlays.
+- 24 optional AFTER dependencies in the 1.21.1 jar (was 21); the 26.x jar is unchanged at 12,
+  since none of the three has a 26.x build.
+- The seed rule needed no change and earned its keep: Pam's Crops plants its *food* items, so
+  every one of them sits in `minecraft:villager_plantable_seeds`, and its real seeds are named
+  `...seeditem` — matching neither the `_seed` nor the `_seeds` name rule. The third signal added
+  at 0.8.0 caught all 16 of them on its own while keeping the produce.
+
 ## 0.8.0 — 2026-10-06
 
 **Six more mods, and the wok finally lights.**

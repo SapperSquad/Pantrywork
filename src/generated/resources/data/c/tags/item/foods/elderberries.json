@@ -1,5 +1,6 @@
 {
   "values": [
-    { "id": "croptopia:elderberry", "required": false }
+    { "id": "croptopia:elderberry", "required": false },
+    { "id": "pamhc2crops:elderberryitem", "required": false }
   ]
 }

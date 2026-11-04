@@ -90,6 +90,12 @@ dependencies {
             'tools/work/jars/croptopia-neoforge-1.21.1-4.2.4.jar',
             'tools/work/jars/EpheroLib-1.21.1-NEO-FORGE-1.2.0.jar',
             'tools/work/jars/pamhc2foodcore-NEOFORGE-1.21.1-1.0.4.jar',
+            // 0.9.0: the other three Pam's HarvestCraft 2 modules (player request). Food
+            // Extended's store page says it needs Crops and Trees, but none of the three
+            // declares a dependency on the others or on Food Core, so they load in any order.
+            'tools/work/jars/pamhc2crops-NEOFORGE-1.21.1-1.0.9.jar',
+            'tools/work/jars/pamhc2trees-NEOFORGE-1.21.1-1.0.9.jar',
+            'tools/work/jars/pamhc2foodextended-NEOFORGE-1.21.1-1.0.0.jar',
             'tools/work/jars/oceansdelight-neoforge-1.0.4-1.21.1.jar',
             'tools/work/jars/ends_delight-2.6.1+neoforge.1.21.1.jar',
             'tools/work/jars/origins-0.3.jar',

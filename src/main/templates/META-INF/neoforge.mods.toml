@@ -48,6 +48,27 @@ logoFile = "icon.png"
     side = "BOTH"
 
 [[dependencies.${mod_id}]]
+    modId = "pamhc2crops"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "pamhc2trees"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "pamhc2foodextended"
+    type = "optional"
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
     modId = "oceansdelight"
     type = "optional"
     versionRange = "[0,)"
