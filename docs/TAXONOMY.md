@@ -251,8 +251,9 @@ which is the intended outcome". But the **item row was missing**. The fish tags 
 under FC2-4, so tofish silently inherited the price of a whole cod, PASSed every fish floor, and was
 emitted into `c:rawfish`, `c:fishes` and `c:raw_fishes` — and, through the live `#c:rawfish`
 reference, into canonical `c:foods/raw_fish`. A free plant item satisfying every fish recipe in three
-dialects: exactly what the cost floor exists to prevent, shipped in the first 0.9.0 build and found
-while writing this document up rather than by any check.
+dialects: exactly what the cost floor exists to prevent. It was present in the first 0.9.0 build,
+which was boot-tested but never published, and was found while writing this document up rather than
+by any check.
 
 Two lessons worth keeping, because neither tool caught it:
 

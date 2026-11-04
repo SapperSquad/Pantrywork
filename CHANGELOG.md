@@ -60,8 +60,8 @@ members explicitly instead of pointing at a dialect. Both are explained below.
   soybean as the other five, but it had no price of its own, so it inherited the fish tags'
   default — the price of a whole fish — and passed every floor. It reached `c:rawfish`,
   `c:fishes`, `c:raw_fishes` and canonical `c:foods/raw_fish`, where any recipe asking for raw
-  fish would have taken it. It is now priced at 0 like its siblings and excluded like them. If
-  you cooked with it in the first 0.9.0 build, that is why it worked.
+  fish would have taken it. It is now priced at 0 like its siblings and excluded like them. This
+  was caught before release, so no published build ever had it.
 - **Pam's Food Extended is no longer counted as a rescuer it cannot be.** On twelve judged tags
   (`c:dough`, `c:flour`, `c:salt`, `c:stock`, `c:toast`, `c:pasta`, both `c:juices/*`, all three
   `c:jellies/*` and `c:groundmeats/groundpork`) Food Extended re-declares the tag with exactly
