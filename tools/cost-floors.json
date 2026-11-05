@@ -60,6 +60,429 @@
   "modAliases": {
     "croptopia-refabricated": { "as": "croptopia", "loader": "fabric", "why": "Croptopia's Fabric 1.21.10 build (Croptopia Refabricated 0.10.0, tools/work/jars-12110): mod id croptopia-refabricated, no 'provides', conflicts with croptopia. Its recipes and c: tags match croptopia 4.2.4 for every judged tag (bottle 16 per bucket, cheese = pot + c:milks + c:salts, c:milks/c:cheeses/c:salts/c:vegetables identical), so its floors are Croptopia's and every gate on croptopia must also open for it on Fabric (review CF-2: fabric-server-12110 went 5/2 without this)." }
   },
+  "platformFloors": {
+    "_about": "Per-platform SCOPE for the floors below. The base data describes the 1.21 ecosystem. Another Minecraft line ships different VERSIONS of the same mods - and some of them not at all - so a floor that is real on 1.21 can be genuinely absent there. Stating it here keeps the base strict: an 'unscanned' reason would excuse the floor on 1.21 too, where it must keep failing. tags.<tag>.<mod> takes a floor spec in any of the base's three forms, or JSON null to remove that mod's floor on this platform. items.<id> is a cost that applies only on this platform, because a recipe can differ between mod versions.",
+    "forge1201": {
+      "_about": "Minecraft 1.20.1 on Forge. Shared namespace forge:, plural tags/items path. Jars in tools/work/jars-1201; the measurement and design are in docs/FORGE-1201.md.",
+      "items": {
+        "hearthandharvest:cheese_slice": {
+          "unit": "milk_bucket",
+          "cost": "1/4",
+          "why": "fermenting 1000 mB minecraft:milk + salt -> 1 unripe_cheese_wheel, aging -> 1 cheese_wheel, cutting board -> 4 slices. 1000 mB is one bucket, so a slice is a quarter of it - the same number as meadow:cheese_slice, reached the same way"
+        },
+        "hearthandharvest:goat_cheese_slice": {
+          "unit": "milk_bucket",
+          "cost": "1/4",
+          "why": "same chain on 1000 mB hearthandharvest:goat_milk. Its goat_milk_bottle is already costed 1/4 of a bucket, i.e. four bottles to the bucket, so 1000 mB of goat milk is one bucket-equivalent and the slice is a quarter"
+        },
+        "hearthandharvest:raisin_cookie": {
+          "unit": "wheat",
+          "cost": "1/4",
+          "why": "shapeless 2 wheat + 1 hearthandharvest:raisins -> 8. The same shape as vanilla's cookie and rusticdelight:cherry_blossom_cookie, both already costed 1/4"
+        },
+        "farm_and_charm:sausage_with_oat_patty": {
+          "unit": "meat",
+          "cost": 1,
+          "why": "roaster: oat + butter + potato + carrot + 2x farm_and_charm:minced_beef -> 2. Minced beef is 1 meat, so 2 meat makes 2 patties and each carries 1"
+        }
+      },
+      "tags": {
+        "c:butter": {
+          "culturaldelights": null
+        },
+        "c:cooked_beef": {
+          "farmersdelight": {
+            "item": "farmersdelight:beef_patty",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:cooked_beef on 1.20.1, at 1/2 meat"
+          },
+          "kaleidoscope_cookery": {
+            "item": "kaleidoscope_cookery:cooked_cow_offal",
+            "why": "cheapest member kaleidoscope_cookery (kaleidoscopecookery-1.6.0-forge+mc1.20.1) lists in forge:cooked_beef on 1.20.1, at 1/3 meat"
+          }
+        },
+        "c:cooked_chicken": {
+          "farmersdelight": {
+            "item": "farmersdelight:cooked_chicken_cuts",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:cooked_chicken on 1.20.1, at 1/2 meat"
+          }
+        },
+        "c:cooked_fishes": {
+          "farmersdelight": {
+            "item": "farmersdelight:cooked_cod_slice",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:cooked_fishes on 1.20.1, at 1/2 fish"
+          },
+          "fishofthieves": {
+            "item": "fishofthieves:cooked_ancientscale",
+            "why": "cheapest member fishofthieves (fish_of_thieves-mc1.20.1-v3.4.0-forge) lists in forge:cooked_fishes on 1.20.1, at 1 fish"
+          },
+          "rusticdelight": {
+            "item": "rusticdelight:cooked_calamari_slice",
+            "why": "cheapest member rusticdelight (rusticdelight-forge-1.20.1-1.7.0) lists in forge:cooked_fishes on 1.20.1, at 1/2 fish"
+          }
+        },
+        "c:cooked_mutton": {
+          "farmersdelight": {
+            "item": "farmersdelight:cooked_mutton_chops",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:cooked_mutton on 1.20.1, at 1/2 meat"
+          },
+          "kaleidoscope_cookery": {
+            "item": "kaleidoscope_cookery:cooked_lamb_chops",
+            "why": "cheapest member kaleidoscope_cookery (kaleidoscopecookery-1.6.0-forge+mc1.20.1) lists in forge:cooked_mutton on 1.20.1, at 1/3 meat"
+          }
+        },
+        "c:cooked_pork": {
+          "farmersdelight": {
+            "item": "farmersdelight:cooked_bacon",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:cooked_pork on 1.20.1, at 1/2 meat"
+          },
+          "kaleidoscope_cookery": {
+            "item": "kaleidoscope_cookery:cooked_pork_belly",
+            "why": "cheapest member kaleidoscope_cookery (kaleidoscopecookery-1.6.0-forge+mc1.20.1) lists in forge:cooked_pork on 1.20.1, at 1/3 meat"
+          }
+        },
+        "c:cookies": {
+          "rusticdelight": {
+            "item": "rusticdelight:cherry_blossom_cookie",
+            "why": "cheapest member rusticdelight (rusticdelight-forge-1.20.1-1.7.0) lists in forge:cookies on 1.20.1, at 1/4 wheat"
+          }
+        },
+        "c:crops/cabbage": {
+          "pamhc2crops": null
+        },
+        "c:crops/corn": {
+          "pamhc2crops": null
+        },
+        "c:crops/grain": {
+          "farmersdelight": null
+        },
+        "c:crops/onion": {
+          "pamhc2crops": null
+        },
+        "c:crops/tomato": {
+          "pamhc2crops": null
+        },
+        "c:dough": {
+          "create": {
+            "item": "create:dough",
+            "why": "cheapest member create (create-1.20.1-6.0.8) lists in forge:dough on 1.20.1, at 2/3 wheat"
+          },
+          "croptopia": {
+            "item": "croptopia:dough",
+            "why": "cheapest member croptopia (Croptopia-1.20.1-FORGE-4.0.1) lists in forge:dough on 1.20.1, at 21/10 wheat"
+          },
+          "farmersdelight": {
+            "item": "farmersdelight:wheat_dough",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:dough on 1.20.1, at 1083/1000 wheat"
+          }
+        },
+        "c:doughs": {
+          "farm_and_charm": null
+        },
+        "c:drinks/milk": {
+          "farmersdelight": null,
+          "hearthandharvest": null,
+          "neoforge": null
+        },
+        "c:dusts/salt": {
+          "cookscollection": null,
+          "culturaldelights": null
+        },
+        "c:eggs": {
+          "farmersdelight": {
+            "item": "minecraft:egg",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:eggs on 1.20.1, at 1 egg"
+          },
+          "neoforge": null
+        },
+        "c:flour": {
+          "create": {
+            "item": "create:wheat_flour",
+            "why": "cheapest member create (create-1.20.1-6.0.8) lists in forge:flour on 1.20.1, at 2/3 wheat"
+          },
+          "bountifulfares": null
+        },
+        "c:flours": {
+          "create": null,
+          "farm_and_charm": null
+        },
+        "c:foods/bread": {
+          "bountifulfares": null,
+          "cookscollection": null,
+          "neoforge": null
+        },
+        "c:foods/cabbage": {
+          "farmersdelight": null
+        },
+        "c:foods/cooked_beef": {
+          "farmersdelight": null,
+          "kaleidoscope_cookery": null
+        },
+        "c:foods/cooked_chicken": {
+          "farmersdelight": null
+        },
+        "c:foods/cooked_egg": {
+          "farmersdelight": null
+        },
+        "c:foods/cooked_meat": {
+          "farmersdelight": null,
+          "neoforge": null
+        },
+        "c:foods/cooked_mutton": {
+          "farmersdelight": null,
+          "kaleidoscope_cookery": null
+        },
+        "c:foods/cooked_pork": {
+          "farmersdelight": null,
+          "kaleidoscope_cookery": null
+        },
+        "c:foods/corn": {
+          "bountifulfares": null
+        },
+        "c:foods/dough": {
+          "create": null,
+          "culturaldelights": null,
+          "farmersdelight": null
+        },
+        "c:foods/elderberries": {
+          "bountifulfares": null
+        },
+        "c:foods/leafy_green": {
+          "hearthandharvest": {
+            "item": "hearthandharvest:hops",
+            "why": "cheapest member hearthandharvest (hearthandharvest-1.20.1-1.4.3) lists in forge:foods/leafy_green on 1.20.1, at 1 produce"
+          },
+          "farmersdelight": null
+        },
+        "c:foods/lemons": {
+          "bountifulfares": null
+        },
+        "c:foods/milk": {
+          "bountifulfares": null
+        },
+        "c:foods/onion": {
+          "farmersdelight": null
+        },
+        "c:foods/oranges": {
+          "bountifulfares": null
+        },
+        "c:foods/pasta": {
+          "farmersdelight": null
+        },
+        "c:foods/plums": {
+          "bountifulfares": null
+        },
+        "c:foods/raw_bacon": {
+          "farmersdelight": null
+        },
+        "c:foods/raw_beef": {
+          "farmersdelight": null,
+          "kaleidoscope_cookery": null
+        },
+        "c:foods/raw_chicken": {
+          "farmersdelight": null,
+          "kaleidoscope_cookery": null
+        },
+        "c:foods/raw_fish": {
+          "aquaculture": null,
+          "farmersdelight": null,
+          "fishofthieves": null,
+          "neoforge": null,
+          "rusticdelight": null
+        },
+        "c:foods/raw_meat": {
+          "farmersdelight": null,
+          "neoforge": null
+        },
+        "c:foods/raw_mutton": {
+          "farmersdelight": null,
+          "kaleidoscope_cookery": null
+        },
+        "c:foods/raw_pork": {
+          "farmersdelight": null,
+          "kaleidoscope_cookery": null
+        },
+        "c:foods/tomato": {
+          "farmersdelight": null
+        },
+        "c:foods/vegetable": {
+          "bountifulfares": null,
+          "culturaldelights": null,
+          "farmersdelight": null,
+          "neoforge": null,
+          "rusticdelight": null
+        },
+        "c:foods/walnuts": {
+          "bountifulfares": null
+        },
+        "c:fruits": {
+          "fishofthieves": {
+            "item": "fishofthieves:banana",
+            "why": "cheapest member fishofthieves (fish_of_thieves-mc1.20.1-v3.4.0-forge) lists in forge:fruits on 1.20.1, at 1 produce"
+          },
+          "pamhc2crops": null,
+          "pamhc2trees": null
+        },
+        "c:fruits/banana": {
+          "pamhc2trees": null
+        },
+        "c:fruits/blueberry": {
+          "pamhc2crops": null
+        },
+        "c:fruits/elderberry": {
+          "pamhc2crops": null
+        },
+        "c:fruits/lemon": {
+          "cookscollection": null,
+          "culturaldelights": null,
+          "pamhc2trees": null
+        },
+        "c:fruits/mango": {
+          "pamhc2trees": null
+        },
+        "c:fruits/orange": {
+          "pamhc2trees": null
+        },
+        "c:fruits/pineapple": {
+          "pamhc2crops": null
+        },
+        "c:fruits/plum": {
+          "pamhc2trees": null
+        },
+        "c:grain": {
+          "farmersdelight": {
+            "item": "farmersdelight:rice",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:grain on 1.20.1, at 1 produce"
+          },
+          "farm_and_charm": null,
+          "pamhc2crops": null
+        },
+        "c:grain/barley": {
+          "pamhc2crops": null
+        },
+        "c:grain/corn": {
+          "pamhc2crops": null
+        },
+        "c:grain/oat": {
+          "pamhc2crops": null
+        },
+        "c:milk": {
+          "croptopia": {
+            "item": "croptopia:milk_bottle",
+            "why": "cheapest member croptopia (Croptopia-1.20.1-FORGE-4.0.1) lists in forge:milk on 1.20.1, at 1/16 milk_bucket; its 0-cost croptopia:soy_milk is never a floor"
+          },
+          "farmersdelight": {
+            "item": "farmersdelight:milk_bottle",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:milk on 1.20.1, at 1/4 milk_bucket"
+          },
+          "hearthandharvest": {
+            "item": "hearthandharvest:goat_milk_bottle",
+            "why": "cheapest member hearthandharvest (hearthandharvest-1.20.1-1.4.3) lists in forge:milk on 1.20.1, at 1/4 milk_bucket"
+          },
+          "vinery": {
+            "item": "minecraft:milk_bucket",
+            "why": "cheapest member vinery (letsdo-vinery-forge-1.4.41) lists in forge:milk on 1.20.1, at 1 milk_bucket"
+          }
+        },
+        "c:milks": {
+          "meadow": null
+        },
+        "c:nuts/walnut": {
+          "pamhc2trees": null
+        },
+        "c:onions": {
+          "pamhc2crops": null
+        },
+        "c:pasta": {
+          "farmersdelight": {
+            "item": "farmersdelight:raw_pasta",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:pasta on 1.20.1, at 1083/1000 wheat"
+          }
+        },
+        "c:raw_bacon": {
+          "farmersdelight": {
+            "item": "farmersdelight:bacon",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:raw_bacon on 1.20.1, at 1/2 meat"
+          }
+        },
+        "c:raw_beef": {
+          "farmersdelight": {
+            "item": "farmersdelight:minced_beef",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:raw_beef on 1.20.1, at 1/2 meat"
+          },
+          "kaleidoscope_cookery": {
+            "item": "kaleidoscope_cookery:raw_cow_offal",
+            "why": "cheapest member kaleidoscope_cookery (kaleidoscopecookery-1.6.0-forge+mc1.20.1) lists in forge:raw_beef on 1.20.1, at 1/3 meat"
+          }
+        },
+        "c:raw_chicken": {
+          "farmersdelight": {
+            "item": "farmersdelight:chicken_cuts",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:raw_chicken on 1.20.1, at 1/2 meat"
+          },
+          "kaleidoscope_cookery": {
+            "item": "minecraft:chicken",
+            "why": "cheapest member kaleidoscope_cookery (kaleidoscopecookery-1.6.0-forge+mc1.20.1) lists in forge:raw_chicken on 1.20.1, at 1 meat"
+          }
+        },
+        "c:raw_fishes": {
+          "aquaculture": {
+            "item": "aquaculture:arapaima",
+            "why": "cheapest member aquaculture (Aquaculture-1.20.1-2.5.7) lists in forge:raw_fishes on 1.20.1, at 1 fish"
+          },
+          "farmersdelight": {
+            "item": "farmersdelight:cod_slice",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:raw_fishes on 1.20.1, at 1/2 fish"
+          },
+          "fishofthieves": {
+            "item": "fishofthieves:ancientscale",
+            "why": "cheapest member fishofthieves (fish_of_thieves-mc1.20.1-v3.4.0-forge) lists in forge:raw_fishes on 1.20.1, at 1 fish"
+          },
+          "rusticdelight": {
+            "item": "culturaldelights:raw_calamari",
+            "why": "cheapest member rusticdelight (rusticdelight-forge-1.20.1-1.7.0) lists in forge:raw_fishes on 1.20.1, at 1/2 fish"
+          }
+        },
+        "c:raw_mutton": {
+          "farmersdelight": {
+            "item": "farmersdelight:mutton_chops",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:raw_mutton on 1.20.1, at 1/2 meat"
+          },
+          "kaleidoscope_cookery": {
+            "item": "kaleidoscope_cookery:raw_lamb_chops",
+            "why": "cheapest member kaleidoscope_cookery (kaleidoscopecookery-1.6.0-forge+mc1.20.1) lists in forge:raw_mutton on 1.20.1, at 1/3 meat"
+          }
+        },
+        "c:raw_pork": {
+          "farmersdelight": {
+            "item": "farmersdelight:bacon",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:raw_pork on 1.20.1, at 1/2 meat"
+          },
+          "kaleidoscope_cookery": {
+            "item": "kaleidoscope_cookery:raw_pork_belly",
+            "why": "cheapest member kaleidoscope_cookery (kaleidoscopecookery-1.6.0-forge+mc1.20.1) lists in forge:raw_pork on 1.20.1, at 1/3 meat"
+          }
+        },
+        "c:salt": {
+          "cookscollection": null
+        },
+        "c:salts": {
+          "cookscollection": null
+        },
+        "c:vegetables": {
+          "farmersdelight": {
+            "item": "farmersdelight:onion",
+            "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:vegetables on 1.20.1, at 1 produce"
+          },
+          "rusticdelight": {
+            "item": "rusticdelight:bell_pepper_slice_black",
+            "why": "cheapest member rusticdelight (rusticdelight-forge-1.20.1-1.7.0) lists in forge:vegetables on 1.20.1, at 1/2 produce"
+          },
+          "pamhc2crops": null,
+          "pamhc2trees": null
+        }
+      }
+    }
+  },
   "items": {
     "minecraft:milk_bucket": { "unit": "milk_bucket", "cost": 1, "why": "a bucket of milk" },
     "meadow:wooden_milk_bucket": { "unit": "milk_bucket", "cost": 1, "why": "a full (wooden) bucket of milk" },

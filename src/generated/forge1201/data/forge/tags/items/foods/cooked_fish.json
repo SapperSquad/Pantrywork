@@ -1,0 +1,8 @@
+{
+  "values": [
+    { "id": "#forge:cookedfish", "required": false },
+    { "id": "#forge:cooked_fishes", "required": false },
+    { "id": "oceansdelight:cooked_guardian_tail", "required": false },
+    { "id": "oceansdelight:kelp_encrusted_cod", "required": false }
+  ]
+}

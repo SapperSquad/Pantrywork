@@ -1,0 +1,10 @@
+{
+  "values": [
+    "#pantrywork:food_component/protein",
+    "#pantrywork:food_component/starch",
+    "#pantrywork:food_component/dairy",
+    "#pantrywork:food_component/garnish",
+    "#pantrywork:food_component/liquid_base",
+    "#pantrywork:food_component/sweetener"
+  ]
+}

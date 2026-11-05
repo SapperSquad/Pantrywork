@@ -1,0 +1,7 @@
+{
+  "values": [
+    "#forge:foods/vegetable",
+    { "id": "#forge:foods/berry", "required": false },
+    { "id": "#forge:foods/leafy_green", "required": false }
+  ]
+}

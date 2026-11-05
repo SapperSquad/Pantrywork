@@ -1,0 +1,8 @@
+{
+  "values": [
+    { "id": "#pantrywork:bridged/fruit", "required": false },
+    { "id": "vinery:red_grape", "required": false },
+    { "id": "vinery:white_grape", "required": false },
+    { "id": "vinery:cherry", "required": false }
+  ]
+}

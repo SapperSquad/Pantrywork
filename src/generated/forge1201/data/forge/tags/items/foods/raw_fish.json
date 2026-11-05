@@ -1,0 +1,7 @@
+{
+  "values": [
+    { "id": "#pantrywork:bridged/raw_fishes", "required": false },
+    { "id": "oceansdelight:guardian", "required": false },
+    { "id": "oceansdelight:guardian_tail", "required": false }
+  ]
+}

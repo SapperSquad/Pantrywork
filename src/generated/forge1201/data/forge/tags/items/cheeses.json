@@ -1,0 +1,7 @@
+{
+  "values": [
+    { "id": "hearthandharvest:cheese_slice", "required": false },
+    { "id": "hearthandharvest:goat_cheese_slice", "required": false },
+    { "id": "refurbished_furniture:cheese", "required": false }
+  ]
+}

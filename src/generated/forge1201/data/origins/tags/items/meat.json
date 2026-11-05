@@ -1,0 +1,18 @@
+{
+  "values": [
+    { "id": "#forge:foods/raw_meat", "required": false },
+    { "id": "#forge:foods/cooked_meat", "required": false },
+    { "id": "#forge:foods/raw_fish", "required": false },
+    { "id": "#forge:foods/cooked_fish", "required": false },
+    { "id": "#forge:groundmeats", "required": false },
+    { "id": "#forge:stock", "required": false },
+    { "id": "farmersdelight:ham", "required": false },
+    { "id": "farmersdelight:smoked_ham", "required": false },
+    { "id": "meadow:cooked_buffalo_meat", "required": false },
+    { "id": "farm_and_charm:roasted_chicken", "required": false },
+    { "id": "croptopia:ground_pork", "required": false },
+    { "id": "oceansdelight:fugu_slice", "required": false },
+    { "id": "oceansdelight:elder_guardian_slice", "required": false },
+    { "id": "oceansdelight:cooked_elder_guardian_slice", "required": false }
+  ]
+}

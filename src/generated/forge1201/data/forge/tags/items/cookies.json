@@ -1,0 +1,8 @@
+{
+  "values": [
+    { "id": "hearthandharvest:maple_cookie", "required": false },
+    { "id": "hearthandharvest:peanut_butter_cookie", "required": false },
+    { "id": "hearthandharvest:raisin_cookie", "required": false },
+    { "id": "minecraft:cookie", "required": false }
+  ]
+}

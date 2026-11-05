@@ -1,0 +1,6 @@
+{
+  "values": [
+    { "id": "farm_and_charm:onion", "required": false },
+    { "id": "farmersdelight:onion", "required": false }
+  ]
+}

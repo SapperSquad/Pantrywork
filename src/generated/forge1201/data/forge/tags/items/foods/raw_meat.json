@@ -1,0 +1,8 @@
+{
+  "values": [
+    { "id": "#forge:foods/raw_dragon_meat", "required": false },
+    { "id": "#forge:foods/raw_ender_mite_meat", "required": false },
+    { "id": "#forge:foods/shulker_meat", "required": false },
+    { "id": "meadow:raw_buffalo_meat", "required": false }
+  ]
+}

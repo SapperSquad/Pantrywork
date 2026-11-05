@@ -1,0 +1,6 @@
+{
+  "values": [
+    { "id": "#forge:butters", "required": false },
+    { "id": "#forge:butter", "required": false }
+  ]
+}

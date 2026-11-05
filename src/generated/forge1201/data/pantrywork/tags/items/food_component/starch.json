@@ -1,0 +1,10 @@
+{
+  "values": [
+    "#forge:foods/bread",
+    "#forge:foods/cooked_rice",
+    "minecraft:baked_potato",
+    { "id": "#forge:foods/pasta", "required": false },
+    { "id": "#forge:pasta", "required": false },
+    { "id": "#forge:bread", "required": false }
+  ]
+}

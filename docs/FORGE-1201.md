@@ -157,6 +157,44 @@ differences are stated. Every number still comes out of a 1.20.1 recipe: **do no
 floor across on the assumption the recipe is unchanged** — the versions differ (FD 1.3.4 not
 1.3.2, Cultural Delights 0.16.7 not 0.18.1, Croptopia 4.0.1 not 4.2.4).
 
+## The floors are done (2026-11-04)
+
+A forge1201 run is **green: exit 0, 113 payload files** (73 generated + 39 hand-authored,
+translated + pack.mcmeta), all valid JSON, no `c:` id anywhere in the tree. Modern stays
+byte-identical.
+
+- **4 item costs**, each read from a 1.20.1 recipe: `hearthandharvest:cheese_slice` and
+  `:goat_cheese_slice` at 1/4 milk_bucket (fermenting 1000 mB milk + salt -> unripe wheel,
+  aging -> wheel, cutting -> 4 slices; 1000 mB is one bucket, the same number Meadow's slice
+  reaches the same way), `hearthandharvest:raisin_cookie` at 1/4 wheat (2 wheat + raisins -> 8,
+  vanilla's cookie shape), `farm_and_charm:sausage_with_oat_patty` at 1 meat (2x minced beef
+  -> 2 patties).
+- **39 floors** derived, **89 scoped out** with null. They live in a new `platformFloors`
+  section so the 1.21 base stays strict - an `unscanned` reason would have excused those floors
+  on 1.21 too, where they must keep failing. The two checks cross-verify: null a floor for a mod
+  that DOES define the tag on 1.20.1 and STALE FLOORS fires instead.
+- Two rules had to be honoured while picking floors, and getting either wrong would have
+  silently lowered one: a tag **default** covers an item with no explicit cost (the fish tags
+  carry `default: 1`, which is what the tofish bug rode), and a definer listing only tag
+  **refs** still has a floor - but those refs must be resolved through **that mod's own files
+  only**. Following the merged view instead made Farmer's Delight's `c:raw_fishes` floor
+  `kaleidoscope_cookery:sashimi` at 1/3 rather than its own cod slice at 1/2, and a lower floor
+  lets cheaper items through.
+- A 0-cost plant analogue is still never a floor: `croptopia:soy_milk` was skipped on
+  `c:milk` in favour of its 1/16 milk bottle.
+
+**1.20.1 has no pack overlays, so the conditional swaps cannot ship there.** Vanilla gained
+overlays in 1.20.2 (pack format 18) and NeoForge's conditional variety is 1.20.5+; 1.20.1 is
+format 15. Shipping a GATEd entry unconditionally would put a below-floor item into a tag
+whenever its rescuer is absent - exactly what the floor exists to stop - so the generator drops
+them on this platform and names each in the report. Five are affected: Pam's cheese and salt
+(needed Croptopia), Hearth and Harvest's flour and corn meal (needed Create or Farm & Charm),
+and Farmer's Delight's cabbage leaf. `pack.mcmeta` is written as bare `pack_format: 15` with no
+overlay section at all.
+
+Verdicts on 1.20.1: **5 GATE (all dropped), 67 EXCLUDE, 27 rescued PASS** - and
+`pamhc2foodextended:rawtofishitem` is EXCLUDEd here too, so the 0.9.0 tofish fix carries over.
+
 ## Open before the first build
 
 - Fetch the two missing jars, then re-run the scan so the dialect map is complete.

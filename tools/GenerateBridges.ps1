@@ -66,7 +66,8 @@ $jarsDir = if ($Platform -eq 'forge1201') { Join-Path $root "tools\work\jars-120
            else { Join-Path $root "tools\work\jars" }
 $genRoot = if ($Platform -eq 'forge1201') { Join-Path $root "src\generated\forge1201" }
            else { Join-Path $root "src\generated\resources" }
-$reportFile = Join-Path $root "tools\work\bridges-report.txt"
+$reportFile = if ($Platform -eq 'forge1201') { Join-Path $root "tools\work\bridges-report-forge1201.txt" }
+              else { Join-Path $root "tools\work\bridges-report.txt" }
 if ($SelfTest) {
   # Keep this directory name SHORT. The longest generated path is
   # <root>\pantrywork_gate_<n>\data\pantrywork\tags\item\gated\<mods joined by _or_>\c\<tag>.json,
@@ -83,8 +84,11 @@ if ($SelfTest) {
 }
 $outDir = Join-Path $genRoot "data\$SharedNs\tags\$TagSeg"
 $bridgedDir = Join-Path $genRoot "data\pantrywork\tags\$TagSeg\bridged"
+# entries a GATE would have shipped conditionally, dropped because this platform has no
+# pack overlays to gate them with (see the pack.mcmeta section)
+$gateDropped = New-Object System.Collections.ArrayList
 
-$costData = Read-CostData $root
+$costData = Read-CostData $root $Platform
 if ($costData.problems.Count) { "cost-floors.json is inconsistent:"; $costData.problems | ForEach-Object { "  $_" }; exit 1 }
 
 # --- gather every item-tag definition from all sources ---
@@ -611,6 +615,16 @@ function Split-ByVerdict([string]$judgeTag, $candidates, [string]$label) {
 function Add-PlannedTag([string]$baseRel, [string]$gatedPathPrefix, $split) {
   $refs = @()
   foreach ($key in $split.gated.Keys) {
+    # MINECRAFT 1.20.1 HAS NO PACK OVERLAYS, so a GATEd entry cannot be shipped conditionally
+    # there: vanilla gained overlays in 1.20.2 (pack format 18) and NeoForge's conditional
+    # variety is 1.20.5+, while 1.20.1 is format 15. Shipping these UNconditionally would put
+    # an item below the floor into a tag whenever its rescuer is absent, which is the whole
+    # thing the floor exists to stop - so they are dropped instead. Dropping is the safe
+    # direction: the item is simply not bridged on that line, and the report names each one.
+    if ($Platform -eq 'forge1201') {
+      foreach ($gi in $split.gated[$key]) { [void]$gateDropped.Add("$gatedPathPrefix <- $gi (would need: $key)") }
+      continue
+    }
     # The tag id carries the gate key (tag ids are global: two gate sets on one target need
     # distinct ids). The overlay DIRECTORY gets a short numbered name once every gate set
     # is known - "<gate:key>" is resolved in the write loop.
@@ -715,7 +729,7 @@ foreach ($tid in ($costData.tags.Keys | Sort-Object)) {
 # Naming them after every mod id AND repeating that key in the tag path pushed generated
 # paths past Windows' 260-character MAX_PATH as soon as the tree was copied one level
 # deeper than the repo. pack.mcmeta shows each directory's mods next to its name.
-$gateKeys = @($gateSets.Keys | Sort-Object)
+$gateKeys = if ($Platform -eq 'forge1201') { @() } else { @($gateSets.Keys | Sort-Object) }
 $dirOf = @{}; $gateIndex = 0
 foreach ($key in $gateKeys) { $gateIndex++; $dirOf[$key] = "pantrywork_gate_$gateIndex" }
 $neoEntries = @(); $fabEntries = @()
@@ -737,13 +751,24 @@ foreach ($key in $gateKeys) {
 # The "pack" section is mandatory: Fabric reads a jar's own pack.mcmeta whenever one
 # exists, and vanilla drops a pack whose metadata has no "pack" section. The vanilla
 # "overlays" key is unconditional and must never be used here.
-$mcmeta = "{`n  ""pack"": {`n    ""description"": ""Pantrywork"",`n    ""pack_format"": 48,`n    ""supported_formats"": [48, 1000],`n    ""min_format"": 48,`n    ""max_format"": 1000`n  },`n" +
+if ($Platform -eq 'forge1201') {
+  # 1.20.1 is pack_format 15. supported_formats / min_format / max_format are later additions,
+  # and there is no overlay mechanism at all on this line, so this is the minimum the game
+  # accepts and the only thing it would read.
+  $mcmeta = "{`n  ""pack"": {`n    ""description"": ""Pantrywork"",`n    ""pack_format"": 15`n  }`n}`n"
+} else {
+  $mcmeta = "{`n  ""pack"": {`n    ""description"": ""Pantrywork"",`n    ""pack_format"": 48,`n    ""supported_formats"": [48, 1000],`n    ""min_format"": 48,`n    ""max_format"": 1000`n  },`n" +
           "  ""neoforge:overlays"": {`n    ""entries"": [`n$($neoEntries -join ",`n")`n    ]`n  },`n" +
           "  ""fabric:overlays"": {`n    ""entries"": [`n$($fabEntries -join ",`n")`n    ]`n  }`n}`n"
+}
 
 [void]$report.AppendLine("=== COST-FLOOR VERDICTS (tolerance $($costData.tolerance)x; ratio = floor / cost; every GATE and EXCLUDE, and every PASS that needed a rescue) ===")
 foreach ($l in ($verdictLog | Sort-Object -Unique)) { [void]$report.AppendLine("  $l") }
 if ($gateKeys.Count -eq 0) { [void]$report.AppendLine("  overlays: none") }
+if ($gateDropped.Count) {
+  [void]$report.AppendLine("  DROPPED - this platform has no pack overlays, so these conditional swaps cannot ship:")
+  foreach ($g in ($gateDropped | Sort-Object -Unique)) { [void]$report.AppendLine("    $g") }
+}
 foreach ($key in $gateKeys) { [void]$report.AppendLine("  overlay $($dirOf[$key]) (tags pantrywork:gated/$key/...) applies while any of these is loaded: $($gateSets[$key] -join ', ')") }
 [void]$report.AppendLine("")
 [void]$report.AppendLine("=== vetted namespaces (assets/<ns>/lang in a scanned jar, + minecraft) ===")
@@ -772,6 +797,45 @@ foreach ($rel in $planFiles.Keys) {
   [IO.File]::WriteAllText($full, "{`n  ""values"": [`n$($lines -join ",`n")`n  ]`n}`n", $utf8NoBom)
 }
 [IO.File]::WriteAllText((Join-Path $genRoot 'pack.mcmeta'), $mcmeta, $utf8NoBom)
+
+# --- forge1201 only: the hand-authored layer, translated in beside the generated one ---
+# The 1.21 jars take src/main (hand) and src/generated/resources (generated) and let gradle
+# merge them. The Forge jar is built from THIS directory alone, so the hand layer is written
+# here too: data/c/... becomes data/forge/..., every tags/item becomes tags/items, and c: ids
+# inside the files are retargeted. src/main stays the single source of truth - nothing below
+# is hand-maintained, and a stale copy cannot drift because it is rewritten every run.
+if ($Platform -eq 'forge1201') {
+  $srcMain = Join-Path $root "src\main\resources\data"
+  $handWritten = 0; $handSkipped = @()
+  foreach ($f in (Get-ChildItem $srcMain -Recurse -File -Filter '*.json')) {
+    $rel = $f.FullName.Substring($srcMain.Length + 1)
+    $parts = $rel -split '\\'
+    # only tag files travel: the test recipe and the gametest structure are dev-only and
+    # -Prelease strips them from the 1.21 jars anyway
+    if ($parts.Length -lt 4 -or $parts[1] -ne 'tags' -or $parts[2] -notin @('item', 'items')) {
+      $handSkipped += $rel; continue
+    }
+    $ns = if ($parts[0] -eq 'c') { $SharedNs } else { $parts[0] }
+    $rest = ($parts[3..($parts.Length - 1)]) -join '\'
+    $dest = Join-Path $genRoot ("data\$ns\tags\$TagSeg\$rest")
+    if (Test-Path $dest) {
+      [void]$problems.Add("HAND/GENERATED COLLISION: $rel would overwrite a generated file at $dest")
+      continue
+    }
+    New-Item -ItemType Directory -Force (Split-Path $dest) | Out-Null
+    $txt = (Get-Content $f.FullName -Raw) -replace '"#c:', ('"#' + $SharedNs + ':')
+    [IO.File]::WriteAllText($dest, $txt, $utf8NoBom)
+    $handWritten++
+  }
+  if ($problems.Count) {
+    "GENERATION STOPPED while translating the hand layer:"; $problems | ForEach-Object { "  $_" }; exit 1
+  }
+  "Translated $handWritten hand-authored tag files into $genRoot (skipped $($handSkipped.Count) non-tag: $($handSkipped -join ', '))"
+  [void]$report.AppendLine("=== hand-authored layer, translated for this platform ===")
+  [void]$report.AppendLine("  $handWritten tag files rewritten from src/main into data/$SharedNs|<ns>/tags/$TagSeg")
+  [void]$report.AppendLine("  skipped (not tag files): $($handSkipped -join ', ')")
+}
+
 [IO.File]::WriteAllText($reportFile, $report.ToString(), $utf8NoBom)
 "Wrote $($planFiles.Count) tag files ($(@($planFiles.Keys | Where-Object { $_ -like '<gate:*' }).Count) gated, in $($gateKeys.Count) overlays) + pack.mcmeta to $genRoot"
 "Verdicts: $(@($verdictLog | Where-Object { $_ -like 'GATE*' }).Count) GATE, $(@($verdictLog | Where-Object { $_ -like 'EXCLUDE*' }).Count) EXCLUDE, $(@($verdictLog | Where-Object { $_ -like 'PASS*' }).Count) rescued PASS"

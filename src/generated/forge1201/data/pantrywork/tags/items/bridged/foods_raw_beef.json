@@ -1,0 +1,9 @@
+{
+  "values": [
+    { "id": "farm_and_charm:minced_beef", "required": false },
+    { "id": "farmersdelight:minced_beef", "required": false },
+    { "id": "kaleidoscope_cookery:raw_cow_offal", "required": false },
+    { "id": "minecraft:beef", "required": false },
+    { "id": "pamhc2foodextended:rawtofeakitem", "required": false }
+  ]
+}

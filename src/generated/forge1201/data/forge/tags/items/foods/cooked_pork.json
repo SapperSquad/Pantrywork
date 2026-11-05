@@ -1,0 +1,6 @@
+{
+  "values": [
+    { "id": "#forge:cookedpork", "required": false },
+    { "id": "#forge:cooked_pork", "required": false }
+  ]
+}

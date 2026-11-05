@@ -1,0 +1,9 @@
+{
+  "values": [
+    { "id": "create:wheat_flour", "required": false },
+    { "id": "croptopia:flour", "required": false },
+    { "id": "kaleidoscope_cookery:flour", "required": false },
+    { "id": "pamhc2foodcore:flouritem", "required": false },
+    { "id": "refurbished_furniture:wheat_flour", "required": false }
+  ]
+}

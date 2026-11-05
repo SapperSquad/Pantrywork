@@ -41,7 +41,7 @@ function Format-Cost([double]$c) {
 
 # Parses cost-floors.json into plain hashtables. Fails loudly on internal inconsistency
 # (an item listed with a unit other than the tag's, a floor item with no cost).
-function Read-CostData($root) {
+function Read-CostData($root, [string]$Platform = 'modern') {
   $path = Join-Path $root 'tools\cost-floors.json'
   $j = ConvertFrom-Json ([IO.File]::ReadAllText($path))
   $data = @{ tolerance = [double]$j.tolerance; items = @{}; tags = @{}; dependencies = @{}; aliases = @{}; problems = New-Object System.Collections.ArrayList }
@@ -68,6 +68,38 @@ function Read-CostData($root) {
     }
     $data.tags[$p.Name] = $entry
   }
+  # PLATFORM OVERLAY. The base data describes the 1.21 ecosystem. Another Minecraft line ships
+  # different VERSIONS of the same mods - and some of those mods not at all - so a floor that is
+  # real on 1.21 can be genuinely absent on 1.20.1. That is SCOPE, not fiction, and it is stated
+  # here rather than by weakening the base with "unscanned", which would also excuse the floor on
+  # 1.21 where it must keep failing.
+  #   tags.<tag>.<mod>  a floor spec in any of the base's three forms; JSON null REMOVES the
+  #                     base floor for that mod on this platform
+  #   items.<id>        an item cost that applies only on this platform (recipes differ between
+  #                     mod versions, so a 1.20.1 cost must never silently become a 1.21 one)
+  if ($Platform -and $Platform -ne 'modern') {
+    $ov = if ($j.platformFloors) { $j.platformFloors.$Platform } else { $null }
+    if ($null -eq $ov) {
+      [void]$data.problems.Add("platformFloors has no section for platform '$Platform'")
+    } else {
+      foreach ($p in $ov.items.PSObject.Properties) {
+        $data.items[$p.Name] = @{ cost = (ConvertTo-CostNumber $p.Value.cost); unit = $p.Value.unit; why = $p.Value.why }
+      }
+      foreach ($p in $ov.tags.PSObject.Properties) {
+        if (-not $data.tags.ContainsKey($p.Name)) {
+          [void]$data.problems.Add("platformFloors.${Platform}.tags: $($p.Name) is not a judged tag"); continue
+        }
+        $entry = $data.tags[$p.Name]
+        foreach ($f in $p.Value.PSObject.Properties) {
+          $v = $f.Value
+          if ($null -eq $v) { $entry.floors.Remove($f.Name); $entry.nofloor.Remove($f.Name); continue }
+          if ($v -is [string]) { $entry.floors[$f.Name] = @{ item = $v; cost = $null; why = $null } }
+          elseif ($null -ne $v.none) { $entry.floors.Remove($f.Name); $entry.nofloor[$f.Name] = $v.none }
+          else { $entry.floors[$f.Name] = @{ item = $v.item; cost = (ConvertTo-CostNumber $v.cost); why = $v.why; unscanned = $v.unscanned } }
+        }
+      }
+    }
+  }
   # resolve floor costs and check units
   foreach ($t in $data.tags.Values) {
     if ($t.moot) { continue }
@@ -80,7 +112,11 @@ function Read-CostData($root) {
         $f.cost = $c
       }
     }
-    if ($t.floors.Count -eq 0) { [void]$data.problems.Add("$($t.id): judged tag declares no floors") }
+    # a tag whose every floor is a {"none"} declaration is legitimate; so is one a platform
+    # overlay has emptied because no mod defines it on that line at all.
+    if ($t.floors.Count -eq 0 -and $t.nofloor.Count -eq 0 -and $Platform -eq 'modern') {
+      [void]$data.problems.Add("$($t.id): judged tag declares no floors")
+    }
   }
   return $data
 }
