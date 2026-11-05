@@ -803,7 +803,30 @@ this pass — counted out of the BUILT jar's `neoforge.mods.toml`, not the templ
   release log every release — a stale "not yet published" line here is the same failure mode as the
   three store claims the 0.8.0 audit found had been false on the live pages since 0.1.0.)
 
-## Why no Forge build? (paste-ready answer to a recurring question)
+## Why no Forge build? (SUPERSEDED 2026-11-04 — DO NOT PASTE)
+
+> **STOP. The reasoning below is factually wrong and the decision has been reversed.** SapperSquad
+> asked for the 1.20.1 Forge build on 2026-11-04, and a measurement the same day disproved its
+> premise. Farmer's Delight's **1.20 branch ships `ForgeTags.java` declaring 64 `forge:` tags**,
+> among them `forge:crops/{cabbage,onion,rice,tomato}`, `forge:vegetables/*`, `forge:milk`,
+> `forge:milk/milk_bottle`, `forge:dough`, `forge:pasta`, `forge:grain`, `forge:raw_fishes/*`,
+> `forge:cooked_fishes/*`, the four raw and the four cooked meats, `forge:eggs`, `forge:berries`,
+> `forge:bread` and `forge:salad_ingredients` — the same two-level `<family>` plus
+> `<family>/<leaf>` shape Pantrywork bridges on 1.21, under a different namespace. On the 1.21
+> branch that file is gone and `CommonTags.java` builds the identical ids under `c` instead.
+> **So a 1.20.1 build is a port, not an invention.**
+>
+> Where the old answer went wrong: it quoted the **vanilla/NeoForge-documented** `forge:` crop set
+> (beetroot, carrot, nether wart, potato, wheat) and concluded there was no food vocabulary to
+> extend. That set is what the *platform* documents; the food mods extended `forge:` themselves,
+> which is exactly what they later did to `c:`. The project's own standing rule — measure the jars,
+> do not quote the docs — is what would have caught it, and this was the one claim that never got
+> measured. The "one caveat to keep honest" at the end of the old answer was pointing straight at
+> this gap.
+>
+> Kept below only as the record of what was believed, and why it was wrong.
+
+## Why no Forge build? (the SUPERSEDED pre-2026-11-04 answer)
 
 Asked again by a player 2026-11-01 ("a Forge 1.20.1 version"). The answer has been the project's
 position since the 2026-08-29 roadmap note ("no 1.20.x, pre-`c:`-unification"); the evidence below
