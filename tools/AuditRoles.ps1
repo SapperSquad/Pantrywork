@@ -36,14 +36,26 @@
 # mods and no platform convention tags. Any cross-mod/convention tag reference we
 # mark REQUIRED is undefined there, and a required reference to an undefined tag is a
 # hard datapack load failure - a world that will not load. Run both modes.
-param([switch]$Minimal)
+param([switch]$Minimal, [ValidateSet('modern', 'forge1201')][string]$Platform = 'modern')
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 . (Join-Path $PSScriptRoot 'CostFloor.ps1')
 $root = Split-Path $PSScriptRoot -Parent
-$jarsDir = Join-Path $root "tools\work\jars"
-$genRoot = Join-Path $root "src\generated\resources"
-$costData = Read-CostData $root
+# PLATFORM. Mirrors GenerateBridges.ps1: the shared vocabulary is c: on 1.21+ and forge: on
+# 1.20.1, where the tag path is also plural. Tag IDENTITY stays in the c: spelling everywhere
+# (Key/TagId below), so every check reasons about the same thing on both lines and the
+# cost-floor data is shared rather than forked.
+$SharedNs = if ($Platform -eq 'forge1201') { 'forge' } else { 'c' }
+$TagSeg   = if ($Platform -eq 'forge1201') { 'items' } else { 'item' }
+$jarsDir = if ($Platform -eq 'forge1201') { Join-Path $root "tools\work\jars-1201" }
+           else { Join-Path $root "tools\work\jars" }
+$genRoot = if ($Platform -eq 'forge1201') { Join-Path $root "src\generated\forge1201" }
+           else { Join-Path $root "src\generated\resources" }
+# On forge1201 the generator writes ONE complete tree (its own output plus the hand-authored
+# layer translated in), so there is no src/main half to add here.
+$srcDataDirs = if ($Platform -eq 'forge1201') { @("src\generated\forge1201\data") }
+               else { @("src\main\resources\data", "src\generated\resources\data") }
+$costData = Read-CostData $root $Platform
 
 # tagKey -> list of entries; entry = @{ id=<string>; required=<bool>; src=<string>; gate=<string[] or $null> }
 # src is the jar file name the entry came from, or 'pantrywork' for anything in
@@ -64,7 +76,7 @@ function Add-TagJson($key, $json, $src, $gate) {
     }
   }
 }
-function Key($ns, $path) { if ($ns -eq 'c') { return $path } else { return "${ns}:$path" } }
+function Key($ns, $path) { if ($ns -eq $SharedNs) { return $path } else { return "${ns}:$path" } }
 function TagId($key) { if ($key -like '*:*') { return $key } else { return "c:$key" } }
 
 # src -> namespaces that source's mod owns (assets/<ns>/lang in the jar; the same
@@ -109,12 +121,15 @@ foreach ($jar in $sources) {
   foreach ($e in $zip.Entries) {
     if ($e.FullName -match '^assets/([^/]+)/lang/[^/]+\.json$') { [void]$ownedNs[$src].Add($matches[1]); [void]$jarNs.Add($matches[1]) }
   }
-  foreach ($e in ($zip.Entries | Where-Object { ($_.FullName -replace '[/]','/') -match '/tags/item/' })) {
+  foreach ($e in ($zip.Entries | Where-Object { ($_.FullName -replace '[/]','/') -match ('/tags/' + $TagSeg + '/') })) {
     $ns = ($e.FullName -split '/')[1]
     $r = New-Object IO.StreamReader($e.Open()); $j = $r.ReadToEnd(); $r.Close()
-    $path = $e.FullName -replace "^data/$ns/tags/item/",'' -replace '\.json$',''
+    $path = $e.FullName -replace ('^data/' + $ns + '/tags/' + $TagSeg + '/'),'' -replace '\.json$',''
     Add-TagJson (Key $ns $path) $j $src $null
-    $tid = "${ns}:$path"
+    # Tag identity is recorded in the c: spelling on every platform: the cost-floor keys, the
+    # floor-definer check and the planting/food-evidence seed rules all reason about identity,
+    # so a forge:seeds must register as c:seeds or those rules silently stop matching.
+    $tid = if ($ns -eq $SharedNs) { "c:$path" } else { "${ns}:$path" }
     Add-OwnFiledEntries $tid (ConvertFrom-Json $j).values $jarNs $ownSeedFiled $ownFoodFiled
     if (-not $definers.ContainsKey($tid)) { $definers[$tid] = New-Object System.Collections.Generic.HashSet[string] }
     [void]$definers[$tid].Add($srcMod[$src])
@@ -127,7 +142,11 @@ foreach ($jar in $sources) {
 $floorDefiners = @{}
 foreach ($k in $definers.Keys) { $floorDefiners[$k] = New-Object System.Collections.Generic.HashSet[string]; foreach ($m in $definers[$k]) { [void]$floorDefiners[$k].Add($m) } }
 if (-not $Minimal) {
-  foreach ($xd in @('tools\work\jars-26x', 'tools\work\jars-12110')) {
+  # Other-line jar sets, unioned in so a 26.x/1.21.10-only item still counts as a definer.
+  # They are 1.21-LINE jars, so a forge1201 run must not read them: their c: tags say nothing
+  # about what a mod ships on 1.20.1.
+  $extraDirs = if ($Platform -eq 'forge1201') { @() } else { @('tools\work\jars-26x', 'tools\work\jars-12110') }
+  foreach ($xd in $extraDirs) {
     $xfull = Join-Path $root $xd
     if (-not (Test-Path $xfull)) { continue }
     foreach ($jar in (Get-ChildItem $xfull -Filter "*.jar")) {
@@ -135,8 +154,11 @@ if (-not $Minimal) {
       $xids = @(Get-JarModIds $zip)
       $xmod = if ($xids.Count) { Resolve-ModAlias $costData $xids[0] } else { $jar.Name }
       foreach ($e in $zip.Entries) {
-        if ($e.FullName -match '^data/([^/]+)/tags/item/(.+)\.json$') {
-          $tid = "$($matches[1]):$($matches[2])"
+        if ($e.FullName -match ('^data/([^/]+)/tags/' + $TagSeg + '/(.+)\.json' + '$')) {
+          # normalise to the c: spelling, the way Key/TagId do: cost-floor tag ids are always
+          # written c:, so a forge:vegetables definer must register against c:vegetables or every
+          # declared floor looks fictional and every definer looks undeclared.
+          $tid = if ($matches[1] -eq $SharedNs) { "c:$($matches[2])" } else { "$($matches[1]):$($matches[2])" }
           if (-not $floorDefiners.ContainsKey($tid)) { $floorDefiners[$tid] = New-Object System.Collections.Generic.HashSet[string] }
           [void]$floorDefiners[$tid].Add($xmod)
         }
@@ -146,12 +168,12 @@ if (-not $Minimal) {
   }
 }
 # Pantrywork's own data (hand-authored + generated)
-foreach ($dir in @("src\main\resources\data", "src\generated\resources\data")) {
+foreach ($dir in $srcDataDirs) {
   $full = Join-Path $root $dir
   if (-not (Test-Path $full)) { continue }
-  Get-ChildItem $full -Recurse -Filter "*.json" | Where-Object { $_.FullName.Replace([char]92, [char]47) -match '/tags/item/' } | ForEach-Object {
+  Get-ChildItem $full -Recurse -Filter "*.json" | Where-Object { $_.FullName.Replace([char]92, [char]47) -match ('/tags/' + $TagSeg + '/') } | ForEach-Object {
     $rel = $_.FullName.Substring($full.Length + 1).Replace([char]92, [char]47)
-    if ($rel -match '^([^/]+)/tags/item/(.+)\.json$') { Add-TagJson (Key $matches[1] $matches[2]) ([IO.File]::ReadAllText($_.FullName)) 'pantrywork' $null }
+    if ($rel -match ('^([^/]+)/tags/' + $TagSeg + '/(.+)\.json' + '$')) { Add-TagJson (Key $matches[1] $matches[2]) ([IO.File]::ReadAllText($_.FullName)) 'pantrywork' $null }
   }
 }
 # Gated overlays, as declared in pack.mcmeta. The NeoForge and Fabric declarations must
@@ -189,7 +211,7 @@ foreach ($od in (Get-ChildItem $genRoot -Directory -Filter 'pantrywork_gate_*' -
   $full = Join-Path $od.FullName 'data'
   Get-ChildItem $full -Recurse -Filter "*.json" | ForEach-Object {
     $rel = $_.FullName.Substring($full.Length + 1).Replace([char]92, [char]47)
-    if ($rel -match '^([^/]+)/tags/item/(.+)\.json$') {
+    if ($rel -match ('^([^/]+)/tags/' + $TagSeg + '/(.+)\.json' + '$')) {
       $k = Key $matches[1] $matches[2]
       if ($k -notlike 'pantrywork:gated/*') { [void]$overlayProblems.Add("overlay $($od.Name) holds $k outside pantrywork:gated/* (it would shadow a base file)") }
       Add-TagJson $k ([IO.File]::ReadAllText($_.FullName)) 'pantrywork' $overlayGates[$od.Name]
@@ -219,7 +241,7 @@ function Resolve-Members($key, $visited) {
     $id = $entry.id
     if ($id.StartsWith('#')) {
       $ref = $id.Substring(1)
-      $refKey = if ($ref.StartsWith('c:')) { $ref.Substring(2) } else { $ref }
+      $refKey = if ($ref.StartsWith("${SharedNs}:")) { $ref.Substring($SharedNs.Length + 1) } else { $ref }
       if (-not $definedBy.ContainsKey($refKey)) {
         if ($entry.required) { [void]$missingRequired.Add("$key -> $id (REQUIRED but undefined)") }
         continue
@@ -261,7 +283,7 @@ function Walk-Provenance($key, $viaPw, $stack, $out) {
     $id = $entry.id
     if ($id.StartsWith('#')) {
       $ref = $id.Substring(1)
-      $refKey = if ($ref.StartsWith('c:')) { $ref.Substring(2) } else { $ref }
+      $refKey = if ($ref.StartsWith("${SharedNs}:")) { $ref.Substring($SharedNs.Length + 1) } else { $ref }
       Walk-Provenance $refKey $pw $stack $out
     } else {
       if (-not $out.ContainsKey($id)) { $out[$id] = @{ pw = $false; up = New-Object System.Collections.Generic.HashSet[string] } }
@@ -313,12 +335,12 @@ function Test-IsSeed($id) {
 # c: identity tags it defines - because a seed sitting in c:foods/vegetable is
 # just as wrong as one in a role tag, even if no role currently surfaces it.
 $ownKeys = New-Object System.Collections.Generic.HashSet[string]
-foreach ($dir in @("src\main\resources\data", "src\generated\resources\data")) {
+foreach ($dir in $srcDataDirs) {
   $full = Join-Path $root $dir
   if (-not (Test-Path $full)) { continue }
-  Get-ChildItem $full -Recurse -Filter "*.json" | Where-Object { $_.FullName.Replace([char]92, [char]47) -match '/tags/item/' } | ForEach-Object {
+  Get-ChildItem $full -Recurse -Filter "*.json" | Where-Object { $_.FullName.Replace([char]92, [char]47) -match ('/tags/' + $TagSeg + '/') } | ForEach-Object {
     $rel = $_.FullName.Substring($full.Length + 1).Replace([char]92, [char]47)
-    if ($rel -match '^([^/]+)/tags/item/(.+)\.json$') { [void]$ownKeys.Add((Key $matches[1] $matches[2])) }
+    if ($rel -match ('^([^/]+)/tags/' + $TagSeg + '/(.+)\.json' + '$')) { [void]$ownKeys.Add((Key $matches[1] $matches[2])) }
   }
 }
 $roles = @($ownKeys | Sort-Object)
@@ -515,7 +537,7 @@ function Walk-Paths($key, $viaPw, $mods, $gates, $stack, $out) {
     $id = $entry.id
     if ($id.StartsWith('#')) {
       $ref = $id.Substring(1)
-      $refKey = if ($ref.StartsWith('c:')) { $ref.Substring(2) } else { $ref }
+      $refKey = if ($ref.StartsWith("${SharedNs}:")) { $ref.Substring($SharedNs.Length + 1) } else { $ref }
       Walk-Paths $refKey $pw $m2 $g2 $stack $out
     } elseif ($pw) {
       if (-not $out.ContainsKey($id)) { $out[$id] = New-Object System.Collections.ArrayList }
@@ -699,7 +721,7 @@ function Resolve-MembersWithout($key, $srcPattern, $mods, $visited) {
     $id = $entry.id
     if ($id.StartsWith('#')) {
       $ref = $id.Substring(1)
-      $refKey = if ($ref.StartsWith('c:')) { $ref.Substring(2) } else { $ref }
+      $refKey = if ($ref.StartsWith("${SharedNs}:")) { $ref.Substring($SharedNs.Length + 1) } else { $ref }
       foreach ($i in (Resolve-MembersWithout $refKey $srcPattern $mods $visited)) { [void]$items.Add($i) }
     } else { [void]$items.Add($id) }
   }

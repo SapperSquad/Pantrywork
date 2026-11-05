@@ -303,6 +303,54 @@ tasks.register('neoJar26', Jar) {
     from('promo/icon-512.png') { rename { 'icon.png' } }
 }
 
+
+// --- Forge 1.20.1 ----------------------------------------------------------------
+// A separate line in every sense: the shared food vocabulary there is forge: rather than c:,
+// the tag path is the PLURAL tags/items, and the metadata file is META-INF/mods.toml with
+// `mandatory` dependencies. So this jar is NOT built from src/main + src/generated/resources
+// like the others - it takes src/generated/forge1201, which the generator writes complete
+// (its own reverse bridges PLUS the hand-authored layer translated into forge:/plural).
+// Regenerate it with:  powershell -File tools\GenerateBridges.ps1 -Platform forge1201
+//
+// There is no overlay directory and no pack.mcmeta overlay section on this line: 1.20.1 is
+// pack format 15 and has no overlay mechanism at all (vanilla added it in 1.20.2), so the
+// generator drops the conditional swaps rather than shipping them unconditionally.
+var forgeMeta1201 = tasks.register('generateForgeMetadata1201', ProcessResources) {
+    var props = [
+        mod_id: project.mod_id,
+        mod_name: project.mod_name,
+        mod_version: project.mod_version,
+        mod_license: project.mod_license,
+        mod_authors: project.mod_authors,
+        mod_description: project.mod_description,
+        minecraft_version_range_1201: project.minecraft_version_range_1201,
+        forge_version_range: project.forge_version_range,
+        loader_version_range_1201: project.loader_version_range_1201,
+    ]
+    inputs.properties props
+    expand props
+    from 'src/forge1201/templates'
+    into "${layout.buildDirectory.get()}/generated/sources/forgeMetadata1201"
+}
+
+tasks.register('forgeJar1201', Jar) {
+    group = 'build'
+    description = 'Data-only Forge jar for Minecraft 1.20.1 (forge: namespace, plural tags/items).'
+    archiveClassifier = 'forge-mc1201'
+    from forgeMeta1201
+    from('src/generated/forge1201') {
+        include 'data/**'
+        include 'pack.mcmeta'
+    }
+    from('promo/icon-512.png') { rename { 'icon.png' } }
+    doFirst {
+        if (!file('src/generated/forge1201/pack.mcmeta').exists()) {
+            throw new GradleException('src/generated/forge1201 is missing - run ' +
+                'powershell -File tools\\GenerateBridges.ps1 -Platform forge1201 first')
+        }
+    }
+}
+
 var generateModMetadata = tasks.register('generateModMetadata', ProcessResources) {
     var replaceProperties = [
         minecraft_version: project.minecraft_version,

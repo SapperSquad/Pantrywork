@@ -1,0 +1,192 @@
+# Forge 1.20.1 metadata. Note the FILENAME: Forge reads META-INF/mods.toml on this line,
+# where NeoForge 1.21 reads META-INF/neoforge.mods.toml. Same TOML shape, different name -
+# and that difference is what made every 1.20.1 jar fall back to its filename as its mod id
+# when tools/CostFloor.ps1 only knew the newer spelling (docs/FORGE-1201.md).
+#
+# Two more divergences from the 1.21 template, both read out of real 1.20.1 jars rather than
+# from documentation:
+#   - dependencies use `mandatory = true|false`; `type = "required"|"optional"` is the
+#     NeoForge 1.20.5+ spelling and 1.20.1 does not understand it.
+#   - the loader dependency is `forge`, not `neoforge`.
+#
+# modLoader is lowcodefml because this jar is PURE DATA: no classes at all on this line.
+# PantryworkTagKeys is 1.21.1-only - it compiles against that line's MC types - so the 1.20.1
+# jar ships tags and nothing else, exactly like the 26.x jar.
+modLoader = "lowcodefml"
+loaderVersion = "${loader_version_range_1201}"
+license = "${mod_license}"
+
+[[mods]]
+modId = "${mod_id}"
+version = "${mod_version}"
+displayName = "${mod_name}"
+authors = "${mod_authors}"
+description = '''${mod_description}'''
+logoFile = "icon.png"
+
+[[dependencies.${mod_id}]]
+    modId = "forge"
+    mandatory = true
+    versionRange = "${forge_version_range}"
+    ordering = "NONE"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "minecraft"
+    mandatory = true
+    versionRange = "${minecraft_version_range_1201}"
+    ordering = "NONE"
+    side = "BOTH"
+
+# Compat targets. All optional: Pantrywork works with any subset installed - tag entries for
+# absent mods are marked required=false and just get skipped.
+#
+# This list is the 1.20.1 roster, which is SHORTER than the 1.21 one and deliberately so:
+# Pam's HarvestCraft 2 Crops and Trees have no 1.20.1 build at all, and Bountiful Fares is
+# Fabric-only on this line. Naming a mod that cannot exist here would be harmless but untrue.
+[[dependencies.${mod_id}]]
+    modId = "farmersdelight"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "croptopia"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "pamhc2foodcore"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "pamhc2foodextended"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "oceansdelight"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "ends_delight"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "vinery"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "farm_and_charm"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "meadow"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "brewinandchewin"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "aquaculture"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "create"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "fishofthieves"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "refurbished_furniture"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "kaleidoscope_cookery"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "hearthandharvest"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "culturaldelights"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "cookscollection"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "rusticdelight"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "hybrid_delights"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"
+
+[[dependencies.${mod_id}]]
+    modId = "biomeswevegone"
+    mandatory = false
+    versionRange = "[0,)"
+    ordering = "AFTER"
+    side = "BOTH"

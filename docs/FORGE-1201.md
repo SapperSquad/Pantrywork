@@ -195,6 +195,47 @@ overlay section at all.
 Verdicts on 1.20.1: **5 GATE (all dropped), 67 EXCLUDE, 27 rescued PASS** - and
 `pamhc2foodextended:rawtofishitem` is EXCLUDEd here too, so the 0.9.0 tofish fix carries over.
 
+## The jar builds, and the audit found a real blocker (2026-11-05)
+
+`gradlew forgeJar1201` produces **pantrywork-0.9.0-forge-mc1201.jar**, 56,848 bytes, 113 payload
+files (112 data + `pack.mcmeta`), zero singular `tags/item` paths, zero classes, 21 optional
+AFTER deps. `META-INF/mods.toml` (not `neoforge.mods.toml`), `modLoader = "lowcodefml"`,
+`mandatory = true|false` not `type =`, loader dep `forge` - every one of those read out of real
+1.20.1 jars rather than from documentation.
+
+`AuditRoles.ps1` now takes `-Platform forge1201` too, with the same identity model: tag identity
+is recorded in the `c:` spelling on both lines, so one set of checks and one set of cost
+judgments serve both. Modern stays green, full and `-Minimal`. Normalising the definer map was
+again the thing that mattered - before it, 137 of the 138 cost-floor failures and all 15 seed
+violations were phantoms.
+
+**What it then caught is real, and it blocks shipping: 30 dilution failures and 1 cost-floor
+failure.** They share one cause, and it is upstream version drift:
+
+| Croptopia | what its `doughs` tag contains |
+|---|---|
+| 4.0.1 (1.20.1) | `croptopia:dough`, **`#forge:dough`** - it REFERENCES the singular tag |
+| 4.2.4 (1.21) | `croptopia:dough` only |
+
+The generator correctly EXCLUDEs `pamhc2foodcore:doughitem` from `c:doughs` (0.6 wheat against
+Croptopia's 2.1 floor, x3.50) and correctly PASSes it into `c:dough`, where Create's 2/3 floor
+is lenient. On 1.21 that is safe. On 1.20.1 Croptopia's own `doughs` pulls in everything from
+`dough`, so the entry we legitimately wrote to the lenient tag arrives in the strict one anyway,
+below its floor. Same shape for the milk, pasta and vegetable failures.
+
+**The cost model needs the effective floor to be the strictest floor across the tag being
+written AND every tag that references it transitively.** Writing item X into tag B is only safe
+if X clears the floor of every A that can reach B.
+
+**This is a latent hole on 1.21 as well, not only here.** It is unexercised there purely because
+Croptopia dropped that reference between 4.0.1 and 4.2.4 - nothing in the model prevents another
+mod from adding one tomorrow and quietly diluting a canonical tag. Fixing it benefits both
+platforms, and because it changes floor semantics on a build that is already published, it is a
+deliberate decision rather than a porting detail: **do not slip it in with the port.**
+
+Dropping the GATEd entries was necessary but is not sufficient on a gate-less platform, for the
+same reason: severing the direct entry does not sever an upstream reference path.
+
 ## Open before the first build
 
 - Fetch the two missing jars, then re-run the scan so the dialect map is complete.
