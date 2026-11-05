@@ -443,11 +443,20 @@ the live pages since 0.1.0, so this is now a standing step):
       exactly the right scoping. **Do not "fix" this by adding a project-level relation:** that would
       apply to the NeoForge files too and tell NeoForge users to install Fabric API. Re-check the
       same three author pages each release.
-- [ ] **0.9.0: gallery 4 is replaced on BOTH stores.** Again the only image that changed, and it
-      again carries the mod count (now **twenty-four**). Banner, galleries 1–3 and the icon are
-      byte-identical to the live ones — do not re-upload them. Use the 0.8.0 recipe immediately
-      below, including the Modrinth `DELETE ?url=` gotcha (it wants the `_350.webp` url, not
-      `raw_url`).
+- [x] **0.9.0 Modrinth: gallery 4 replaced.** Done 2026-11-04 via the API — new card uploaded
+      (`ce7a4fd8…`, featured) and the old `Twenty-one mods bridged` (`b61d16d4…`) deleted with
+      `DELETE ?url=` using the **`_350.webp`** url. Reads back as five images, twenty-four featured.
+- [ ] **0.9.0 CurseForge: gallery 4 still needs replacing — NEEDS A HUMAN.** Everything else on CF
+      is synced (all four files, summary, description). The image cannot be scripted any more: the
+      **Add media** dialog now uses the File System Access API, so it contains no `input[type=file]`
+      for `file_upload` to target, and a synthetic drop is ignored (27 DragEvents carrying a real
+      `File`, dispatched from the "Upload or Drag Image" tile up through every ancestor to
+      `document`/`window`, changed nothing). Do it by hand:
+      **Media → Add media → Upload or Drag Image →** pick
+      `promo/gallery-4-supported-mods.png`; then hover/click the new card to set the Title to
+      **"Twenty-four mods bridged"**, star it as Feature Media, and delete the old
+      "Twenty-one mods bridged" card. Banner and galleries 1–3 are byte-identical to the live ones —
+      do not re-upload them.
 - [x] **0.8.0: gallery 4 was replaced on BOTH stores.** It was the only image that changed at 0.8.0, and it
       carries the mod count (now twenty-one). The banner and gallery 2 regenerate byte-identical, so leave
       them alone. Done 2026-10-08: Modrinth via the gallery API (new card featured, the old
