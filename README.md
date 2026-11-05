@@ -41,6 +41,11 @@ costs about the same.
   [CHANGELOG.md](CHANGELOG.md) 0.7.0 lists every older swap this removed or
   made conditional, and 0.8.0 lists the two that gained a condition and the
   three conditions that got easier to satisfy — 0.8.0 removed nothing.
+  0.9.0 removed five: Pam's Food Extended files five tofu analogues in its
+  raw beef, pork, mutton and fish tags, and every one of them is a pressed
+  soybean. In the same pass four canonical tags stopped pointing at a whole
+  dialect and now list their members, which is what had let the tofu in;
+  the members themselves did not change.
 - **A mod's own tag, where that is what it reads**: two tag files are
   hand-authored into another mod's namespace, because Kaleidoscope Cookery's
   wok and Rustic Delight's fried-food recipes each read a tag of their own
@@ -53,9 +58,10 @@ and 26.1–26.2. The Fabric and NeoForge-26 jars are pure data (no code). On
 Fabric, Fabric API is required: the Fabric jars declare it, and without it
 Fabric Loader refuses to start and names the missing dependency.
 
-Supported so far, twenty-one mods: Farmer's Delight (+ Refabricated on Fabric),
-Croptopia (+ Croptopia Refabricated on Fabric 1.21.10), Pam's HarvestCraft 2
-Food Core, Ocean's Delight, End's Delight, the **[Let's Do] series** (Vinery,
+Supported so far, twenty-four mods: Farmer's Delight (+ Refabricated on Fabric),
+Croptopia (+ Croptopia Refabricated on Fabric 1.21.10), **all four Pam's
+HarvestCraft 2 modules** (Food Core, and since 0.9.0 **Crops**, **Trees** and
+**Food Extended**), Ocean's Delight, End's Delight, the **[Let's Do] series** (Vinery,
 Farm & Charm, Meadow), **Aquaculture 2**, **Brewin' & Chewin'**, **Create**,
 **Bountiful Fares**, **Fish of Thieves**, **Refurbished Furniture**, and
 since 0.8.0 **Kaleidoscope Cookery**, **Hearth and Harvest**, **Cultural
@@ -80,7 +86,10 @@ Chewin' cheese wedge and vanilla bread and porkchop (and refused with
 Croptopia's cheaper cheese), Farmer's Delight's egg sandwich from Pam's and
 Bountiful Fares eggs (NeoForge 1.21.1), Hearth and Harvest's blueberry crate
 and Croptopia's blueberry jam made from Oh The Biomes We've Gone berries
-(NeoForge 1.21.1), Croptopia's pineapple chicken from a
+(NeoForge 1.21.1), two of Pam's Food Extended recipes built entirely from other mods' food —
+fried onions from Croptopia's onion and Cultural Delights' butter, and cheese
+on toast from Croptopia's toast and Meadow's cheese slice (NeoForge 1.21.1) —
+Croptopia's pineapple chicken from a
 Fish of Thieves pineapple (NeoForge 26.2), and Croptopia's banana smoothie
 made with Farmer's Delight milk (Fabric 1.21.1, 1.21.10, 26.1.2 and 26.2, and
 NeoForge 1.21.1).

@@ -24,26 +24,27 @@ dependency (booted on the staged 0.8.0 `-fabric` jar: it refuses to start, namin
 relation was not printed (that dry run skips CurseForge). After the upload, confirm it on the live
 pages (release blockers below); add it by hand where a store dropped it.
 
-Build all four with `./gradlew clean build -Prelease fabricJar fabricJar26 neoJar26`. The 0.8.0
-payload changed on every loader (six new mods, the wok oil tag, a new shared salt tag, the blueberry
-dialect, nine new conditional overlays), so upload all four files. Staged jars (built 2026-10-06; the
-same bytes are in `dist/0.8.0`; SHA-1 and size re-measured in this pass, on the rebuild that carries
-both the seed-rule blocker fix and the blueberry bridge — every earlier staged set is superseded and
-must not be uploaded):
-`pantrywork-0.8.0.jar` E61935B3399E6366B9085FCAD77CB37ED8D1EA33, 86,448 bytes ·
-`-fabric` 0728AF650B995C8E6CC99FFE757E86197A87A9EA, 84,376 ·
-`-fabric-mc26` EB67143EF769C2A60F9F40721DE44A45228CEAD7, 84,375 ·
-`-neoforge-mc26` 1E2615AFCB1A563C123EA5047B7FEDFAA3E632C2, 84,712.
-Each carries **146 payload files** — 129 data files (39 hand-authored + 90 generated) + `pack.mcmeta`
-+ 16 conditional-overlay tag files in 14 overlays — identical across all four jars, version `0.8.0`,
+Build all four with `./gradlew clean build -Prelease fabricJar fabricJar26 neoJar26`. The 0.9.0
+payload changed on every loader (three new Pam's modules on the 1.21.1 side, and on EVERY file the
+tofu exclusions and the four sanitized canonical tags), so upload all four files. Staged jars (built
+2026-11-03, **rebuilt 2026-11-04** for the tofish fix; the same bytes are in `dist/0.9.0`; SHA-1 and
+size measured in this pass — every earlier staged set is superseded and must not be uploaded, the
+first 0.9.0 cut included):
+`pantrywork-0.9.0.jar` 26302D0887306C04FDBB6869FCA0F803AE9F8360, 89,462 bytes ·
+`-fabric` 31DCC8922B39721C3D1D5A115992D700C9A9D5E9, 87,369 ·
+`-fabric-mc26` 843A48F62C0421F9695B66FD4DD20E6537E6EAEC, 87,368 ·
+`-neoforge-mc26` 6056F2EA136B01199A183A4D01A4AF3526EEF10E, 87,705.
+Each carries **151 payload files** — 134 data files (39 hand-authored + 95 generated) + `pack.mcmeta`
++ 16 conditional-overlay tag files in 14 overlays — identical across all four jars, version `0.9.0`,
 authors `SapperSquad`, and no test recipe, structure template or gametest class. These exact files
-were booted by every dedicated test server in the 0.8.0 verification log (each boot checked its
-Pantrywork jar's SHA-1 against `dist/0.8.0` first). The dev-server suites run the source tree, whose
-payload matches all four jars byte for byte.
+were booted by every dedicated test server in the 0.9.0 verification log (each boot checked its
+Pantrywork jar's SHA-1 against `dist/0.9.0` first). The dev-server suites run the source tree, whose
+payload matches all four jars byte for byte apart from the two dev-only files `-Prelease` strips.
 Both NeoForge jars declare the food mods as optional AFTER deps (read from the staged jars'
-`neoforge.mods.toml`). The 1.21.1 jar lists **21**: farmersdelight, croptopia, pamhc2foodcore,
+`neoforge.mods.toml`). The 1.21.1 jar lists **24**: farmersdelight, croptopia, pamhc2foodcore,
+**pamhc2crops, pamhc2trees, pamhc2foodextended** (new in 0.9.0),
 oceansdelight, ends_delight, vinery, farm_and_charm, meadow, brewinandchewin, aquaculture, create,
-bountifulfares, fishofthieves, refurbished_furniture, and new in 0.8.0 kaleidoscope_cookery,
+bountifulfares, fishofthieves, refurbished_furniture, and from 0.8.0 kaleidoscope_cookery,
 hearthandharvest, culturaldelights, cookscollection, rusticdelight, hybrid_delights and
 biomeswevegone. The 26.x jar
 lists **12** — the 1.21.1 list minus create, bountifulfares and all seven 0.8.0 ids, none of which has a
@@ -52,8 +53,9 @@ name) — and still names mods with no 26.x build at all, such as Pam's and Farm
 harmless for optional deps. Fabric metadata carries no compat entries.
 
 **Also on both stores this release** (store-mirror rule): paste the new Summary and Project description
-below, and replace **gallery 4 only** (see Gallery upload plan — the banner and gallery 2 regenerate
-byte-identical at 0.8.0 and must not be re-uploaded).
+below, and replace **gallery 4 only** — at 0.9.0 it is again the single image that changed (roster
+twenty-one → twenty-four). The banner, galleries 1–3 and the icon are byte-identical to what is
+already live (verified by hashing each against the 0.8.0 commit) and must not be re-uploaded.
 
 Fabric version range: the 1.21.x file declares `>=1.21.1 <1.22` and is tagged 1.21.1–1.21.11 from that
 range; it was booted on 1.21.1, 1.21.10 and 1.21.11 (versions in between were not booted). 2026-08-08:
@@ -395,11 +397,14 @@ fish tags' `default: 1`, was priced as a whole cod, and shipped into `c:rawfish`
 `c:raw_fishes` and canonical `c:foods/raw_fish`. Fixed with a 0-fish cost row and by routing
 `c:foods/raw_fish` through the judged enumeration the three raw meats already use. The payload
 difference between the two builds is **5 entries in 4 of the 151 files**, and the only item that
-leaves any tag anywhere is that one. Re-verified on the new bytes: all static gates, the full dev
-boot with all 16 suites at their documented counts, three release-jar scenarios (solo, S1, and S9
-— the fish cut gates at item level) and the Fabric 1.21.1 harness. The remaining release boots in
-`CLAUDE.md`'s matrix ran on the superseded bytes; re-run the full matrix if a uniform record is
-wanted before upload.
+leaves any tag anywhere is that one. Re-verified on the new bytes: all static gates, then **the
+entire 27-boot matrix re-run on the rebuilt jars on 2026-11-04** — 4 dev (full `runServer` 9742
+recipes with all 16 suites, `-PnoFarmAndCharm`, `-PnoCompatMods`, GameTests 7/7) and 23 release
+(neo-server-1211 solo + S1–S12; neo-server-2612 and -262 compat, gates and solo; all five Fabric
+harnesses; and the no-Fabric-API boot, which refuses to start and names `fabric-api`). Every suite
+at its documented count, zero regressions, and the log scan clean on all 27 apart from the
+documented KC-without-Quark pair on the three Kaleidoscope scenarios and the dev boots carrying it.
+**No result in this record rests on the superseded first cut.**
 
 **Store-copy audit for this release** (the 0.8.0 pass found three claims that had been false on
 the live pages since 0.1.0, so this is now a standing step):
@@ -419,9 +424,9 @@ the live pages since 0.1.0, so this is now a standing step):
 - [x] **`pantrywork:test/universal_sandwich` must not ship.** Verified 2026-07-19 against a fresh
       `-Prelease` build: jar audit found 0 matches for universal_sandwich / recipe/test / gametest /
       .nbt; the real data files are intact. Re-verify on every release build. Last re-verified
-      2026-10-07 (0.8.0, the staged SHA-1s above): all four jars hold the same 146 payload files (129
-      data files + `pack.mcmeta` + 16 conditional-overlay tag files), with no test recipe, structure
-      template or gametest class. (0.7.0 block, superseded: 126 payload files, same result.)
+      2026-11-04 (0.9.0, the staged SHA-1s above, the rebuild): all four jars hold the same 151 payload
+      files (134 data files + `pack.mcmeta` + 16 conditional-overlay tag files), with no test recipe,
+      structure template or gametest class. (0.8.0 block, superseded: 146 payload files, same result.)
 - [x] **Fabric API is a required dependency of both Fabric files, on BOTH stores (from 0.7.0).**
       `publish.ps1` sends it (Modrinth project `P7dR8mSH`, `required`; CurseForge relation slug
       `fabric-api`, `requiredDependency`) and both Fabric jars declare `"fabric-api": "*"` in
@@ -438,7 +443,12 @@ the live pages since 0.1.0, so this is now a standing step):
       exactly the right scoping. **Do not "fix" this by adding a project-level relation:** that would
       apply to the NeoForge files too and tell NeoForge users to install Fabric API. Re-check the
       same three author pages each release.
-- [x] **Gallery 4 is replaced on BOTH stores.** It is the only image that changed at 0.8.0, and it
+- [ ] **0.9.0: gallery 4 is replaced on BOTH stores.** Again the only image that changed, and it
+      again carries the mod count (now **twenty-four**). Banner, galleries 1–3 and the icon are
+      byte-identical to the live ones — do not re-upload them. Use the 0.8.0 recipe immediately
+      below, including the Modrinth `DELETE ?url=` gotcha (it wants the `_350.webp` url, not
+      `raw_url`).
+- [x] **0.8.0: gallery 4 was replaced on BOTH stores.** It was the only image that changed at 0.8.0, and it
       carries the mod count (now twenty-one). The banner and gallery 2 regenerate byte-identical, so leave
       them alone. Done 2026-10-08: Modrinth via the gallery API (new card featured, the old
       "Fourteen mods bridged" deleted — note `DELETE ?url=` wants the **`_350.webp`** url from the
@@ -488,8 +498,8 @@ needs Fabric API).
 **Identity** — `c:foods/*`. Extends the built-in convention and translates the others into it.
 Croptopia's plural dialect (`c:cheeses`), Pam's concatenated dialect (`c:rawpork`), and Farm &
 Charm's underscored dialect (`c:raw_pork`) all resolve to canonical names (`c:foods/cheese`,
-`c:foods/raw_pork`). Bridges run in **both** directions: 72 of those mods' own dialect tags gain the
-other mods' equivalent items (82 tag files in all, the other ten being canonical `c:foods/*` leaves
+`c:foods/raw_pork`). Bridges run in **both** directions: 74 of those mods' own dialect tags gain the
+other mods' equivalent items (84 tag files in all, the other ten being canonical `c:foods/*` leaves
 like `c:foods/corn` and `c:foods/oranges`), so their *own* recipes accept foreign ingredients — Meadow's
 cheese recipes take Brewin' & Chewin' cheese, Pam's fish recipes take an Aquaculture catch, and
 Croptopia's pineapple recipes take a Fish of Thieves pineapple.
@@ -512,7 +522,11 @@ and Refurbished Furniture's six-per-loaf toast stays out of other mods' recipes.
 Pantrywork adds; what each mod lists in its own tags is its own call. Version 0.7.0 removed or made
 conditional every older swap that failed it, and its changelog lists them all; 0.8.0 removed nothing,
 and its changelog lists the two swaps that gained a condition and the three conditions that got easier
-to satisfy.
+to satisfy. 0.9.0 removed five: Pam's Food Extended files five tofu analogues in its raw beef, pork,
+mutton and fish tags, and each one is a pressed soybean, so none of them reaches a canonical meat or
+fish tag through Pantrywork any more. In the same pass four canonical tags — raw beef, raw pork, raw
+mutton and raw fish — stopped pointing at a whole dialect and now list their members, which is what
+let the tofu in; the members themselves are unchanged.
 
 **Role** — `pantrywork:food_component/{protein, starch, dairy, garnish, liquid_base, sweetener}`.
 Tags-of-tags over the identity layer, describing function rather than identity. Author one recipe
@@ -561,11 +575,13 @@ Farm & Charm butter and Brewin' & Chewin' cheese (and refused with Croptopia's c
 Farmer's Delight's egg sandwich made from Pam's and Bountiful Fares eggs; Croptopia's pineapple
 chicken made from a Fish of Thieves pineapple on NeoForge 26.2; Croptopia's banana smoothie made
 with Farmer's Delight milk; Hearth and Harvest's blueberry crate and Croptopia's blueberry jam made
-from Oh The Biomes We've Gone berries. The Fabric build is booted on 1.21.1, 1.21.10, 1.21.11, 26.1.2 and 26.2;
+from Oh The Biomes We've Gone berries; and, new at 0.9.0, two of Pam's Food Extended recipes built
+entirely out of other mods' food — fried onions from Croptopia's onion and Cultural Delights' butter,
+and cheese on toast from Croptopia's toast and Meadow's cheese slice. The Fabric build is booted on 1.21.1, 1.21.10, 1.21.11, 26.1.2 and 26.2;
 the NeoForge builds on 1.21.1, 26.1.2 and 26.2 — the 26.1.2 boot on the exact NeoForge build All the
 Mods 11 ships, alongside its Croptopia and Aquaculture 2. Separate runs boot it with **none** of the
 supported mods installed, with Farm & Charm removed, and with and without the mods the conditional
-swaps depend on — twelve such combinations on the 1.21.1 release jar alone at 0.8.0, which prove
+swaps depend on — twelve such combinations on the 1.21.1 release jar alone, which prove
 thirteen of the fourteen conditions both open and closed. The few they cannot reach are proven on the
 development boot instead, and the changelog says which rather than implying full coverage. Automated
 GameTests cover role tags, cross-mod identity, reverse bridges, cost floors, and recipe resolution
@@ -587,7 +603,27 @@ bridged mods' real item textures (extracted to `tools/work/tex/`; re-extract fro
 **0.4.0: no art changes needed** — the roster is still ten mods, four dialects, both loaders;
 no card carries a Minecraft-version claim (checked `GenPromo.java` headline strings 2026-08-22).
 
-**0.8.0: replace gallery 4 on BOTH stores. Nothing else.** Regenerated 2026-10-06 with
+**0.9.0: replace gallery 4 on BOTH stores. Nothing else.** Regenerated 2026-11-03 with
+`java tools/GenPromo.java` (JDK 21) after `FOOD_MOD_COUNT` went 21 → 24 and the roster gained its
+three Pam's rows. Every PNG was re-hashed against the 0.8.0 commit afterwards and **only
+`gallery-4-supported-mods.png` changed** — B61D16D4 → CE7A4FD8. The banner (6464C0DC), gallery 1
+(33EEC10C), gallery 2 (8E75C1B0), gallery 3 (72811F90) and the icon (B4D3454C) are byte-identical to
+what is already live, so their claims are untouched and they must not be re-uploaded.
+- Gallery 4 is now **three rows of eight** (was 7/7/7). Headline: "Twenty-four mods bridged."
+- The three new icons are real item textures: Crops' corn and Trees' banana, both items Pantrywork
+  genuinely bridges, and Food Extended's sushi. **The sushi is an identifying icon, not a bridge
+  claim** — Pantrywork bridges none of Food Extended's own items. Its roster row is earned the other
+  way round, as the biggest consumer of what the other mods supply; the comment beside the row says
+  so, and the store copy says "inbound" for the same reason.
+- Gallery 2's craft is unchanged and still true (tagtest-reverse.txt Craft B — Pam's Grilled Cheese
+  & Ham from F&C butter and B&C cheese). 0.9.0 touched no item in it: the tofu exclusions are all
+  Food Extended items, and the four sanitized canonical tags kept every member they had.
+- Gallery 1's "Four dialects" still holds — Pam's three new modules speak the SAME concatenated
+  dialect as Food Core, which is exactly why this release needed no new machinery.
+- The card was opened and read after the run: 24 tiles, no label collision, no overflow, and the
+  footer line still gives Origins its own credit outside the count.
+
+**0.8.0: replaced gallery 4 on BOTH stores. Nothing else.** Regenerated 2026-10-06 with
 `java tools/GenPromo.java` (JDK 21) after `FOOD_MOD_COUNT` went 14 → 20 and the roster gained its six
 new rows, then **regenerated again 2026-10-07** when the blueberry work took the count to 21. Every
 PNG was re-hashed after each run and **only `gallery-4-supported-mods.png` changed** — SHA-1 prefixes
@@ -635,14 +671,14 @@ their claims are untouched and they must not be re-uploaded.
   cheese slice, B&C flaxen wedge) all resolve into `#c:foods/cheese` with the 0.7.0 data, with the
   conditional overlays on or off.
 
-| File | Caption | Status at 0.8.0 |
+| File | Caption | Status at 0.9.0 |
 |---|---|---|
 | `promo/icon-512.png` | Project icon: pantry shelf | unchanged (byte-identical, B4D3454C) |
 | `promo/banner-1920x640.png` | Four mods' cheeses converging into one tag | unchanged (byte-identical, 6464C0DC) |
 | `promo/gallery-1-one-tag.png` | The two layers: identity tags bridging four dialects, role tags on top | unchanged (byte-identical, 33EEC10C) |
 | `promo/gallery-2-four-mod-craft.png` | Pam's Grilled Cheese & Ham crafted with Farm & Charm butter and Brewin' & Chewin' cheese | unchanged (byte-identical, 8E75C1B0). The file name keeps "four-mod" so upload scripts and links still match |
 | `promo/gallery-3-role-tags.png` | Recipe JSON targeting `#pantrywork:food_component/protein`, beside the items it accepts | unchanged (byte-identical, 72811F90) |
-| `promo/gallery-4-supported-mods.png` | All twenty bridged mods, with the "install all, some, or none" promise | **REPLACE** — was fourteen mods; now 25F0734BA3EB0E8A9AE44E6D6742CE5EA639C06B |
+| `promo/gallery-4-supported-mods.png` | All twenty-four bridged mods, with the "install all, some, or none" promise | **REPLACE** — was twenty-one mods (B61D16D4); now CE7A4FD8 |
 
 **Gallery uploads are manual.** The Modrinth PAT used by `publish.ps1` carries version scopes only
 (create/delete versions); the gallery API returns 401 without project-edit scope. CurseForge has no
@@ -655,19 +691,30 @@ stale count survives silently. This release is the proof: "Three dialects" was w
 Farm & Charm landed.
 
 No card states a Minecraft version. Three cards carry content claims that go stale: gallery 4 states
-the bridged-mod count ("Twenty-one mods bridged", derived from `FOOD_MOD_COUNT`) and the roster; gallery
+the bridged-mod count ("Twenty-four mods bridged", derived from `FOOD_MOD_COUNT`) and the roster; gallery
 2 shows one specific craft, which must be a craft a suite performs (tagtest-reverse.txt Craft B), and
 says "No food mod required."; the banner shows four cheeses reaching `#c:foods/cheese`. Re-check them
 every release — images can't be grepped and go stale invisibly. `FOOD_MOD_COUNT` must equal the number
 of optional AFTER deps in `src/main/templates/META-INF/neoforge.mods.toml` (Origins is a consumer, not
-a bridged food mod, and has the card's footer line to itself): 20 at 0.8.0, checked both ways in this
-pass.
+a bridged food mod, and has the card's footer line to itself): **24 at 0.9.0**, checked both ways in
+this pass — counted out of the BUILT jar's `neoforge.mods.toml`, not the template.
 
 ---
 
 ## Changelog for the uploads
 
-> **0.8.0 — Six more mods, and the wok finally lights.** Paste-ready body in
+> **0.9.0 — The rest of Pam's HarvestCraft, and a free lunch taken off the menu.** Paste-ready body
+> in `tools/changelog-current.md`: Pam's HarvestCraft 2 Crops, Trees and Food Extended, taking the
+> roster to 24; Crops' and Trees' ~250 items landing in tag families the pack already reads, with
+> Pam's two-level dialect growing the family tags by itself; **Food Extended as the release's point —
+> 743 of its 3,472 tag-read ingredient slots now accept other mods' food**, stated as inbound because
+> Pantrywork bridges none of its items; the two crafts that prove it (fried onions from Croptopia's
+> onion + Cultural Delights' butter, cheese on toast from Croptopia's toast + Meadow's cheese slice);
+> five tofu analogues excluded and four canonical tags sanitized, with the members unchanged; the
+> tofish fix, said plainly to have been caught before release; what tags cannot fix; and the two
+> upstream Pam's bugs.
+>
+> **0.8.0 — Six more mods, and the wok finally lights.** (shipped 2026-10-08) Paste-ready body in
 > `tools/changelog-current.md`: Kaleidoscope Cookery, Hearth and Harvest, Cultural Delights (+ Cook's
 > Collection), Rustic Delight and Hybrid Delights; the wok oil tag that gates all 225 of Kaleidoscope's
 > wok recipes; Hybrid Delights' salt into 75 recipes and a fifth salt spelling bridged into 36; oils
@@ -780,7 +827,7 @@ was re-checked against the NeoForge/Forge docs on 2026-11-01 so the reply can ci
 | `c:` is a 1.20.5+ convention | NeoForge docs: the 1.20.3/1.20.4 pages say `forge`, the 1.20.6 pages say `c` |
 | 1.20.1 has no food tags to extend | the documented `forge:` crop set is beetroot, carrot, nether_wart, potato, wheat |
 | path differs too | 1.20.1 `data/<ns>/tags/items/`, 1.21+ `data/<ns>/tags/item/` (singular) |
-| it is not a repackage | all 146 payload files would change namespace AND path, and every bridged mod's 1.20.1 jar would need re-reading and re-costing (186 item costs, 196 floors, 14 gates re-derived) |
+| it is not a repackage | all 151 payload files would change namespace AND path, and every bridged mod's 1.20.1 jar would need re-reading and re-costing (195 item costs, 249 floors, 14 gates re-derived) |
 
 **One caveat to keep honest:** nobody has proven that *no* 1.20.1 Forge mod reads `c:` tags. The
 2026-11-01 check could not reach MinecraftForge's own 1.20.x source, so this rests on documented

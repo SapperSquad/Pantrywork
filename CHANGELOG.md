@@ -19,7 +19,7 @@ members explicitly instead of pointing at a dialect. Both are explained below.
   Pam's mods". All three are NeoForge 1.21.1 only, like Food Core; none has a 26.x build, so the
   26.x files are unchanged. All three ship `c:` tags of their own (424, 139 and 393 item-tag
   files), none of them touches `c:foods/*`, and that is exactly the Food Core shape Pantrywork
-  has bridged since 0.1.0 — so this needed no new machinery, only 53 cost floors and 8 item
+  has bridged since 0.1.0 — so this needed no new machinery, only 53 cost floors and 9 item
   costs read out of the jars.
 - **Crops and Trees land where your pack already looks.** 193 of Crops' 197 tagged items and 47
   of Trees' 48 sit in tag families Pantrywork already bridges, so their corn, barley, oats,
@@ -76,7 +76,7 @@ members explicitly instead of pointing at a dialect. Both are explained below.
 - 111 generated tag files (was 106), 151 payload files per jar (was 146): 134 data +
   `pack.mcmeta` + 16 overlay tag files, identical across all four jars.
 - 53 new cost floors and 9 new item costs, every number read out of a recipe in the jar.
-  Verdicts: 42 GATE (unchanged), 87 EXCLUDE (was 66), 12 rescued PASS (was 11). No new gates and
+  Verdicts: 42 GATE (unchanged), 91 EXCLUDE (was 66), 12 rescued PASS (was 11). No new gates and
   no new overlays — still 16 gated entries in 14 overlays.
 - 24 optional AFTER dependencies in the 1.21.1 jar (was 21); the 26.x jar is unchanged at 12,
   since none of the three has a 26.x build.

@@ -203,14 +203,15 @@ load tag" - EXCEPT exactly the two documented KC-without-Quark TagLoader lines o
 Kaleidoscope scenarios (S7, S9, S10) and on the two dev boots that carry it. The only recipe
 parse error anywhere is the documented `brewinandchewin:pizza_from_dough` baseline.
 
-**RE-VERIFICATION OF THE REBUILD 2026-11-04 - 5 boots on the NEW bytes, every suite at its
-documented count.** The 27-boot matrix above ran on the superseded jars, so read it with this.
+**FULL 27-BOOT MATRIX RE-RUN ON THE REBUILD 2026-11-04 - every suite at its documented count,
+zero regressions. THIS is the matrix the released bytes carry; the 2026-11-03 block above ran on
+the superseded first cut and is kept only as the record of what those bytes measured.**
 Payload delta between the two builds, measured entry by entry across all 151 files: **5 entries
 lost, 0 gained, in 4 files** - `pamhc2foodextended:rawtofishitem` out of c/tags/item/rawfish.json,
 fishes.json and raw_fishes.json, and the two live refs out of c/tags/item/foods/raw_fish.json. All
 four jars still 151 payload files and still byte-identical to each other. Static gates re-run:
 generator exit 0 (111 tag files, 16 gated in 14 overlays, 42 GATE / **91** EXCLUDE / 12 rescued
-PASS - three more EXCLUDEs, all tofish), `-SelfTest` PASSED, AuditRoles full (**891 routes**, 45
+PASS - four more EXCLUDEs, all tofish), `-SelfTest` PASSED, AuditRoles full (**891 routes**, 45
 gates proven conditional) and `-Minimal` both exit 0 with every counter 0.
 Boots re-run on 26302D08 / 31DCC892: full dev `runServer` **9742 recipes** and all 16 suites at
 their documented counts (tagtest 14/0, multi 14/0, reverse 18/0, crafttest-reverse 4/0, crafttest
@@ -218,10 +219,32 @@ their documented counts (tagtest 14/0, multi 14/0, reverse 18/0, crafttest-rever
 15/0, feedback 204/0, kaleido 212/0+5, nofandc 18/3 by design, pams 119/0); neo-server-1211 solo
 (5/0 + 4/1 cake by design), S1 (gates 19/0+7, s1 7/0+4) and **S9 (20/0+3, the fish cut gates at
 item level)**; fabric-server (tagtest-fabric 7/0, fabric-gates 22/0+10). Log scans clean except the
-documented KC-without-Quark pair. NOT re-booted on the new bytes: S2-S8, S10-S12, both NeoForge
-26.x harnesses and four of the five Fabric harnesses - their results above stand on bytes whose
-only difference is the five entries listed, and the membership resolution shows no item they assert
-can have moved. Re-run the full matrix before publishing if a uniform record is wanted.
+documented KC-without-Quark pair.
+
+THEN THE WHOLE MATRIX WAS RE-RUN on the rebuilt jars, so no result in the release record rests on
+superseded bytes any more. Fresh world + deleted latest.log/debug.log before every boot, stopped via
+RCON, java confirmed exited and 25575 free between boots, every suite classified with
+tools\CountSuite.ps1, and each harness's Pantrywork SHA-1 printed at boot.
+DEV, 4 boots: full `runServer` **9742 recipes** with all 16 suites (tagtest 14/0, multi 14/0,
+reverse 18/0, crafttest-reverse 4/0, crafttest 4/0, addons 8/0, origins 11/0, letsdo 50/0, brewaqua
+24/0, seedfix 10/0, collisions 17/0, milkshim 15/0, feedback 204/0, kaleido 212/0+5, nofandc 18/3 by
+design, pams 119/0); `-PnoFarmAndCharm` 9572 (nofandc 21/0, feedback 204/0); `-PnoCompatMods` 1291
+(tagtest-nofd 5/0); `runGameTestServer` 9743, "All 7 required tests passed".
+RELEASE, 23 boots, all on 26302D08 / 31DCC892 / 843A48F6 / 6056F2EA. neo-server-1211 (21.1.241):
+solo tagtest-neo26 5/0 + tagtest-nofd 4/1 (the cake line, by design); S1-S4 each tagtest-gates
+19/0+7 plus s1 7/0+4, s2 15/0+4, s3 18/0+1, s4 9/0+1; S5 6/0+5; S6 30/0+5; S7 16/0+4; S8 19/0+3;
+S9 20/0+3; S10 7/0+3; S11 17/0+3; S12 27/0+3. neo-server-2612 (26.1.2.94): neo26-compat 7/0,
+neo26-gates 7/0+12; solo neo26 5/0. neo-server-262 (26.2.0.64): compat262 5/0, neo26-feedback 37/0,
+neo26-gates 7/0+12; solo neo26 5/0. Fabric: fabric-server, -12110, -2612 and -262 each
+tagtest-fabric 7/0 + fabric-gates 22/0+10; -12111 tagtest-fabric-fd 9/0. No-Fabric-API boot: exit 1,
+"Mod resolution failed", "Incompatible mods found!",
+`HARD_DEP pantrywork 0.9.0 {depends fabric-api @ [*]}`, no world directory created.
+The two 26.x solo boots and the no-API boot move the other mods aside and restore them; all three
+printed the mod set as byte-identical afterwards (4, 7 and 5 jars).
+Log scan, all 27: ZERO lines matching pack.mcmeta, overlay, pantrywork_gate, pantrywork:gated,
+"Failed to load", "Missing data pack", "Tried to load invalid" or "Couldn't load tag" - EXCEPT
+exactly the two documented KC-without-Quark TagLoader lines on the three Kaleidoscope scenarios
+(S7, S9, S10) and on the three dev boots that carry it.
 
 **TWO NEW UPSTREAM BASELINES, both Pam's and neither ours:**
 - **Pam's Crops ships an unreadable `minecraft:rabbit_food`.** The dev log carries
