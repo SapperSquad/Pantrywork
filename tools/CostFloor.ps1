@@ -291,7 +291,12 @@ function Resolve-PlatformNeoJar($root) {
 function Get-JarModIds($zip) {
   $ids = @()
   foreach ($e in $zip.Entries) {
-    if ($e.FullName -eq 'META-INF/neoforge.mods.toml') {
+    # Forge on 1.20.1 names this file META-INF/mods.toml; NeoForge renamed it to
+    # neoforge.mods.toml for 1.21. Same TOML shape, so one reader serves both. Without the
+    # 1.20.1 spelling every Forge jar falls back to its FILENAME as the mod id, which makes
+    # every declared floor look fictional and every definer look undeclared (418 phantom
+    # problems on the first forge1201 run, 2026-11-04).
+    if ($e.FullName -eq 'META-INF/neoforge.mods.toml' -or $e.FullName -eq 'META-INF/mods.toml') {
       $r = New-Object IO.StreamReader($e.Open()); $txt = $r.ReadToEnd(); $r.Close()
       $section = ''
       foreach ($line in ($txt -split "`n")) {

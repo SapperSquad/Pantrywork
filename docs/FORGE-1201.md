@@ -97,6 +97,66 @@ the 1.20.1 recipes**, not copied: the mods are at different versions (FD 1.3.4 n
 - Pam's Food Core / Food Extended ship as `1.20.4` files tagged for 1.20–1.20.4, which **includes
   1.20.1**. Those are the right jars.
 
+## Built so far (2026-11-04)
+
+`GenerateBridges.ps1` now takes **`-Platform modern|forge1201`**. Modern is the default and its
+output is **byte-identical** to before the change (re-verified after every edit: 111 tag files,
+42 GATE / 91 EXCLUDE / 12 rescued PASS, `git status src/generated` clean).
+
+What the switch changes, and nothing else:
+
+| | modern (1.21+) | forge1201 |
+|---|---|---|
+| shared namespace (`$SharedNs`) | `c` | `forge` |
+| tag path segment (`$TagSeg`) | `item` | `items` |
+| jars read | `tools/work/jars` | `tools/work/jars-1201` |
+| output root | `src/generated/resources` | `src/generated/forge1201` |
+
+The key design decision: **tag identity is always recorded in the `c:` spelling**, whatever
+namespace the line uses. The cost-floor keys, the floor-definer check and the planting /
+food-evidence seed rules all reason about identity, so normalising on ingest is what lets one set
+of judgments serve both platforms instead of forking 249 floors. Only reading and writing use
+`$SharedNs`. The hand-authored tree stays the single source of truth in its `c:` spelling and has
+its refs retargeted on a forge1201 run.
+
+Two real bugs fell out of this, both now fixed:
+
+- **`Get-JarModIds` only read `META-INF/neoforge.mods.toml`.** Forge 1.20.1 names it
+  `META-INF/mods.toml`. Every 1.20.1 jar was therefore falling back to its *filename* as the mod
+  id, which made every declared floor look fictional and every definer look undeclared — 418
+  phantom problems on the first run, down to 134 once the 1.20.1 spelling was read.
+- **Accepting both `tags/item/` and `tags/items/` in one scan was wrong.** It made the 1.21 run
+  read files the game ignores: Let's Do Vinery ships a dead plural `tags/items/milk.json` in its
+  1.21 jar, which registered Vinery as a definer of `c:milk` and stopped the modern build. The
+  scan now reads exactly the path form that platform's game reads.
+
+## The remaining work, measured not estimated
+
+A forge1201 run reaches the cost gate and stops there with **134 problems** — which is the
+guardrail doing its job, not a failure. Broken down:
+
+- **39 STALE** — a 1.20.1 jar defines a judged tag and no floor is declared for that mod. These
+  are genuine "read the recipe out of the jar" decisions: farmersdelight 17, kaleidoscope_cookery
+  7, rusticdelight 4, fishofthieves 3, create 2, croptopia 2, hearthandharvest 2, vinery 1,
+  aquaculture 1. Tags include `c:dough`, `c:flour`, `c:milk`, `c:eggs`, `c:pasta`, `c:grain`,
+  `c:fruits`, the cooked and raw meats.
+- **89 FICTIONAL** — a floor is declared for a mod that defines no such tag on 1.20.1. Three
+  causes, and only the third needs judgment: (a) the mod does not exist on 1.20.1 at all —
+  `pamhc2crops` 14, `pamhc2trees` 8, `bountifulfares` 10, 32 in total, so those floors simply do
+  not apply on this platform; (b) `neoforge` 7, which is the platform's own tags and maps to
+  Forge/vanilla on 1.20.1; (c) genuine version differences, led by `farmersdelight` 22 — FD 1.3.4
+  does not file everything FD 1.3.2-on-1.21 files.
+- **6 UNKNOWN** — items with no cost: `hearthandharvest:cheese_slice` and `:goat_cheese_slice`
+  (in both `c:cheese` and `c:cheeses`), `farm_and_charm:sausage_with_oat_patty` in `c:cookedbeef`,
+  `hearthandharvest:raisin_cookie` in `c:cookies`.
+
+**This needs a per-platform floor model** — a floor that is real on 1.21 and absent on 1.20.1 is
+not a fiction to delete, it is scoped. The shape to add is a platform overlay in
+`cost-floors.json` rather than a second file, so the 1.21 judgments stay the base and only the
+differences are stated. Every number still comes out of a 1.20.1 recipe: **do not copy a 1.21
+floor across on the assumption the recipe is unchanged** — the versions differ (FD 1.3.4 not
+1.3.2, Cultural Delights 0.16.7 not 0.18.1, Croptopia 4.0.1 not 4.2.4).
+
 ## Open before the first build
 
 - Fetch the two missing jars, then re-run the scan so the dialect map is complete.

@@ -44,15 +44,28 @@
 # written): stale floors must be fixed, never guessed. The gate mechanism (pack
 # overlays, not conditions inside tag files, which every loader ignores) was proven
 # live on NeoForge 1.21.1/26.1.2/26.2 and Fabric 1.21.1/1.21.11/26.2 on 2026-09-13.
-param([string[]]$ExtraJarDirs = @(), [switch]$SelfTest)
+param([string[]]$ExtraJarDirs = @(), [switch]$SelfTest,
+      [ValidateSet('modern', 'forge1201')][string]$Platform = 'modern')
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 . (Join-Path $PSScriptRoot 'CostFloor.ps1')
 $root = Split-Path $PSScriptRoot -Parent
 # powershell -File passes "a,b" as ONE string: split it
 $ExtraJarDirs = @($ExtraJarDirs | ForEach-Object { $_ -split ',' } | Where-Object { $_ })
-$jarsDir = Join-Path $root "tools\work\jars"
-$genRoot = Join-Path $root "src\generated\resources"
+# PLATFORM TARGETING. 'modern' is 1.21+: shared namespace c:, singular tags/item.
+# 'forge1201' is Minecraft 1.20.1 on Forge, where the shared food vocabulary is forge: and
+# the path is PLURAL tags/items - a singular path is silently dead there, exactly as a plural
+# one is on 1.21. Measured 2026-11-04 across 21 1.20.1 jars: 1608 forge: item-tag files
+# against 63 c:, and every one of the 1541 on the plural path (docs/FORGE-1201.md).
+# The resolution core needs no fork: shared-namespace tags are keyed by BARE PATH, so only
+# the edges below change. Cost-floor keys keep their c: spelling - they are judgments about
+# what a food IS, not about which namespace a loader spells it in.
+$SharedNs = if ($Platform -eq 'forge1201') { 'forge' } else { 'c' }
+$TagSeg   = if ($Platform -eq 'forge1201') { 'items' } else { 'item' }
+$jarsDir = if ($Platform -eq 'forge1201') { Join-Path $root "tools\work\jars-1201" }
+           else { Join-Path $root "tools\work\jars" }
+$genRoot = if ($Platform -eq 'forge1201') { Join-Path $root "src\generated\forge1201" }
+           else { Join-Path $root "src\generated\resources" }
 $reportFile = Join-Path $root "tools\work\bridges-report.txt"
 if ($SelfTest) {
   # Keep this directory name SHORT. The longest generated path is
@@ -68,8 +81,8 @@ if ($SelfTest) {
   $reportFile = Join-Path $selfTestDir "report.txt"
   New-Item -ItemType Directory -Force $genRoot | Out-Null
 }
-$outDir = Join-Path $genRoot "data\c\tags\item"
-$bridgedDir = Join-Path $genRoot "data\pantrywork\tags\item\bridged"
+$outDir = Join-Path $genRoot "data\$SharedNs\tags\$TagSeg"
+$bridgedDir = Join-Path $genRoot "data\pantrywork\tags\$TagSeg\bridged"
 
 $costData = Read-CostData $root
 if ($costData.problems.Count) { "cost-floors.json is inconsistent:"; $costData.problems | ForEach-Object { "  $_" }; exit 1 }
@@ -146,14 +159,18 @@ foreach ($jar in $sources) {
   # canonical tag that references it. minecraft: tags are skipped as noise for the
   # unions, but they are still read for the own-mod seed/food filing above
   # (minecraft:villager_plantable_seeds is one of the planting signals).
-  foreach ($e in ($zip.Entries | Where-Object { $_.FullName -match '^data/[^/]+/tags/item/.+\.json$' })) {
+  foreach ($e in ($zip.Entries | Where-Object { $_.FullName -match ('^data/[^/]+/tags/' + $TagSeg + '/.+\.json' + '$') })) {
     $ns = ($e.FullName -split '/')[1]
     $r = New-Object IO.StreamReader($e.Open()); $json = $r.ReadToEnd(); $r.Close()
-    $path = $e.FullName -replace "^data/$ns/tags/item/",'' -replace '\.json$',''
-    $tid = "${ns}:$path"
+    $path = $e.FullName -replace ('^data/' + $ns + '/tags/' + $TagSeg + '/'),'' -replace '\.json$',''
+    # Tag IDENTITY is always recorded in the c: spelling, whatever namespace the line
+    # actually uses. Everything downstream reasons about identity - cost-floor keys, the
+    # floor-definer check, the planting/food-evidence tag rules - so normalising here is what
+    # lets one set of judgments serve both platforms. Only reading and writing use $SharedNs.
+    $tid = if ($ns -eq $SharedNs) { "c:$path" } else { "${ns}:$path" }
     Add-OwnFiledEntries $tid (ConvertFrom-Json $json).values $jarNs $ownSeedFiled $ownFoodFiled
     if ($ns -eq 'minecraft') { continue }
-    $key = if ($ns -eq 'c') { $path } else { $tid }
+    $key = if ($ns -eq $SharedNs) { $path } else { $tid }
     Add-TagFile $key $json
     if (-not $definers.ContainsKey($tid)) { $definers[$tid] = New-Object System.Collections.Generic.HashSet[string] }
     [void]$definers[$tid].Add($primaryMod)
@@ -161,9 +178,15 @@ foreach ($jar in $sources) {
   $zip.Dispose()
 }
 # our hand-authored canonical tags participate in resolution too
-Get-ChildItem (Join-Path $root "src\main\resources\data\c\tags\item") -Recurse -Filter "*.json" | ForEach-Object {
-  $rel = $_.FullName.Substring((Join-Path $root "src\main\resources\data\c\tags\item").Length + 1) -replace '\\','/' -replace '\.json$',''
-  Add-TagFile $rel (Get-Content $_.FullName -Raw)
+$handRoot = Join-Path $root "src\main\resources\data\c\tags\item"
+Get-ChildItem $handRoot -Recurse -Filter "*.json" | ForEach-Object {
+  $rel = $_.FullName.Substring($handRoot.Length + 1) -replace '\\','/' -replace '\.json$',''
+  $txt = Get-Content $_.FullName -Raw
+  # The hand-authored layer is written ONCE, in the c: spelling, and stays the single source
+  # of truth. On a forge1201 run its refs are retargeted so a "#c:rawfish" finds the
+  # forge:rawfish the 1.20.1 jars actually ship.
+  if ($SharedNs -ne 'c') { $txt = $txt -replace '"#c:', ('"#' + $SharedNs + ':') }
+  Add-TagFile $rel $txt
 }
 
 # --- transitive resolution: tagPath -> set of item ids ---
@@ -177,7 +200,7 @@ function Resolve-Tag($tagPath, $visited) {
       # c: tags are keyed by bare path; every other namespace keeps its "ns:path"
       # key, so both a "#c:foods/cheese" and a "#brewinandchewin:foods/cheese_wedge"
       # reference resolve to the items behind them.
-      $key = if ($ref.StartsWith('c:')) { $ref.Substring(2) } else { $ref }
+      $key = if ($ref.StartsWith("${SharedNs}:")) { $ref.Substring($SharedNs.Length + 1) } else { $ref }
       foreach ($i in (Resolve-Tag $key $visited)) { [void]$items.Add($i) }
     } else {
       [void]$items.Add($id)
@@ -592,7 +615,7 @@ function Add-PlannedTag([string]$baseRel, [string]$gatedPathPrefix, $split) {
     # distinct ids). The overlay DIRECTORY gets a short numbered name once every gate set
     # is known - "<gate:key>" is resolved in the write loop.
     $refs += "#pantrywork:gated/$key/$gatedPathPrefix"
-    $overlayRel = "<gate:$key>\data\pantrywork\tags\item\gated\$key\$($gatedPathPrefix -replace '/','\').json"
+    $overlayRel = "<gate:$key>\data\pantrywork\tags\$TagSeg\gated\$key\$($gatedPathPrefix -replace '/','\').json"
     $planFiles[$overlayRel] = @{ items = @($split.gated[$key]); refs = @() }
   }
   if ($split.pass.Count -eq 0 -and $refs.Count -eq 0) { return $false }
@@ -638,7 +661,7 @@ foreach ($cat in $categories) {
     $gatedIds = @(); foreach ($k in $split.gated.Keys) { $gatedIds += $split.gated[$k] }
     $excluded = @($candidates | Where-Object { $split.pass -notcontains $_ -and $gatedIds -notcontains $_ } | Sort-Object)
     if ($excluded.Count) { [void]$report.AppendLine("  c:$t : EXCLUDED below the cost floor: $($excluded -join ', ')") }
-    $wrote = Add-PlannedTag "data\c\tags\item\$($t -replace '/','\').json" "c/$t" $split
+    $wrote = Add-PlannedTag "data\$SharedNs\tags\$TagSeg\$($t -replace '/','\').json" "c/$t" $split
     if (-not $wrote) { [void]$report.AppendLine("  c:$t : nothing to inject"); continue }
     if ($split.pass.Count) { [void]$report.AppendLine("  c:$t += $(($split.pass | Sort-Object) -join ', ')") }
     foreach ($k in $split.gated.Keys) { [void]$report.AppendLine("  c:$t += (GATED, only with $($gateSets[$k] -join ' or ')) $($split.gated[$k] -join ', ')") }
@@ -664,7 +687,7 @@ foreach ($fs in $forwardSanitized) {
   $split = Split-ByVerdict $fs.judgeAs @($members) $label
   $gatedIds = @(); foreach ($k in $split.gated.Keys) { $gatedIds += $split.gated[$k] }
   $excluded = @($members | Where-Object { $split.pass -notcontains $_ -and $gatedIds -notcontains $_ } | Sort-Object)
-  [void](Add-PlannedTag "data\pantrywork\tags\item\bridged\$($fs.target).json" "bridged/$($fs.target)" $split)
+  [void](Add-PlannedTag "data\pantrywork\tags\$TagSeg\bridged\$($fs.target).json" "bridged/$($fs.target)" $split)
   [void]$report.AppendLine("  pantrywork:bridged/$($fs.target) <- $($split.pass.Count) items from $($fs.sources -join ', ') (judged as $($fs.judgeAs)); dropped $($dropped.Count) seed(s): $($dropped -join ', ')")
   if ($blocked.Count) { [void]$report.AppendLine("    blacklisted: $($blocked -join ', ')") }
   if ($unvetted.Count) { [void]$report.AppendLine("    dropped unvetted: $($unvetted -join ', ')") }
