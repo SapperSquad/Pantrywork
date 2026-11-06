@@ -40,9 +40,6 @@
     { "id": "fishofthieves:stormfish", "required": false },
     { "id": "fishofthieves:wildsplash", "required": false },
     { "id": "fishofthieves:wrecker", "required": false },
-    { "id": "minecraft:cod", "required": false },
-    { "id": "minecraft:salmon", "required": false },
-    { "id": "minecraft:tropical_fish", "required": false },
     { "id": "oceansdelight:guardian", "required": false },
     { "id": "oceansdelight:guardian_tail", "required": false },
     { "id": "rusticdelight:calamari", "required": false }

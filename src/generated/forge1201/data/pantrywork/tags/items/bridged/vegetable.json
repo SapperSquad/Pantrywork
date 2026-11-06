@@ -35,7 +35,6 @@
     { "id": "farm_and_charm:strawberry", "required": false },
     { "id": "farm_and_charm:tomato", "required": false },
     { "id": "farmersdelight:cabbage", "required": false },
-    { "id": "farmersdelight:cabbage_leaf", "required": false },
     { "id": "farmersdelight:onion", "required": false },
     { "id": "farmersdelight:tomato", "required": false },
     { "id": "kaleidoscope_cookery:green_chili", "required": false },

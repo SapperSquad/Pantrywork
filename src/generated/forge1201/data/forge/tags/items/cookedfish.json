@@ -12,8 +12,6 @@
     { "id": "fishofthieves:cooked_stormfish", "required": false },
     { "id": "fishofthieves:cooked_wildsplash", "required": false },
     { "id": "fishofthieves:cooked_wrecker", "required": false },
-    { "id": "minecraft:cooked_cod", "required": false },
-    { "id": "minecraft:cooked_salmon", "required": false },
     { "id": "oceansdelight:cooked_guardian_tail", "required": false },
     { "id": "oceansdelight:kelp_encrusted_cod", "required": false },
     { "id": "rusticdelight:cooked_calamari", "required": false }

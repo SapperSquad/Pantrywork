@@ -194,6 +194,47 @@ Get-ChildItem $handRoot -Recurse -Filter "*.json" | ForEach-Object {
 }
 
 # --- transitive resolution: tagPath -> set of item ids ---
+# Items already in a tag WITHOUT depending on a mod other than the tag's own definers.
+#
+# Needed because the two obvious readings are both wrong. Counting only literal entries misses
+# a mod that files its items behind its own sub-tag - Rustic Delight keeps its bell-pepper
+# slices in forge:vegetables/bell_pepper and references that from forge:vegetables - so we
+# re-inject what the tag already holds, which in game adds nothing but makes Pantrywork the
+# author of a path it did not create. Following EVERY reference is worse: on 1.20.1 it made
+# farm_and_charm:strawberry look already-present in forge:fruits when only Croptopia's chain
+# delivered it, so we skipped injecting it and its membership silently became conditional on
+# Croptopia - which AuditRoles check 6 caught.
+#
+# So a reference is followed only when the referenced tag shares a defining mod with the tag we
+# are filling. The same mod's own sub-tag counts; another mod's contribution does not.
+function Resolve-TagOwned($tagPath, $visited, $owners) {
+  $items = New-Object System.Collections.Generic.HashSet[string]
+  if ($visited.Contains($tagPath) -or -not $tagEntries.ContainsKey($tagPath)) { return ,$items }
+  [void]$visited.Add($tagPath)
+  foreach ($id in $tagEntries[$tagPath]) {
+    if ($id.StartsWith('#')) {
+      $ref = $id.Substring(1)
+      $key = if ($ref.StartsWith("${SharedNs}:")) { $ref.Substring($SharedNs.Length + 1) } else { $ref }
+      $refOwners = if ($definers.ContainsKey((TagIdOf $key))) { $definers[(TagIdOf $key)] } else { $null }
+      # EVERY definer of the referenced tag must also define the parent, not merely one of
+      # them. Overlap is not enough: forge:strawberries is defined by Croptopia AND Farm &
+      # Charm, so following it from forge:fruits (which Croptopia defines) dragged in Farm &
+      # Charm's strawberry as though it were already present - and skipping its injection made
+      # that bridge conditional on Croptopia being installed. A sub-tag only its parent's own
+      # definers write, like Rustic Delight's forge:vegetables/bell_pepper, is safe to follow.
+      $ownedWholly = $false
+      if ($refOwners) {
+        $ownedWholly = $true
+        foreach ($o in $refOwners) { if ($owners -notcontains $o) { $ownedWholly = $false; break } }
+      }
+      if ($ownedWholly) { foreach ($i in (Resolve-TagOwned $key $visited $owners)) { [void]$items.Add($i) } }
+    } else {
+      [void]$items.Add($id)
+    }
+  }
+  return ,$items
+}
+function TagIdOf($key) { if ($key -like '*:*') { return $key } else { return "c:$key" } }
 function Resolve-Tag($tagPath, $visited) {
   $items = New-Object System.Collections.Generic.HashSet[string]
   if ($visited.Contains($tagPath) -or -not $tagEntries.ContainsKey($tagPath)) { return ,$items }
@@ -667,8 +708,26 @@ foreach ($cat in $categories) {
     # croptopia:dough reached Pam's c:dough only through Farm & Charm's
     # c:dough -> #c:doughs, so uninstalling F&C silently broke Croptopia dough in
     # Pam's recipes. A duplicate entry costs nothing (tag loading de-duplicates).
+    # Items already in the tag, which are never re-injected.
+    #
+    # On 1.21 this is the LITERAL entry list, and it stays that way: resolving references here
+    # changes 62 files of the published payload and moves the verdicts (42 -> 33 GATE, 12 -> 3
+    # rescued PASS), dropping whole bridges. That is a deliberate decision about a shipped
+    # build, not a porting detail, so it is not made here.
+    #
+    # On forge1201 the set DOES resolve references, because 1.20.1 has no gates: a mod that
+    # files items behind its own sub-tag (Rustic Delight keeps its bell-pepper slices in
+    # forge:vegetables/bell_pepper and references that from forge:vegetables) leaves them out of
+    # the literal list, so we would re-inject what the tag already holds. In game that adds
+    # nothing; on paper it makes Pantrywork the author of a path it did not create, and with no
+    # gate available to qualify it the dilution guard rightly reports it against us.
     $direct = New-Object System.Collections.Generic.HashSet[string]
-    foreach ($x in $tagEntries[$t]) { if (-not $x.StartsWith('#')) { [void]$direct.Add($x) } }
+    if ($Platform -eq 'forge1201') {
+      $owners = if ($definers.ContainsKey("c:$t")) { @($definers["c:$t"]) } else { @() }
+      foreach ($x in (Resolve-TagOwned $t (New-Object System.Collections.Generic.HashSet[string]) $owners)) { [void]$direct.Add($x) }
+    } else {
+      foreach ($x in $tagEntries[$t]) { if (-not $x.StartsWith('#')) { [void]$direct.Add($x) } }
+    }
     $candidates = @($union | Where-Object { -not $direct.Contains($_) })
     if ($candidates.Count -eq 0) { [void]$report.AppendLine("  c:$t : nothing to inject"); continue }
     $split = Split-ByVerdict "c:$t" $candidates "c:$t"
@@ -783,6 +842,10 @@ if ($problems.Count) {
 }
 
 # --- write the plan ---
+# forge1201 writes ONE self-contained tree (generated + translated hand layer), so the whole
+# root is cleared: leaving last run's translated hand files in place makes the collision check
+# fire against the generator's own previous output.
+if ($Platform -eq 'forge1201' -and (Test-Path $genRoot)) { Remove-Item $genRoot -Recurse -Force }
 if (Test-Path $outDir) { Remove-Item $outDir -Recurse -Force }
 if (Test-Path $bridgedDir) { Remove-Item $bridgedDir -Recurse -Force }
 Get-ChildItem $genRoot -Directory -Filter 'pantrywork_gate_*' -ErrorAction SilentlyContinue | ForEach-Object { Remove-Item $_.FullName -Recurse -Force }

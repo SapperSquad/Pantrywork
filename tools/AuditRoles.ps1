@@ -786,6 +786,41 @@ foreach ($tid in ($costData.tags.Keys | Sort-Object)) {
 $costLines | Sort-Object -Unique
 if ($costFail -eq 0) { "  ok: $costChecked Pantrywork (tag, item) routes judged; $costGatedOk GATE verdicts proven conditional on a rescuing mod on every path" }
 ""
+""
+"=== STRICTER-REFERRER GUARD (a judged tag that pulls in a looser judged tag) ==="
+# The hazard: upstream writes tag A referencing tag B, and A's floor is STRICTER than B's.
+# Anything Pantrywork legitimately puts in B then arrives in A below A's floor, and no check
+# that looks at B alone can see it. Croptopia 4.0.1's forge:doughs referenced forge:dough
+# exactly this way (floors 2.1 against 0.094); by 4.2.4 the reference was gone. So this guards
+# against upstream changing its mind rather than reporting a standing fault. Measured when
+# added, 2026-11-05: 0 such edges on 1.21 across 193 judged refs, 1 on 1.20.1.
+$hazard = 0
+$hazardSeen = @{}
+foreach ($k in $tags.Keys) {
+  $aId = TagId $k
+  if (-not $costData.tags.ContainsKey($aId)) { continue }
+  $aFloor = Get-StrictestFloor $costData $aId
+  if ($null -eq $aFloor) { continue }
+  foreach ($entry in $tags[$k]) {
+    if ($entry.src -eq 'pantrywork') { continue }
+    if (-not $entry.id.StartsWith('#')) { continue }
+    $ref = $entry.id.Substring(1)
+    $bKey = if ($ref.StartsWith("${SharedNs}:")) { $ref.Substring($SharedNs.Length + 1) } else { $ref }
+    $bId = TagId $bKey
+    if (-not $costData.tags.ContainsKey($bId)) { continue }
+    if ($costData.tags[$aId].unit -ne $costData.tags[$bId].unit) { continue }
+    $bFloor = Get-StrictestFloor $costData $bId
+    if ($null -eq $bFloor -or $bFloor -ge $aFloor) { continue }
+    $sig = "$aId|$bId"
+    if ($hazardSeen.ContainsKey($sig)) { continue }
+    $hazardSeen[$sig] = $true
+    $hazard++
+    "  FAIL: $aId references $bId, which is LOOSER (floors $(Format-Cost $aFloor) vs $(Format-Cost $bFloor)): anything Pantrywork puts in $bId arrives in $aId below its floor"
+  }
+}
+if ($hazard -eq 0) { "  none (no judged tag pulls in a looser judged tag)" }
+
+""
 "=== REQUIRED-BUT-UNDEFINED TAG REFERENCES / REQUIRED FOREIGN ITEMS ==="
 if ($missingRequired.Count -eq 0) { "  none" } else { $missingRequired | Sort-Object -Unique | ForEach-Object { "  $_" } }
 ""
@@ -796,4 +831,5 @@ if ($missingRequired.Count -eq 0) { "  none" } else { $missingRequired | Sort-Ob
 "dilution via Pantrywork  : $dilution"
 "third-mod dependence     : $dependence"
 "cost-floor failures      : $costFail"
-if ($violations -gt 0 -or $missingRequired.Count -gt 0 -or $shimLeak -gt 0 -or $nonFoodFail -gt 0 -or $dilution -gt 0 -or $dependence -gt 0 -or $costFail -gt 0) { exit 1 } else { exit 0 }
+"stricter-referrer edges  : $hazard"
+if ($violations -gt 0 -or $missingRequired.Count -gt 0 -or $shimLeak -gt 0 -or $nonFoodFail -gt 0 -or $dilution -gt 0 -or $dependence -gt 0 -or $costFail -gt 0 -or $hazard -gt 0) { exit 1 } else { exit 0 }

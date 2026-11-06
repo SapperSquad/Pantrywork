@@ -1,6 +1,5 @@
 {
   "values": [
-    { "id": "pamhc2foodcore:flouritem", "required": false },
     { "id": "refurbished_furniture:wheat_flour", "required": false }
   ]
 }

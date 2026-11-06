@@ -3,7 +3,6 @@
     { "id": "farm_and_charm:lamb_ham", "required": false },
     { "id": "farmersdelight:mutton_chops", "required": false },
     { "id": "kaleidoscope_cookery:raw_lamb_chops", "required": false },
-    { "id": "minecraft:mutton", "required": false },
-    { "id": "pamhc2foodextended:rawtofuttonitem", "required": false }
+    { "id": "minecraft:mutton", "required": false }
   ]
 }

@@ -30,6 +30,22 @@ function ConvertTo-CostNumber($v) {
   return [double]$v
 }
 
+# The strictest (lowest) declared floor on a judged tag, or $null if it declares none that
+# resolve. Used by the stricter-referrer guard, which compares two tags rather than an item
+# against one tag.
+function Get-StrictestFloor($data, [string]$tagId) {
+  if (-not $data.tags.ContainsKey($tagId)) { return $null }
+  $t = $data.tags[$tagId]
+  if ($t.moot) { return $null }
+  $best = $null
+  foreach ($m in $t.floors.Keys) {
+    $c = $t.floors[$m].cost
+    if ($null -eq $c) { continue }
+    if ($null -eq $best -or $c -lt $best) { $best = $c }
+  }
+  return $best
+}
+
 function Format-Cost([double]$c) {
   if ($c -eq 0) { return '0' }
   foreach ($d in 2, 3, 4, 6, 8, 9, 12, 14, 16) {
@@ -112,9 +128,12 @@ function Read-CostData($root, [string]$Platform = 'modern') {
         $f.cost = $c
       }
     }
-    # a tag whose every floor is a {"none"} declaration is legitimate; so is one a platform
-    # overlay has emptied because no mod defines it on that line at all.
-    if ($t.floors.Count -eq 0 -and $t.nofloor.Count -eq 0 -and $Platform -eq 'modern') {
+    # A judged tag with no floor at all EXCLUDES NOTHING - everything passes it. That must be
+    # an error on every platform. Relaxing it for non-modern platforms (briefly, 2026-11-05) let
+    # four canonical tags lose every floor on forge1201 and silently accept diluting items; the
+    # hand-kept dilution table in AuditRoles caught it, which is exactly why that table does not
+    # read this file. A tag whose every floor is a {"none"} declaration is still legitimate.
+    if ($t.floors.Count -eq 0 -and $t.nofloor.Count -eq 0) {
       [void]$data.problems.Add("$($t.id): judged tag declares no floors")
     }
   }

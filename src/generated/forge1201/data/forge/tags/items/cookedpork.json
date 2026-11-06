@@ -1,6 +1,5 @@
 {
   "values": [
-    { "id": "farm_and_charm:chicken_wrapped_in_bacon", "required": false },
-    { "id": "minecraft:cooked_porkchop", "required": false }
+    { "id": "farm_and_charm:chicken_wrapped_in_bacon", "required": false }
   ]
 }

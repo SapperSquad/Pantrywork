@@ -1,6 +1,5 @@
 {
   "values": [
-    { "id": "farm_and_charm:lamb_ham", "required": false },
-    { "id": "minecraft:mutton", "required": false }
+    { "id": "farm_and_charm:lamb_ham", "required": false }
   ]
 }

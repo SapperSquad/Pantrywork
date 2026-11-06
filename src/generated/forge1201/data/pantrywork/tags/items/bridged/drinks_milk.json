@@ -1,12 +1,8 @@
 {
   "values": [
-    { "id": "croptopia:milk_bottle", "required": false },
-    { "id": "croptopia:soy_milk", "required": false },
     { "id": "farmersdelight:milk_bottle", "required": false },
     { "id": "hearthandharvest:goat_milk_bottle", "required": false },
     { "id": "meadow:wooden_milk_bucket", "required": false },
-    { "id": "minecraft:milk_bucket", "required": false },
-    { "id": "pamhc2foodcore:freshmilkitem", "required": false },
-    { "id": "pamhc2foodextended:soymilkitem", "required": false }
+    { "id": "minecraft:milk_bucket", "required": false }
   ]
 }

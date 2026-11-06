@@ -88,7 +88,10 @@
       },
       "tags": {
         "c:butter": {
-          "culturaldelights": null
+          "culturaldelights": {
+            "item": "culturaldelights:butter",
+            "unscanned": "culturaldelights ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:cooked_beef": {
           "farmersdelight": {
@@ -147,19 +150,34 @@
           }
         },
         "c:crops/cabbage": {
-          "pamhc2crops": null
+          "pamhc2crops": {
+            "item": "pamhc2crops:cabbageitem",
+            "unscanned": "pamhc2crops is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:crops/corn": {
-          "pamhc2crops": null
+          "pamhc2crops": {
+            "item": "pamhc2crops:cornitem",
+            "unscanned": "pamhc2crops is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:crops/grain": {
-          "farmersdelight": null
+          "farmersdelight": {
+            "item": "minecraft:wheat",
+            "unscanned": "farmersdelight ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:crops/onion": {
-          "pamhc2crops": null
+          "pamhc2crops": {
+            "item": "pamhc2crops:onionitem",
+            "unscanned": "pamhc2crops is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:crops/tomato": {
-          "pamhc2crops": null
+          "pamhc2crops": {
+            "item": "pamhc2crops:tomatoitem",
+            "unscanned": "pamhc2crops is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:dough": {
           "create": {
@@ -176,194 +194,441 @@
           }
         },
         "c:doughs": {
-          "farm_and_charm": null
+          "farm_and_charm": {
+            "item": "farm_and_charm:dough",
+            "unscanned": "farm_and_charm ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:drinks/milk": {
-          "farmersdelight": null,
-          "hearthandharvest": null,
-          "neoforge": null
+          "farmersdelight": {
+            "item": "farmersdelight:milk_bottle",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          },
+          "hearthandharvest": {
+            "item": "hearthandharvest:goat_milk_bottle",
+            "unscanned": "hearthandharvest ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          },
+          "neoforge": {
+            "item": "minecraft:milk_bucket",
+            "unscanned": "neoforge is not installed on this line, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:dusts/salt": {
-          "cookscollection": null,
-          "culturaldelights": null
+          "cookscollection": {
+            "item": "cookscollection:salt",
+            "unscanned": "cookscollection ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          },
+          "culturaldelights": {
+            "item": "cookscollection:salt",
+            "unscanned": "culturaldelights ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "Cultural Delights' own data/c/tags/item/dusts/salt.json lists exactly one id, cookscollection:salt (required:false), and Cook's Collection is a hard dependency of CD 0.18.x, so its 1/4 mined salt is the cheapest salt CD's 7 readers see"
+          }
         },
         "c:eggs": {
           "farmersdelight": {
             "item": "minecraft:egg",
             "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:eggs on 1.20.1, at 1 egg"
           },
-          "neoforge": null
+          "neoforge": {
+            "item": "minecraft:egg",
+            "unscanned": "neoforge is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:flour": {
           "create": {
             "item": "create:wheat_flour",
             "why": "cheapest member create (create-1.20.1-6.0.8) lists in forge:flour on 1.20.1, at 2/3 wheat"
           },
-          "bountifulfares": null
+          "bountifulfares": {
+            "item": "bountifulfares:flour",
+            "unscanned": "bountifulfares is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:flours": {
-          "create": null,
-          "farm_and_charm": null
+          "create": {
+            "item": "create:wheat_flour",
+            "unscanned": "create ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          },
+          "farm_and_charm": {
+            "item": "farm_and_charm:flour",
+            "unscanned": "farm_and_charm ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:foods/bread": {
-          "bountifulfares": null,
-          "cookscollection": null,
-          "neoforge": null
+          "bountifulfares": {
+            "item": "bountifulfares:maize_bread",
+            "unscanned": "bountifulfares is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          },
+          "cookscollection": {
+            "item": "cookscollection:rustic_loaf_slice",
+            "unscanned": "cookscollection ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          },
+          "neoforge": {
+            "item": "minecraft:bread",
+            "unscanned": "neoforge is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:foods/cabbage": {
-          "farmersdelight": null
+          "farmersdelight": {
+            "item": "farmersdelight:cabbage_leaf",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing.",
+            "why": "its file is [cabbage, cabbage_leaf] and the leaf is half a cabbage"
+          }
         },
         "c:foods/cooked_beef": {
-          "farmersdelight": null,
-          "kaleidoscope_cookery": null
+          "farmersdelight": {
+            "item": "farmersdelight:beef_patty",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          },
+          "kaleidoscope_cookery": {
+            "item": "kaleidoscope_cookery:cooked_cow_offal",
+            "unscanned": "kaleidoscope_cookery ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/cooked_chicken": {
-          "farmersdelight": null
+          "farmersdelight": {
+            "item": "farmersdelight:cooked_chicken_cuts",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/cooked_egg": {
-          "farmersdelight": null
+          "farmersdelight": {
+            "item": "farmersdelight:fried_egg",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/cooked_meat": {
-          "farmersdelight": null,
-          "neoforge": null
+          "farmersdelight": {
+            "item": "farmersdelight:cooked_bacon",
+            "unscanned": "farmersdelight ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "via its own refs to c:foods/cooked_pork etc."
+          },
+          "neoforge": {
+            "item": "minecraft:cooked_beef",
+            "unscanned": "neoforge is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:foods/cooked_mutton": {
-          "farmersdelight": null,
-          "kaleidoscope_cookery": null
+          "farmersdelight": {
+            "item": "farmersdelight:cooked_mutton_chops",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          },
+          "kaleidoscope_cookery": {
+            "item": "kaleidoscope_cookery:cooked_lamb_chops",
+            "unscanned": "kaleidoscope_cookery ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/cooked_pork": {
-          "farmersdelight": null,
-          "kaleidoscope_cookery": null
+          "farmersdelight": {
+            "item": "farmersdelight:cooked_bacon",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing.",
+            "why": "via its own #c:foods/cooked_bacon"
+          },
+          "kaleidoscope_cookery": {
+            "item": "kaleidoscope_cookery:cooked_pork_belly",
+            "unscanned": "kaleidoscope_cookery ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/corn": {
-          "bountifulfares": null
+          "bountifulfares": {
+            "item": "bountifulfares:maize",
+            "unscanned": "bountifulfares is not installed on this line, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/dough": {
-          "create": null,
-          "culturaldelights": null,
-          "farmersdelight": null
+          "create": {
+            "item": "create:dough",
+            "unscanned": "create ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          },
+          "culturaldelights": {
+            "item": "culturaldelights:corn_dough",
+            "unscanned": "culturaldelights ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          },
+          "farmersdelight": {
+            "item": "farmersdelight:wheat_dough",
+            "unscanned": "farmersdelight ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "via its own #c:foods/dough/wheat"
+          }
         },
         "c:foods/elderberries": {
-          "bountifulfares": null
+          "bountifulfares": {
+            "item": "bountifulfares:elderberries",
+            "unscanned": "bountifulfares is not installed on this line, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/leafy_green": {
           "hearthandharvest": {
             "item": "hearthandharvest:hops",
             "why": "cheapest member hearthandharvest (hearthandharvest-1.20.1-1.4.3) lists in forge:foods/leafy_green on 1.20.1, at 1 produce"
           },
-          "farmersdelight": null
+          "farmersdelight": {
+            "item": "farmersdelight:cabbage_leaf",
+            "unscanned": "farmersdelight ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "its file is exactly #c:foods/cabbage, so the leaf is the cheapest member"
+          }
         },
         "c:foods/lemons": {
-          "bountifulfares": null
+          "bountifulfares": {
+            "item": "bountifulfares:lemon",
+            "unscanned": "bountifulfares is not installed on this line, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/milk": {
-          "bountifulfares": null
+          "bountifulfares": {
+            "item": "minecraft:milk_bucket",
+            "unscanned": "bountifulfares is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "coconut milk is a plant milk and not a floor"
+          }
         },
         "c:foods/onion": {
-          "farmersdelight": null
+          "farmersdelight": {
+            "item": "farmersdelight:onion",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/oranges": {
-          "bountifulfares": null
+          "bountifulfares": {
+            "item": "bountifulfares:orange",
+            "unscanned": "bountifulfares is not installed on this line, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/pasta": {
-          "farmersdelight": null
+          "farmersdelight": {
+            "item": "farmersdelight:raw_pasta",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/plums": {
-          "bountifulfares": null
+          "bountifulfares": {
+            "item": "bountifulfares:plum",
+            "unscanned": "bountifulfares is not installed on this line, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/raw_bacon": {
-          "farmersdelight": null
+          "farmersdelight": {
+            "item": "farmersdelight:bacon",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/raw_beef": {
-          "farmersdelight": null,
-          "kaleidoscope_cookery": null
+          "farmersdelight": {
+            "item": "farmersdelight:minced_beef",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          },
+          "kaleidoscope_cookery": {
+            "item": "kaleidoscope_cookery:raw_cow_offal",
+            "unscanned": "kaleidoscope_cookery ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/raw_chicken": {
-          "farmersdelight": null,
-          "kaleidoscope_cookery": null
+          "farmersdelight": {
+            "item": "farmersdelight:chicken_cuts",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          },
+          "kaleidoscope_cookery": {
+            "item": "minecraft:chicken",
+            "unscanned": "kaleidoscope_cookery ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing.",
+            "why": "its file lists only the whole vanilla chicken; its own cut small meats are in c:raw_meats, not here"
+          }
         },
         "c:foods/raw_fish": {
-          "aquaculture": null,
-          "farmersdelight": null,
-          "fishofthieves": null,
-          "neoforge": null,
-          "rusticdelight": null
+          "aquaculture": {
+            "item": "aquaculture:atlantic_cod",
+            "unscanned": "aquaculture ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          },
+          "farmersdelight": {
+            "item": "farmersdelight:cod_slice",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing.",
+            "why": "via its own #c:foods/raw_cod"
+          },
+          "fishofthieves": {
+            "item": "fishofthieves:splashtail",
+            "unscanned": "fishofthieves ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing.",
+            "why": "via its own #fishofthieves:thieves_fish"
+          },
+          "neoforge": {
+            "item": "minecraft:cod",
+            "unscanned": "neoforge is not installed on this line, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          },
+          "rusticdelight": {
+            "item": "rusticdelight:calamari_slice",
+            "unscanned": "rusticdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing.",
+            "why": "its file is #c:foods/raw_calamari, which holds its own calamari (1) and calamari_slice (1/2)"
+          }
         },
         "c:foods/raw_meat": {
-          "farmersdelight": null,
-          "neoforge": null
+          "farmersdelight": {
+            "item": "farmersdelight:bacon",
+            "unscanned": "farmersdelight ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "via its own refs to c:foods/raw_pork etc."
+          },
+          "neoforge": {
+            "item": "minecraft:beef",
+            "unscanned": "neoforge is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:foods/raw_mutton": {
-          "farmersdelight": null,
-          "kaleidoscope_cookery": null
+          "farmersdelight": {
+            "item": "farmersdelight:mutton_chops",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          },
+          "kaleidoscope_cookery": {
+            "item": "kaleidoscope_cookery:raw_lamb_chops",
+            "unscanned": "kaleidoscope_cookery ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/raw_pork": {
-          "farmersdelight": null,
-          "kaleidoscope_cookery": null
+          "farmersdelight": {
+            "item": "farmersdelight:bacon",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing.",
+            "why": "via its own #c:foods/raw_bacon"
+          },
+          "kaleidoscope_cookery": {
+            "item": "kaleidoscope_cookery:raw_pork_belly",
+            "unscanned": "kaleidoscope_cookery ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/tomato": {
-          "farmersdelight": null
+          "farmersdelight": {
+            "item": "farmersdelight:tomato",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:foods/vegetable": {
-          "bountifulfares": null,
-          "culturaldelights": null,
-          "farmersdelight": null,
-          "neoforge": null,
-          "rusticdelight": null
+          "bountifulfares": {
+            "item": "bountifulfares:leek",
+            "unscanned": "bountifulfares is not installed on this line, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          },
+          "culturaldelights": {
+            "item": "culturaldelights:cut_cucumber",
+            "unscanned": "culturaldelights ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing.",
+            "why": "its file lists cut_cucumber and cut_eggplant (1/2 each) beside whole cucumber, eggplant and corn"
+          },
+          "farmersdelight": {
+            "item": "farmersdelight:onion",
+            "unscanned": "farmersdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          },
+          "neoforge": {
+            "item": "minecraft:carrot",
+            "unscanned": "neoforge is not installed on this line, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          },
+          "rusticdelight": {
+            "item": "rusticdelight:potato_slices",
+            "unscanned": "rusticdelight ships here but does not define this tag on 1.20.1, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing.",
+            "why": "its file is potato_slices (1/2) + #c:foods/bell_pepper, which holds nine 1/2 bell-pepper slices"
+          }
         },
         "c:foods/walnuts": {
-          "bountifulfares": null
+          "bountifulfares": {
+            "item": "bountifulfares:walnut",
+            "unscanned": "bountifulfares is not installed on this line, and no 1.20.1 mod defines this canonical tag at all - forge:foods/* is Pantrywork's own layer on this line, not an upstream convention. The floor is therefore our judgment about what the food IS, carried over from the 1.21 line unchanged; leaving the tag unfloored would exclude nothing."
+          }
         },
         "c:fruits": {
           "fishofthieves": {
             "item": "fishofthieves:banana",
             "why": "cheapest member fishofthieves (fish_of_thieves-mc1.20.1-v3.4.0-forge) lists in forge:fruits on 1.20.1, at 1 produce"
           },
-          "pamhc2crops": null,
-          "pamhc2trees": null
+          "pamhc2crops": {
+            "item": "minecraft:melon_slice",
+            "unscanned": "pamhc2crops is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "every member it lists is a raw gathered crop, which is 1 produce under FC2-4, so the floor is 1 whichever member is named; this one is cited as the representative"
+          },
+          "pamhc2trees": {
+            "item": "pamhc2trees:apricotitem",
+            "unscanned": "pamhc2trees is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "every member it lists is a raw gathered crop, which is 1 produce under FC2-4, so the floor is 1 whichever member is named; this one is cited as the representative"
+          }
         },
         "c:fruits/banana": {
-          "pamhc2trees": null
+          "pamhc2trees": {
+            "item": "pamhc2trees:bananaitem",
+            "unscanned": "pamhc2trees is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:fruits/blueberry": {
-          "pamhc2crops": null
+          "pamhc2crops": {
+            "item": "pamhc2crops:blueberryitem",
+            "unscanned": "pamhc2crops is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:fruits/elderberry": {
-          "pamhc2crops": null
+          "pamhc2crops": {
+            "item": "pamhc2crops:elderberryitem",
+            "unscanned": "pamhc2crops is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:fruits/lemon": {
-          "cookscollection": null,
-          "culturaldelights": null,
-          "pamhc2trees": null
+          "cookscollection": {
+            "item": "cookscollection:lemon",
+            "unscanned": "cookscollection ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          },
+          "culturaldelights": {
+            "item": "cookscollection:lemon",
+            "unscanned": "culturaldelights ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "Cultural Delights' own file lists Cook's Collection's lemon (Cook's is a hard dependency of CD)"
+          },
+          "pamhc2trees": {
+            "item": "pamhc2trees:lemonitem",
+            "unscanned": "pamhc2trees is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:fruits/mango": {
-          "pamhc2trees": null
+          "pamhc2trees": {
+            "item": "pamhc2trees:mangoitem",
+            "unscanned": "pamhc2trees is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:fruits/orange": {
-          "pamhc2trees": null
+          "pamhc2trees": {
+            "item": "pamhc2trees:orangeitem",
+            "unscanned": "pamhc2trees is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:fruits/pineapple": {
-          "pamhc2crops": null
+          "pamhc2crops": {
+            "item": "pamhc2crops:pineappleitem",
+            "unscanned": "pamhc2crops is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:fruits/plum": {
-          "pamhc2trees": null
+          "pamhc2trees": {
+            "item": "pamhc2trees:plumitem",
+            "unscanned": "pamhc2trees is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:grain": {
           "farmersdelight": {
             "item": "farmersdelight:rice",
             "why": "cheapest member farmersdelight (FarmersDelight-1.20.1-1.3.4) lists in forge:grain on 1.20.1, at 1 produce"
           },
-          "farm_and_charm": null,
-          "pamhc2crops": null
+          "farm_and_charm": {
+            "item": "farm_and_charm:oat",
+            "unscanned": "farm_and_charm ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          },
+          "pamhc2crops": {
+            "item": "minecraft:wheat",
+            "unscanned": "pamhc2crops is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "every member it lists is a raw gathered crop, which is 1 produce under FC2-4, so the floor is 1 whichever member is named; this one is cited as the representative"
+          }
         },
         "c:grain/barley": {
-          "pamhc2crops": null
+          "pamhc2crops": {
+            "item": "pamhc2crops:barleyitem",
+            "unscanned": "pamhc2crops is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:grain/corn": {
-          "pamhc2crops": null
+          "pamhc2crops": {
+            "item": "pamhc2crops:cornitem",
+            "unscanned": "pamhc2crops is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:grain/oat": {
-          "pamhc2crops": null
+          "pamhc2crops": {
+            "item": "pamhc2crops:oatsitem",
+            "unscanned": "pamhc2crops is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:milk": {
           "croptopia": {
@@ -384,13 +649,23 @@
           }
         },
         "c:milks": {
-          "meadow": null
+          "meadow": {
+            "item": "minecraft:milk_bucket",
+            "unscanned": "meadow ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:nuts/walnut": {
-          "pamhc2trees": null
+          "pamhc2trees": {
+            "item": "pamhc2trees:walnutitem",
+            "unscanned": "pamhc2trees is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version."
+          }
         },
         "c:onions": {
-          "pamhc2crops": null
+          "pamhc2crops": {
+            "item": "pamhc2crops:onionitem",
+            "unscanned": "pamhc2crops is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "every member it lists is a raw gathered crop, which is 1 produce under FC2-4, so the floor is 1 whichever member is named; this one is cited as the representative"
+          }
         },
         "c:pasta": {
           "farmersdelight": {
@@ -463,10 +738,18 @@
           }
         },
         "c:salt": {
-          "cookscollection": null
+          "cookscollection": {
+            "item": "hearthandharvest:salt",
+            "unscanned": "cookscollection ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "Cook's Collection files c:salt as exactly #c:dusts/salt, so its salt recipes accept every salt that tag carries; with Hearth and Harvest loaded that is its 1/32 salt (Cook's own mined salt is 1/4)"
+          }
         },
         "c:salts": {
-          "cookscollection": null
+          "cookscollection": {
+            "item": "hearthandharvest:salt",
+            "unscanned": "cookscollection ships on 1.20.1 but does not define this tag there. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "same file shape as its c:salt: exactly #c:dusts/salt"
+          }
         },
         "c:vegetables": {
           "farmersdelight": {
@@ -477,8 +760,16 @@
             "item": "rusticdelight:bell_pepper_slice_black",
             "why": "cheapest member rusticdelight (rusticdelight-forge-1.20.1-1.7.0) lists in forge:vegetables on 1.20.1, at 1/2 produce"
           },
-          "pamhc2crops": null,
-          "pamhc2trees": null
+          "pamhc2crops": {
+            "item": "pamhc2crops:arrowrootitem",
+            "unscanned": "pamhc2crops is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "every member it lists is a raw gathered crop, which is 1 produce under FC2-4, so the floor is 1 whichever member is named; this one is cited as the representative"
+          },
+          "pamhc2trees": {
+            "item": "pamhc2trees:avocadoitem",
+            "unscanned": "pamhc2trees is not installed on the 1.20.1 line at all. The floor is carried over from 1.21 rather than dropped: dropping it would make this tag EASIER to pass on 1.20.1 than on 1.21, and a platform overlay must only ever tighten a floor. What the food is worth does not change with the Minecraft version.",
+            "why": "every member it lists is a raw gathered crop, which is 1 produce under FC2-4, so the floor is 1 whichever member is named; this one is cited as the representative"
+          }
         }
       }
     }

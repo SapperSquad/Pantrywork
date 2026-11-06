@@ -1,5 +1,6 @@
 {
   "values": [
+    { "id": "farm_and_charm:dough", "required": false },
     { "id": "refurbished_furniture:dough", "required": false }
   ]
 }

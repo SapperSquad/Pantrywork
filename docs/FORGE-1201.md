@@ -236,6 +236,59 @@ deliberate decision rather than a porting detail: **do not slip it in with the p
 Dropping the GATEd entries was necessary but is not sufficient on a gate-less platform, for the
 same reason: severing the direct entry does not sever an upstream reference path.
 
+## Both platforms green (2026-11-06)
+
+`-Platform forge1201` now passes the generator **and** the full audit: every counter 0, the new
+check 8 included. Modern is untouched throughout - byte-identical payload, audit green full and
+`-Minimal`, `-SelfTest` passed.
+
+| | modern | forge1201 |
+|---|---|---|
+| generator | exit 0, 42 GATE / 91 EXCLUDE / 12 rescued PASS | exit 0, 19 GATE (all dropped) / 63 EXCLUDE / 21 rescued PASS |
+| audit | exit 0 (full and `-Minimal`) | exit 0 |
+| payload | unchanged | 107 files, jar 54,037 bytes |
+
+Getting there turned up three things worth keeping.
+
+**A platform overlay must never make a floor more lenient.** The first overlay nulled every
+floor whose mod does not define that tag on 1.20.1. That is right only when the tag still has a
+strict definer. It was wrong 49 times: `c:vegetables` kept only Rustic Delight, whose own
+`forge:vegetables` lists its bell-pepper SLICES, so the slice became its own floor and every
+half-cut passed trivially. Worse, **23 judged tags lost every floor**, and a judged tag with no
+floor excludes nothing - `forge:foods/*` is almost entirely Pantrywork's own canonical layer on
+1.20.1, so there is no upstream definer to derive one from. Both are fixed by carrying the base
+floor across marked `unscanned`, with the reason stated: strictness can then only increase.
+
+**The "declares no floors" guard must apply on every platform.** It had been relaxed for
+non-modern platforms, which is how those 23 tags went quiet. Restored. The hand-kept dilution
+table is what caught it, which is exactly why that table does not read `cost-floors.json`.
+
+**"Already present" has to mean present without a third mod.** On a gate-less platform we must
+not re-inject what a tag already holds - that adds nothing in game and makes Pantrywork the
+author of a path it did not create, which the dilution guard then reports. But following every
+reference is worse: it made `farm_and_charm:strawberry` look already-present in `forge:fruits`
+when only Croptopia's chain delivered it, so skipping the injection silently made that bridge
+conditional on Croptopia - caught by check 6. The rule that satisfies both: follow a reference
+only when **every** definer of the referenced tag also defines the parent. Rustic Delight's own
+`forge:vegetables/bell_pepper` qualifies; `forge:strawberries`, which Croptopia and Farm & Charm
+both write, does not. This applies on forge1201 only - switching it on for 1.21 rewrites 62
+files of a published payload and moves the verdicts, which is a decision about a shipped build,
+not a porting detail.
+
+## Check 8: the stricter-referrer guard
+
+A judged tag that references a LOOSER judged tag is a hole no per-tag check can see: anything
+we legitimately put in the looser one arrives in the stricter one below its floor. Croptopia
+4.0.1's `forge:doughs` referenced `forge:dough` exactly so (floors 2.1 against 0.094) and the
+reference was gone by 4.2.4.
+
+Measured before adding it: **0 such edges on 1.21 across 193 judged references**, 1 on 1.20.1
+(now resolved by the floor carry-over). So this is a guard against upstream changing its mind,
+not a fix for a standing fault - which is why the 1.21 floor semantics were left alone rather
+than rebuilt. **Mutation-proven**, the way the project proves its other checks: loosening
+`c:foods/cabbage` to 1/16 while `c:foods/leafy_green` (which is exactly `#c:foods/cabbage`)
+stays at 1/2 makes it fail with one precise line, and restoring the file makes it pass again.
+
 ## Open before the first build
 
 - Fetch the two missing jars, then re-run the scan so the dialect map is complete.
