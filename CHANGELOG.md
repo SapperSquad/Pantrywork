@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.10.0 — unreleased
+## 0.10.0 — 2026-11-07
 
 **Forge 1.20.1, and an answer that had been wrong since August.**
 

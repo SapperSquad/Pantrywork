@@ -72,6 +72,52 @@ public class GenPromo {
 
     static final String TEX = "tools/work/tex/";
 
+    // ---- loaders the banner names ----------------------------------------
+    // DERIVED from the mod-metadata templates that actually ship, never typed. An
+    // art file naming the wrong loaders is the same class of defect as a stale mod
+    // count, and it happened: the banner read "NeoForge & Fabric" right through the
+    // 0.10.0 pass, whose whole point was adding the Forge 1.20.1 file. FOOD_MOD_COUNT
+    // already stops a stale number; this stops a stale loader list.
+    //   src/*/templates/META-INF/neoforge.mods.toml -> NeoForge
+    //   src/*/templates/META-INF/mods.toml          -> Forge   (the 1.20.1 spelling;
+    //                                                  that filename IS the difference)
+    //   src/*/templates/fabric.mod.json             -> Fabric
+    // java.util is fully qualified throughout: java.awt.* is imported, and both
+    // packages define List.
+    static final String[] LOADERS = {"NeoForge", "Fabric", "Forge"};
+
+    static java.util.Set<String> loadersOnDisk() {
+        java.util.Set<String> found = new java.util.TreeSet<>();
+        File[] dirs = new File("src").listFiles(File::isDirectory);
+        if (dirs == null) {
+            throw new IllegalStateException("no src/ directory - run from the project root");
+        }
+        for (File d : dirs) {
+            File t = new File(d, "templates");
+            if (new File(t, "META-INF/neoforge.mods.toml").isFile()) found.add("NeoForge");
+            else if (new File(t, "META-INF/mods.toml").isFile()) found.add("Forge");
+            if (new File(t, "fabric.mod.json").isFile()) found.add("Fabric");
+        }
+        return found;
+    }
+
+    /** "NeoForge, Fabric & Forge" - and refuses to render if that is not what ships. */
+    static String loaderPhrase() {
+        java.util.Set<String> want = new java.util.TreeSet<>(java.util.Arrays.asList(LOADERS));
+        java.util.Set<String> have = loadersOnDisk();
+        if (!want.equals(have)) {
+            throw new IllegalStateException("LOADERS names " + want
+                + " but src/*/templates ship metadata for " + have
+                + " - update LOADERS (and the store copy) instead of shipping stale art");
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < LOADERS.length; i++) {
+            if (i > 0) sb.append(i == LOADERS.length - 1 ? " & " : ", ");
+            sb.append(LOADERS[i]);
+        }
+        return sb.toString();
+    }
+
     public static void main(String[] args) throws Exception {
         new File("promo").mkdirs();
         if (args.length > 0 && args[0].equals("icons")) {
@@ -326,7 +372,7 @@ public class GenPromo {
         g.drawString("One cheese. Every recipe.", 100, 410);
         g.setFont(new Font("Segoe UI", Font.PLAIN, 34));
         g.setColor(BODY);
-        g.drawString("The food-mod interop layer - NeoForge & Fabric", 100, 470);
+        g.drawString("The food-mod interop layer - " + loaderPhrase(), 100, 470);
 
         // Right: four mods' cheeses converge into one canonical tag. Labelled by
         // mod rather than tag - several of them legitimately use the same tag

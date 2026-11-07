@@ -453,7 +453,11 @@ the live pages since 0.1.0, so this is now a standing step):
 - [x] **0.9.0 Modrinth: gallery 4 replaced.** Done 2026-11-04 via the API — new card uploaded
       (`ce7a4fd8…`, featured) and the old `Twenty-one mods bridged` (`b61d16d4…`) deleted with
       `DELETE ?url=` using the **`_350.webp`** url. Reads back as five images, twenty-four featured.
-- [ ] **0.9.0 CurseForge: gallery 4 still needs replacing — NEEDS A HUMAN.** Everything else on CF
+- [x] **0.9.0 CurseForge: gallery 4 — DONE.** Confirmed on the live Media tab 2026-11-06: the card
+      reads **"Twenty-four mods bridged"**, five cards total. SapperSquad did it by hand at some
+      point after the 0.9.0 pass. The original note is kept below because the dialog limitation it
+      describes is still real and bit again at 0.10.0.
+- [ ] ~~**0.9.0 CurseForge: gallery 4 still needs replacing — NEEDS A HUMAN.**~~ (superseded by the line above) Everything else on CF
       is synced (all four files, summary, description). The image cannot be scripted any more: the
       **Add media** dialog now uses the File System Access API, so it contains no `input[type=file]`
       for `file_upload` to target, and a synthetic drop is ignored (27 DragEvents carrying a real
@@ -949,6 +953,60 @@ formality.
 `0.10.0+mc1.20.1-forge` / `loaders ['forge']` / `game_versions ['1.20.1']` / `dependencies []` /
 project `rNg1wypx`, CurseForge project `1617573` with `Forge` → 7498, MC `1.20.1` → 9990,
 Client/Server → 9638 / 9639, 1/1 versions resolved and nothing dropped.
+
+### 0.10.0 — PUBLISHED 2026-11-07 (both stores)
+
+Pushed to GitHub first (`6d0efa6..829ae44`, 6 commits), then one `publish.ps1 -Only forge` run sent
+the single file to both stores. Jar check passed on the way out
+(`META-INF/mods.toml, version 0.10.0 - matches this row`).
+
+**Modrinth — fully done, verified live.**
+- Version `0.10.0+mc1.20.1-forge`: loader `forge`, game version `1.20.1`, no dependencies, SHA-1
+  `04870274482d21048055bb0f4f86c4244ba2ff93`, 54,037 bytes. 29 versions on the project, and the four
+  0.9.0 files are untouched. The project now lists loaders **fabric, forge, neoforge** and game
+  version **1.20.1**.
+- Description replaced via `PATCH /v2/project/rNg1wypx` (204). Read back byte-identical to the kit
+  at 10,526 chars. Before the update the live body differed from the kit in **only** the 2 lines
+  this release changed — no drift had accumulated since 0.9.0.
+- **Banner replaced** (see below for why it needed to be). New card uploaded via
+  `POST /v2/project/{id}/gallery` with the old title and description preserved
+  ("One cheese. Every recipe." / "Four mods' cheeses, one shared tag."), then the stale card deleted
+  with `DELETE ?url=` using the **`_350.webp`** url, exactly as the 0.8.0 note says. Reads back as
+  five cards with "Twenty-four mods bridged" still featured.
+- **Gotcha, new:** the Modrinth project endpoint is **CDN-cached**, and a read immediately after a
+  gallery write returns the OLD gallery — both calls had returned 204 and the gallery still looked
+  untouched. Add a cache-buster (`?cb=<epoch>` plus `Cache-Control: no-cache`) when verifying, or
+  you will think a successful write failed and redo it. The description PATCH, by contrast, read
+  back immediately.
+
+**CurseForge — file and description done, banner still manual.**
+- File uploaded and visible in the authors portal as **Pantrywork 0.10.0 (Forge 1.20.1)**, tagged
+  `1.20.1` + Client + Server + Forge, status **Processing**. That is CF's normal approval queue, not
+  an error: the public files page still showed 0.9.0 as newest while it sat there. Check it has
+  flipped to **Approved** before telling anyone the Forge build is out.
+- Description saved through the authors portal and **verified after a reload** (9,842 chars, stale
+  platform line gone, all three edits present).
+- **CF's description is stored UNWRAPPED** — 41 long lines where Modrinth's is hard-wrapped at ~100
+  columns, same text otherwise. So do **not** paste the kit body into CurseForge: apply the
+  release's changes surgically to what is already there (anchor on an exact sentence, assert it
+  occurs once, replace). Pasting the kit would reflow all 41 paragraphs and bury the real diff.
+- **The banner on CurseForge is NOT updated.** Instructions below.
+
+- [ ] **0.10.0 CurseForge: replace the banner by hand.** Gallery card **"One cheese. Every recipe."**
+      still shows the old subtitle *"The food-mod interop layer - NeoForge & Fabric"*, which the
+      Forge file makes false. Do it at
+      `authors.curseforge.com/#/projects/1617573/media` → **Add media → Upload or Drag Image** →
+      pick `promo/banner-1920x640.png` (SHA-1 `1F1466B4B93A…`, 182,678 bytes); then title it
+      **"One cheese. Every recipe."**, description **"Four mods' cheeses, one shared tag."**, and
+      delete the old card. The other four images are byte-identical to the live ones — do not
+      re-upload them.
+      **Why it cannot be scripted, re-checked 2026-11-06:** the Add media dialog calls
+      `showOpenFilePicker` (File System Access API) and has **no file input of its own**.
+      **The trap:** the page does contain exactly one `input[type=file]`, and it is NOT the
+      dialog's — it belongs to the react-mde markdown editor on the Description tab
+      (`LABEL.image-tip`, `accept="image/*"`, class `image-input`). `file_upload` targets it
+      happily and **reports "Uploaded 1 file(s)" while nothing reaches the gallery.** Check
+      `insideDialog` before believing an upload worked here.
 
 **The four 1.21.1 / 26.x jars were deliberately NOT rebuilt.** Their published bytes are the 0.9.0
 ones in `dist/0.9.0`, they stay live at 0.9.0, and `-Only forge` is what keeps this release to the
