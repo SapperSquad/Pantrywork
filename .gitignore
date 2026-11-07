@@ -9,4 +9,5 @@ tools/*.class
 tools/work/
 tools/fabric-server*/
 tools/neo-server*/
+tools/forge-server*/
 tools/work/jars-1201/
