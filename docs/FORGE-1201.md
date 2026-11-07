@@ -289,6 +289,23 @@ than rebuilt. **Mutation-proven**, the way the project proves its other checks: 
 `c:foods/cabbage` to 1/16 while `c:foods/leafy_green` (which is exactly `#c:foods/cabbage`)
 stays at 1/2 makes it fail with one precise line, and restoring the file makes it pass again.
 
+## Stamped at 0.10.0 (2026-11-06)
+
+`mod_version` 0.9.0 -> **0.10.0**, `gradlew forgeJar1201` ->
+`pantrywork-0.10.0-forge-mc1201.jar`, 54,037 bytes, SHA-1 **04870274482D21048055BB0F4F86C4244BA2FF93**,
+staged in `dist/0.10.0`.
+
+The bump is provably version-string-only: hashing both builds entry by entry, **1 of 110 non-empty
+zip entries differs, and it is `META-INF/mods.toml`**. The suites and probe pack regenerate
+byte-identical from the new jar, so the generator is keying off payload content and not a
+filename. All three scenarios and every static gate were still re-run on the staged bytes - solo
+50/0 with a clean log, compat 338/0, control identical at 31 upstream errors, 0 naming us,
+generator and audit exit 0 on both platforms with modern byte-identical. The full record is in
+PUBLISHING.md under "0.10.0 - verification record".
+
+The four 1.21.1 / 26.x jars were **not** rebuilt: they stay published at 0.9.0, and
+`publish.ps1 -Only forge` keeps the release to the one file.
+
 ## Booted and suite-tested (2026-11-06)
 
 The last open item was a 1.20.1 Forge harness. It exists now:

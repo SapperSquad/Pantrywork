@@ -18,7 +18,8 @@
 # Report: tools/work/bridges-report.txt
 # Rerun whenever a compat jar in tools/work/jars changes. ALWAYS pass
 # -ExtraJarDirs tools\work\jars-26x (0.6.0 shipped without Aquaculture 2.9.x's
-# largemouth bass because a run left it out).
+# largemouth bass because a run left it out). This is no longer advice: a modern run
+# that omits it now THROWS and writes nothing - see the guard below the param block.
 #
 # -ExtraJarDirs: additional jar directories to union in (e.g. tools\work\jars-26x
 # so 26.x-only items - Croptopia 4.3.x foods, Aquaculture 2.9.x fish - join the
@@ -45,13 +46,40 @@
 # overlays, not conditions inside tag files, which every loader ignores) was proven
 # live on NeoForge 1.21.1/26.1.2/26.2 and Fabric 1.21.1/1.21.11/26.2 on 2026-09-13.
 param([string[]]$ExtraJarDirs = @(), [switch]$SelfTest,
-      [ValidateSet('modern', 'forge1201')][string]$Platform = 'modern')
+      [ValidateSet('modern', 'forge1201')][string]$Platform = 'modern',
+      [switch]$NoExtra26x)
 $ErrorActionPreference = "Stop"
 Add-Type -AssemblyName System.IO.Compression.FileSystem
 . (Join-Path $PSScriptRoot 'CostFloor.ps1')
 $root = Split-Path $PSScriptRoot -Parent
 # powershell -File passes "a,b" as ONE string: split it
 $ExtraJarDirs = @($ExtraJarDirs | ForEach-Object { $_ -split ',' } | Where-Object { $_ })
+
+# A modern run that forgets -ExtraJarDirs tools\work\jars-26x silently SHRINKS the
+# published payload: the 26.x-only items (Aquaculture 2.9.x fish, Croptopia 4.3.x foods)
+# have no source jar, so they are dropped rather than written required=false. It costs
+# nothing at generation time and is invisible in the exit code - the run reports exit 0
+# and a plausible verdict count. This has happened twice: 0.6.0 SHIPPED without
+# Aquaculture's largemouth bass, and the 0.10.0 gate run dropped it from c:fishes,
+# c:raw_fishes and c:rawfish again (caught only by `git status src/generated`). The
+# header has warned about it in prose since 0.6.0, which was evidently not enough, so
+# it is now enforced. -NoExtra26x is the deliberate opt-out.
+#
+# forge1201 is exempt: jars-26x holds 1.21/26.x jars whose tags live at the SINGULAR
+# tags/item path, which a 1.20.1 scan correctly ignores, so they contribute nothing there.
+if ($Platform -eq 'modern' -and -not $NoExtra26x) {
+  $x26 = Join-Path $root 'tools\work\jars-26x'
+  $named = @($ExtraJarDirs | Where-Object { $_ -replace '/', '\' -match 'jars-26x\\?$' })
+  if ((Test-Path $x26) -and $named.Count -eq 0) {
+    throw ("A modern run must include the 26.x jars or it silently drops their items " +
+           "from the payload (0.6.0 shipped without Aquaculture's largemouth bass this way). " +
+           "Re-run as:`n" +
+           "  powershell -File tools\GenerateBridges.ps1 -ExtraJarDirs 'tools\work\jars-26x'" +
+           $(if ($SelfTest) { ' -SelfTest' } else { '' }) + "`n" +
+           "Pass -NoExtra26x only if you deliberately want the payload without them, and " +
+           "check `git status src/generated` afterwards either way.")
+  }
+}
 # PLATFORM TARGETING. 'modern' is 1.21+: shared namespace c:, singular tags/item.
 # 'forge1201' is Minecraft 1.20.1 on Forge, where the shared food vocabulary is forge: and
 # the path is PLURAL tags/items - a singular path is silently dead there, exactly as a plural

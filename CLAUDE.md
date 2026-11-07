@@ -775,7 +775,15 @@ tools/cost-floors.json; the rules are written up in TAXONOMY.md "What a bridge m
 ALWAYS run it as
 `powershell -File tools\GenerateBridges.ps1 -ExtraJarDirs tools\work\jars-26x`:
 0.6.0 shipped without Aquaculture 2.9.x's largemouth bass because a run left the
-flag out (`tools\work\jars-12110` needs no flag: the script always scans it). The flag unions the 26.x compat jars in
+flag out (`tools\work\jars-12110` needs no flag: the script always scans it).
+**ENFORCED since 2026-11-06: a `modern` run without the flag throws and writes
+nothing.** Prose was not enough - the 0.10.0 gate run forgot it and dropped
+largemouth bass from `c:fishes`, `c:raw_fishes` and `c:rawfish` all over again, caught
+only by `git status src/generated`. The failure is invisible in the exit code: a run
+without the jars reports exit 0 and a plausible verdict count, it just writes a
+smaller payload. `-NoExtra26x` is the deliberate opt-out, and it is proven non-vacuous
+- passing it reproduces exactly those three dropped files. `-Platform forge1201` is
+exempt: jars-26x tags live at the singular `tags/item` path a 1.20.1 scan ignores. The flag unions the 26.x compat jars in
 (26.x-only items like Aquaculture 2.9.x's largemouth bass enter the
 bridges; on older lines those entries are required=false and skip). One
 payload ships to every jar. After a jar update, read the report's

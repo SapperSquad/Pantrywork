@@ -431,6 +431,9 @@ the live pages since 0.1.0, so this is now a standing step):
       2026-11-04 (0.9.0, the staged SHA-1s above, the rebuild): all four jars hold the same 151 payload
       files (134 data files + `pack.mcmeta` + 16 conditional-overlay tag files), with no test recipe,
       structure template or gametest class. (0.8.0 block, superseded: 146 payload files, same result.)
+      **0.10.0 (the Forge 1.20.1 jar, SHA-1 `04870274482D21048055BB0F4F86C4244BA2FF93`): re-verified 2026-11-06** —
+      107 payload files (106 data + `pack.mcmeta`), 0 classes, and 0 matches for
+      universal_sandwich / recipe/test / gametest / .nbt.
 - [x] **Fabric API is a required dependency of both Fabric files, on BOTH stores (from 0.7.0).**
       `publish.ps1` sends it (Modrinth project `P7dR8mSH`, `required`; CurseForge relation slug
       `fabric-api`, `requiredDependency`) and both Fabric jars declare `"fabric-api": "*"` in
@@ -895,16 +898,62 @@ needed. So 0.10.0 is a one-file release.
       ```
       Re-run the dry run immediately before the real publish — CurseForge mints new ids over time,
       and the resolver warns and skips rather than guessing.
-- [ ] **The jar is still built at `0.9.0`** — the last open item. `gradle.properties` says
-      `mod_version=0.9.0`, so `gradlew forgeJar1201` currently produces
-      `pantrywork-0.9.0-forge-mc1201.jar` (54,037 bytes, SHA-1
-      `CFB35115CA49192EFF143FCC2242E01602FAAD95`, the bytes every boot below ran). Bump to
-      `0.10.0`, rebuild, re-run both suites against the new SHA-1, and stage into `dist/0.10.0/`.
-      **`publish.ps1` now enforces this**: it re-reads each staged jar and refuses to upload one
-      whose declared version disagrees with `-Version`, or whose loader metadata file disagrees
-      with its row (`META-INF/mods.toml` for Forge, `neoforge.mods.toml` for NeoForge,
-      `fabric.mod.json` for Fabric). Both failure modes were provoked and confirmed to skip the
-      upload. `-SkipJarCheck` overrides it; don't.
+- [x] **Bumped and rebuilt at `0.10.0` (2026-11-06).** `gradle.properties` `mod_version=0.10.0`;
+      `gradlew forgeJar1201` → **`pantrywork-0.10.0-forge-mc1201.jar`, 54,037 bytes, SHA-1
+      `04870274482D21048055BB0F4F86C4244BA2FF93`**, staged in `dist/0.10.0/`. All three scenarios re-run on
+      those exact bytes and all static gates re-run — see the 0.10.0 verification record below.
+      `publish.ps1`'s jar check, which refused the 0.9.0 jar under this version, now reports
+      `META-INF/mods.toml, version 0.10.0 - matches this row`.
+
+**Everything is staged and dry-run clean. The only thing left is the upload itself, which needs
+SapperSquad's explicit go** (and the store-mirror rule: both stores in the same pass).
+
+### 0.10.0 — verification record (2026-11-06)
+
+One jar, `dist/0.10.0/pantrywork-0.10.0-forge-mc1201.jar`, **54,037 bytes**, SHA-1
+**04870274482D21048055BB0F4F86C4244BA2FF93**. 107 payload files (106 data + `pack.mcmeta`), 0 classes, 0
+singular `tags/item` paths, 0 test recipes / structure templates / gametest classes, 21 optional
+AFTER deps, version `0.10.0`, authors `SapperSquad`.
+
+**The bump changed the version string and nothing else, proven rather than assumed.** Both builds
+were hashed entry by entry: of 110 non-empty zip entries, **exactly one differs —
+`META-INF/mods.toml`**. Nothing added, nothing removed, every payload file byte-identical to the
+0.9.0-built jar that the earlier boots ran. The suites and probe pack regenerate byte-identical
+from it too (`git status tools/` clean), which is the generator keying off payload content rather
+than a filename.
+
+Re-run on the staged bytes anyway, because the house rule is to test the artifact and not its
+ancestor:
+
+| scenario | mods/ | result |
+|---|---|---|
+| solo | 1 | **50 passed / 0 failed**, and 0 errors of any class in the log |
+| compat | 19 | **338 passed / 0 failed** |
+| control | 18 (Pantrywork removed) | same 31 upstream errors, 16 / 6 / 4 / 5 |
+
+`ERROR`/`FATAL` lines naming `pantrywork`: **0 in all three.** Static gates: generator `forge1201`
+exit 0 (19 GATE / 63 EXCLUDE / 21 rescued PASS), generator modern exit 0 and **byte-identical**
+(42 / 91 / 12, `git status src/generated` clean), `-SelfTest` PASSED, and `AuditRoles.ps1` exit 0
+in all three modes (full, `-Minimal`, `-Platform forge1201`).
+
+**The modern gate run must be `-ExtraJarDirs 'tools\work\jars-26x'`.** This pass forgot it the
+first time and the run silently dropped `aquaculture:largemouth_bass` from `c:fishes`,
+`c:raw_fishes` and `c:rawfish` - exit 0, plausible verdict counts, a smaller payload. It is the
+same mistake that shipped in 0.6.0. The generator now **throws** on a modern run without it
+(`-NoExtra26x` to opt out), so it cannot recur; the three files are back to byte-identical and
+largemouth bass is present in all three. The four modern jars were not rebuilt, so no published
+byte was ever at risk - but this is why `git status src/generated` is part of the gate and not a
+formality.
+
+**Pre-upload dry run clean on both stores** (`-Only forge -DryRun`): jar check passes, Modrinth
+`0.10.0+mc1.20.1-forge` / `loaders ['forge']` / `game_versions ['1.20.1']` / `dependencies []` /
+project `rNg1wypx`, CurseForge project `1617573` with `Forge` → 7498, MC `1.20.1` → 9990,
+Client/Server → 9638 / 9639, 1/1 versions resolved and nothing dropped.
+
+**The four 1.21.1 / 26.x jars were deliberately NOT rebuilt.** Their published bytes are the 0.9.0
+ones in `dist/0.9.0`, they stay live at 0.9.0, and `-Only forge` is what keeps this release to the
+one file. Building them at `mod_version=0.10.0` would produce artifacts that were never published
+and must not be uploaded.
 
 ### What is different from the four modern files, and must be said rather than implied
 
