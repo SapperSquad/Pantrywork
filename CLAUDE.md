@@ -947,6 +947,33 @@ Any OTHER error line on a Forge 1.20.1 boot is a real finding. Roster provenance
 excluded for missing libraries, and the Pam's javafml table are in
 `tools/work/jars-1201/SOURCES.md`; the design record is `docs/FORGE-1201.md`.
 
+## publish.ps1 has five legs now, and two new guards (2026-11-06)
+
+The Forge 1.20.1 leg is in. Three things a future pass needs to know:
+
+- **`-Only <terms>`** filters the file list, for a release that adds one artifact instead of
+  rebuilding all of them. 0.10.0 is exactly that:
+  `-Version 0.10.0 -ChangelogFile tools\changelog-current.md -Only forge`. Terms match an exact
+  loader slug first, then an exact label, then a jar-name wildcard - in that order, because a
+  plain substring match made `-Only forge` select the **neoforge** 26.x leg too ('forge' is a
+  substring of 'neoforge'). It throws if a term matches nothing rather than publishing zero files.
+- **`suffix` is now an explicit column in `$files`**, not derived from the loader. The old
+  `if fabric then '-fabric' else ''` would have given the Forge file the NeoForge shape
+  (`0.10.0+mc1.20.1`) instead of `0.10.0+mc1.20.1-forge`. The four existing values are
+  **published ids** - dry-run verified unchanged. Do not touch them.
+- **The jar check** re-reads every staged jar before uploading it and refuses on a mismatch:
+  the loader metadata file must be the one its row expects (`META-INF/mods.toml` Forge /
+  `neoforge.mods.toml` NeoForge / `fabric.mod.json` Fabric) and the declared version must equal
+  `-Version`. Both failure modes were provoked and confirmed to skip. This catches the two
+  mistakes with a precedent here: a jar staged under the wrong name (= uploaded under another
+  loader's tag, installing for the wrong people and failing silently either way), and a jar built
+  at the wrong version, since `mod_version` in gradle.properties is a separate edit from
+  `-Version`. `-SkipJarCheck` exists; do not use it.
+
+CurseForge ids for the new leg, dry-run resolved: `Forge` -> **7498**, MC `1.20.1` -> **9990**
+(Client/Server 9638/9639 unchanged). Re-run a `-DryRun` before any real publish anyway - CF mints
+new ids over time and the resolver warns and skips rather than guessing.
+
 ## Roster candidate: AnvilCraft (measured 2026-11-06, NOT bridged)
 
 SapperSquad relayed player feedback: AnvilCraft "has a bunch of incompatible food items, like the

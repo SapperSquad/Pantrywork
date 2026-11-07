@@ -16,6 +16,26 @@
 #   powershell -File tools\publish.ps1 -Version 0.1.0 -ChangelogFile tools\changelog-current.md -DryRun
 #   powershell -File tools\publish.ps1 -Version 0.1.0 -ChangelogFile tools\changelog-current.md
 #
+# ONE-FILE RELEASES: -Only filters the file list, so a release that adds a single
+# artifact does not warn four times about jars that were deliberately not built.
+# 0.10.0 is exactly that - the Forge 1.20.1 file, with the four 1.21.1/26.x files
+# left live at 0.9.0:
+#   powershell -File tools\publish.ps1 -Version 0.10.0 -ChangelogFile tools\changelog-current.md -Only forge -DryRun
+# -Only matches the loader slug, the label or the jar name (wildcards allowed), and
+# it fails loudly rather than silently publishing nothing if it matches no file.
+#
+# FORGE LEG, DRY-RUN VERIFIED 2026-11-06 (read-only GETs; -DryRun never reaches the
+# upload POST). Both CurseForge ids resolve, so neither is a guess:
+#   loader 'Forge' -> 7498   (distinct from NeoForge; the lookup is an exact name
+#                             match under the 'modloader' version type, so the two
+#                             cannot collide)
+#   Minecraft '1.20.1' -> 9990      environment Client/Server -> 9638 / 9639
+# Modrinth needs no lookup: loader slug 'forge', and the payload comes out as
+# version_number '0.10.0+mc1.20.1-forge', loaders ['forge'], game_versions
+# ['1.20.1'], dependencies [] - no Fabric API on this file, correctly.
+# Re-run a -DryRun before the real publish anyway: CurseForge mints new ids over time
+# and Get-CurseForgeVersionIdByType warns and skips rather than guessing.
+#
 # This performs REAL, PUBLIC uploads when run without -DryRun.
 
 param(
@@ -23,8 +43,10 @@ param(
     [Parameter(Mandatory=$true)][string]$ChangelogFile,
     [string]$ModrinthProjectId = "",
     [int]$CurseForgeProjectId = 0,
+    [string[]]$Only = @(),
     [switch]$SkipModrinth,
     [switch]$SkipCurseForge,
+    [switch]$SkipJarCheck,
     [switch]$DryRun
 )
 $ErrorActionPreference = "Stop"
@@ -124,7 +146,7 @@ function Get-CurseForgeVersionIdByType {
     return $valid[0].id
 }
 
-# The four release artifacts and the Minecraft versions each is tagged with on the
+# The five release artifacts and the Minecraft versions each is tagged with on the
 # stores. The versions actually booted are in PUBLISHING.md's verification log: the
 # Fabric 1.21.x file was booted on 1.21.1, 1.21.10 and 1.21.11, and 1.21.2-1.21.9 are
 # tagged from its declared range (>=1.21.1 <1.22). Both Fabric files are sent with
@@ -139,20 +161,111 @@ function Get-CurseForgeVersionIdByType {
 # the other uploads still go). Loader names:
 # Modrinth uses lowercase loader slugs; CurseForge models loaders as
 # game-version entries under the 'modloader' type.
+#
+# FORGE 1.20.1 (added for 0.10.0) is Forge, NOT NeoForge, and the difference is not
+# cosmetic: it declares META-INF/mods.toml where the NeoForge files declare
+# META-INF/neoforge.mods.toml, and Minecraft 1.20.1 reads tags from the plural
+# data/<ns>/tags/items/ path where 1.21 reads the singular tags/item/ - each silently
+# dead on the other line. A Forge jar uploaded under the neoforge loader tag, or a
+# NeoForge jar under forge, would install for the wrong people and fail without an
+# error either way, so $jarMeta below re-reads each staged jar and refuses to publish
+# one whose metadata disagrees with its row here. That file bridges 21 mods, not 24,
+# and ships no conditional overlays (1.20.1 has none); PUBLISHING.md's "Forge 1.20.1"
+# section is the store copy that says so.
+#
+# `suffix` is explicit rather than derived from the loader. It used to be
+# `if fabric then '-fabric' else ''`, which silently gave the Forge file the
+# NeoForge files' unsuffixed shape (0.10.0+mc1.20.1) instead of the intended
+# 0.10.0+mc1.20.1-forge. The four values below are EXACTLY what the live store
+# versions already use - do not change them, they are published ids.
 $fabric121 = @('1.21.1','1.21.2','1.21.3','1.21.4','1.21.5','1.21.6','1.21.7','1.21.8','1.21.9','1.21.10','1.21.11')
 $mc26      = @('26.1.2','26.2')
 $files = @(
-    @{ jar = "pantrywork-$Version.jar";               loaderModrinth = "neoforge"; loaderCf = "NeoForge"; label = "1.21.1";  mc = @('1.21.1') },
-    @{ jar = "pantrywork-$Version-fabric.jar";        loaderModrinth = "fabric";   loaderCf = "Fabric";   label = "1.21.x"; mc = $fabric121 },
-    @{ jar = "pantrywork-$Version-fabric-mc26.jar";   loaderModrinth = "fabric";   loaderCf = "Fabric";   label = "26";     mc = $mc26 },
-    @{ jar = "pantrywork-$Version-neoforge-mc26.jar"; loaderModrinth = "neoforge"; loaderCf = "NeoForge"; label = "26";     mc = $mc26 }
+    @{ jar = "pantrywork-$Version.jar";               loaderModrinth = "neoforge"; loaderCf = "NeoForge"; label = "1.21.1"; suffix = "";        meta = "META-INF/neoforge.mods.toml"; mc = @('1.21.1') },
+    @{ jar = "pantrywork-$Version-fabric.jar";        loaderModrinth = "fabric";   loaderCf = "Fabric";   label = "1.21.x"; suffix = "-fabric"; meta = "fabric.mod.json";             mc = $fabric121 },
+    @{ jar = "pantrywork-$Version-fabric-mc26.jar";   loaderModrinth = "fabric";   loaderCf = "Fabric";   label = "26";     suffix = "-fabric"; meta = "fabric.mod.json";             mc = $mc26 },
+    @{ jar = "pantrywork-$Version-neoforge-mc26.jar"; loaderModrinth = "neoforge"; loaderCf = "NeoForge"; label = "26";     suffix = "";        meta = "META-INF/neoforge.mods.toml"; mc = $mc26 },
+    @{ jar = "pantrywork-$Version-forge-mc1201.jar";  loaderModrinth = "forge";    loaderCf = "Forge";    label = "1.20.1"; suffix = "-forge";  meta = "META-INF/mods.toml";          mc = @('1.20.1') }
 )
+
+if ($Only.Count -gt 0) {
+    # Matched in priority order, and the first rule that hits for a term WINS. A plain
+    # substring match on the jar name is not good enough on its own: 'forge' is a
+    # substring of 'neoforge', so -Only forge quietly selected the NeoForge 26.x leg as
+    # well as the Forge one. An exact loader slug or label is therefore tried first, and
+    # only a term that is neither falls through to a jar-name wildcard.
+    $kept = @()
+    foreach ($term in $Only) {
+        $hit = @($files | Where-Object { $_.loaderModrinth -eq $term })
+        if ($hit.Count -eq 0) { $hit = @($files | Where-Object { $_.label -eq $term }) }
+        if ($hit.Count -eq 0) { $hit = @($files | Where-Object { $_.jar -like "*$term*" }) }
+        foreach ($h in $hit) { if ($kept -notcontains $h) { $kept += $h } }
+    }
+    $kept = @($files | Where-Object { $kept -contains $_ })   # keep the table's order
+    if ($kept.Count -eq 0) {
+        throw ("-Only '$($Only -join ', ')' matched none of the $($files.Count) files. " +
+               "Match on a loader slug (neoforge/fabric/forge), a label (1.21.1/1.21.x/26/1.20.1), " +
+               "or part of a jar name.")
+    }
+    Write-Host "-Only '$($Only -join ', ')': publishing $($kept.Count) of $($files.Count) files - $(($kept | ForEach-Object { $_.jar }) -join ', ')"
+    $files = $kept
+}
+
+# Re-read each staged jar and refuse to publish one whose own metadata disagrees with
+# its row above. Two mistakes this catches, both of which have a precedent in this
+# project: a jar staged under the wrong name (so it would go up with another loader's
+# tag), and a jar built at the wrong version - gradle.properties' mod_version is a
+# separate edit from -Version here, and the Forge jar sat at 0.9.0 while 0.10.0 was
+# being written up. Pass -SkipJarCheck only to deliberately publish a jar whose
+# metadata you have already read yourself.
+Add-Type -AssemblyName System.IO.Compression.FileSystem
+function Get-JarModMeta {
+    param([string]$JarPath)
+    $zip = [System.IO.Compression.ZipFile]::OpenRead($JarPath)
+    try {
+        $found = @($zip.Entries | Where-Object {
+            $_.FullName -in @('META-INF/mods.toml','META-INF/neoforge.mods.toml','fabric.mod.json')
+        } | ForEach-Object { $_.FullName })
+        $ver = $null
+        if ($found.Count -eq 1) {
+            $entry = $zip.Entries | Where-Object { $_.FullName -eq $found[0] }
+            $reader = New-Object System.IO.StreamReader($entry.Open())
+            try { $text = $reader.ReadToEnd() } finally { $reader.Dispose() }
+            # mods.toml: version = "x"   |   fabric.mod.json: "version": "x"
+            $m = [regex]::Match($text, '(?m)^\s*version\s*=\s*"([^"]+)"')
+            if (-not $m.Success) { $m = [regex]::Match($text, '"version"\s*:\s*"([^"]+)"') }
+            if ($m.Success) { $ver = $m.Groups[1].Value }
+        }
+        return @{ meta = $found; version = $ver }
+    } finally { $zip.Dispose() }
+}
 
 foreach ($f in $files) {
     $jar = Join-Path $dist $f.jar
     if (-not (Test-Path $jar)) { Write-Warning "missing $jar - skipped"; continue }
-    $suffix = if ($f.loaderModrinth -eq 'fabric') { "-fabric" } else { "" }
+    $suffix = $f.suffix
     Write-Host "`n=== $($f.jar)  [$($f.loaderCf) $($f.label): $($f.mc -join ', ')] ==="
+
+    if (-not $SkipJarCheck) {
+        $jm = Get-JarModMeta -JarPath $jar
+        $problems = @()
+        if ($jm.meta.Count -ne 1) {
+            $problems += "declares $($jm.meta.Count) loader metadata files ($($jm.meta -join ', ')); expected exactly $($f.meta)"
+        } elseif ($jm.meta[0] -ne $f.meta) {
+            $problems += "declares $($jm.meta[0]) but this row is $($f.loaderCf), which needs $($f.meta) - the jar is for the WRONG LOADER or staged under the wrong name"
+        }
+        if (-not $jm.version) {
+            $problems += "no mod version could be read from its metadata"
+        } elseif ($jm.version -ne $Version) {
+            $problems += "declares version '$($jm.version)' but -Version is '$Version' - rebuild after bumping mod_version in gradle.properties"
+        }
+        if ($problems.Count -gt 0) {
+            Write-Warning "SKIPPED $($f.jar) - jar check failed:"
+            foreach ($pb in $problems) { Write-Warning "    $pb" }
+            continue
+        }
+        Write-Host "jar check : $($jm.meta[0]), version $($jm.version) - matches this row"
+    }
     # assigned outside an if-expression so PS 5.1 never unrolls the one-element arrays
     $mrDeps = @()
     $cfRelations = $null

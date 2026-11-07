@@ -881,14 +881,30 @@ needed. So 0.10.0 is a one-file release.
 
 **Before uploading, two things are genuinely not done yet** — neither is a copy question:
 
-- [ ] **`tools/publish.ps1` has no forge1201 leg.** Grep it: nothing matches `forge1201`, `mc1201`
-      or `1.20.1`. It cannot send this file, its game version or its loader. That has to be added
-      (and dry-run) before any upload, or the file goes up mislabelled.
-- [ ] **The jar is still built at `0.9.0`.** `gradle.properties` says `mod_version=0.9.0`, so
-      `gradlew forgeJar1201` currently produces `pantrywork-0.9.0-forge-mc1201.jar`
-      (54,037 bytes, SHA-1 `CFB35115CA49192EFF143FCC2242E01602FAAD95`, the bytes every boot below
-      ran). Bump to `0.10.0`, rebuild, re-run both suites against the new SHA-1, and stage into
-      `dist/0.10.0/`.
+- [x] **`tools/publish.ps1` has a forge leg (added 2026-11-06).** Fifth `$files` row — Modrinth
+      loader slug `forge`, CurseForge loader `Forge`, label `1.20.1`, no dependencies. **Dry-run
+      verified** (read-only GETs; `-DryRun` never reaches the upload POST): CurseForge resolves
+      `Forge` → **7498** and Minecraft `1.20.1` → **9990**, 1/1 game versions, nothing unresolved;
+      Modrinth emits `version_number` `0.10.0+mc1.20.1-forge`, `loaders ['forge']`,
+      `game_versions ['1.20.1']`, `dependencies []`. The four published version ids are
+      **unchanged** by the change — re-checked in the same dry run: `0.9.0+mc1.21.1`,
+      `0.9.0+mc1.21.x-fabric`, `0.9.0+mc26-fabric`, `0.9.0+mc26`.
+      Publish this one file with **`-Only forge`**:
+      ```
+      powershell -File tools\publish.ps1 -Version 0.10.0 -ChangelogFile tools\changelog-current.md -Only forge -DryRun
+      ```
+      Re-run the dry run immediately before the real publish — CurseForge mints new ids over time,
+      and the resolver warns and skips rather than guessing.
+- [ ] **The jar is still built at `0.9.0`** — the last open item. `gradle.properties` says
+      `mod_version=0.9.0`, so `gradlew forgeJar1201` currently produces
+      `pantrywork-0.9.0-forge-mc1201.jar` (54,037 bytes, SHA-1
+      `CFB35115CA49192EFF143FCC2242E01602FAAD95`, the bytes every boot below ran). Bump to
+      `0.10.0`, rebuild, re-run both suites against the new SHA-1, and stage into `dist/0.10.0/`.
+      **`publish.ps1` now enforces this**: it re-reads each staged jar and refuses to upload one
+      whose declared version disagrees with `-Version`, or whose loader metadata file disagrees
+      with its row (`META-INF/mods.toml` for Forge, `neoforge.mods.toml` for NeoForge,
+      `fabric.mod.json` for Fabric). Both failure modes were provoked and confirmed to skip the
+      upload. `-SkipJarCheck` overrides it; don't.
 
 ### What is different from the four modern files, and must be said rather than implied
 
