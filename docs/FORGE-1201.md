@@ -299,7 +299,7 @@ The last open item was a 1.20.1 Forge harness. It exists now:
 | scenario | mods/ | result |
 |---|---|---|
 | `-Scenario solo` | the forge jar alone | **50 passed / 0 failed**, and a log with 0 errors of any class |
-| `-Scenario compat` | + the 18 loadable roster jars | **314 passed / 0 failed** |
+| `-Scenario compat` | + the 18 loadable roster jars | **338 passed / 0 failed** |
 | `-Scenario control` | the 18 jars, Pantrywork REMOVED | upstream error set byte-identical to compat |
 
 Three things about the harness are worth knowing before touching it.
@@ -339,7 +339,8 @@ payload green.
 
 ### What the compat boot found: `forge:doughs` is two doughs, not six
 
-The first compat run failed 3 of 314, all on `forge:doughs`, and the cause turned out to be two
+The first compat run (314 assertions, before the probe set was widened below) failed 3, all on
+`forge:doughs`, and the cause turned out to be two
 independent things stacking - both correct behaviour, neither a bug:
 
 1. **Pantrywork deliberately does not inject them.** All four cheap doughs
@@ -358,6 +359,28 @@ cannot - and it is the first place the 19 dropped GATE entries are observable in
 asserted as a negative in the compat suite with the reason attached, so delivering it later is a
 deliberate, visible change. Store copy for the Forge build should say this plainly rather than
 imply overlay parity.
+
+### The probe set was filtering to `forge:`, and the wok gate went unasserted
+
+Found 2026-11-06 while writing store copy, which is the point of writing store copy: the claim
+wanted was Kaleidoscope's wok, and nothing backed it. `gen_compat` built its tag list as
+`[t for t in ours if t.startswith('forge:')]`, so the three tags the payload writes in *mod*
+namespaces were never probed - `kaleidoscope_cookery:oil`, `rusticdelight:cooking_oil` and
+`origins:meat`. The first of those is the single highest-value bridge in the payload: the wok
+checks it before it will cook, and all 225 of Kaleidoscope's wok recipes are behind it. It is the
+headline of the 0.8.0 release and it had no coverage on this line at all.
+
+Now `[t for t in ours if not t.startswith('pantrywork:')]` - everything except the role layer,
+which the role and umbrella sections already cover. Compat went **314 -> 338 assertions over 83
+tags**, all passing, and the wok tag is confirmed to hold six mods' oils: Kaleidoscope's own plus
+Cook's Collection, Croptopia's olive oil, Hearth and Harvest, Pam's and Rustic Delight. Solo
+re-ran 50/0 unchanged (the probe pack is additive, so widening compat cannot disturb it).
+
+One thing the new coverage surfaced, which is upstream's call and not a fault: Pam's Food
+Extended's firm tofu reaches `origins:meat`. It gets there because Food Extended itself writes
+`forge:groundmeats` -> `#forge:groundmeats/firmtofu`, and our `origins:meat` references that
+family - the same shape as Croptopia listing its own tofu in `croptopia:meat_replacements`. The
+cost floor does not apply: a carnivore diet tag is not a recipe ingredient tag.
 
 ### Upstream noise on the compat boot, and the control that attributes it
 

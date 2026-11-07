@@ -723,6 +723,57 @@ item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with farmersdelight:
 execute as @e[tag=pwprobe,limit=1] if predicate pwtest:forge__tomatoes
 item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with kaleidoscope_cookery:tomato
 execute as @e[tag=pwprobe,limit=1] if predicate pwtest:forge__tomatoes
+#   -> kaleidoscope_cookery:oil
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with cookscollection:cooking_oil
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:kaleidoscope_cookery__oil
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with croptopia:olive_oil
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:kaleidoscope_cookery__oil
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with hearthandharvest:cooking_oil
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:kaleidoscope_cookery__oil
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with kaleidoscope_cookery:oil
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:kaleidoscope_cookery__oil
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with pamhc2foodcore:cookingoilitem
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:kaleidoscope_cookery__oil
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with rusticdelight:cooking_oil
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:kaleidoscope_cookery__oil
+#   -> origins:meat
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with minecraft:cod
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:origins__meat
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with aquaculture:arapaima
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:origins__meat
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with brewinandchewin:cheesy_pasta
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:origins__meat
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with croptopia:anchovy
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:origins__meat
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with culturaldelights:glow_squid
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:origins__meat
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with farm_and_charm:bacon
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:origins__meat
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with farmersdelight:bacon_and_eggs
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:origins__meat
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with hearthandharvest:cooked_sausage
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:origins__meat
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with meadow:cooked_buffalo_meat
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:origins__meat
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with oceansdelight:cooked_elder_guardian_slice
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:origins__meat
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with pamhc2foodcore:groundbeefitem
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:origins__meat
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with pamhc2foodextended:firmtofuitem
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:origins__meat
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with rusticdelight:calamari
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:origins__meat
+#   -> rusticdelight:cooking_oil
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with cookscollection:cooking_oil
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:rusticdelight__cooking_oil
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with croptopia:olive_oil
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:rusticdelight__cooking_oil
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with hearthandharvest:cooking_oil
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:rusticdelight__cooking_oil
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with pamhc2foodcore:cookingoilitem
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:rusticdelight__cooking_oil
+item replace entity @e[tag=pwprobe,limit=1] weapon.mainhand with rusticdelight:cooking_oil
+execute as @e[tag=pwprobe,limit=1] if predicate pwtest:rusticdelight__cooking_oil
 
 # --- 4. NAMED CASES FROM THE DESIGN RECORD - asserted by name, never sampled. ---
 # the third-mod rule: both mods' strawberries land here, and neither arrives via the other

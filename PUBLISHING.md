@@ -1,4 +1,7 @@
-# Pantrywork — publishing kit (current as of v0.9.0)
+# Pantrywork — publishing kit (current as of v0.10.0, the Forge 1.20.1 file)
+
+**0.10.0 is a ONE-FILE release:** the Forge 1.20.1 jar is added, and the four 1.21.1 / 26.x files stay
+at 0.9.0 with their bytes unchanged. Do not re-upload them.
 
 Store copy for the Modrinth / CurseForge project pages. Bump this file in the same pass as
 `CHANGELOG.md` and `README.md` — never one alone.
@@ -11,6 +14,7 @@ Store copy for the Modrinth / CurseForge project pages. Bump this file in the sa
 | `0.9.0+mc1.21.x-fabric` | `dist/0.9.0/pantrywork-0.9.0-fabric.jar` | 1.21.1–1.21.11 (booted on 1.21.1, 1.21.10, 1.21.11) | fabric | Fabric API, required |
 | `0.9.0+mc26-fabric` | `dist/0.9.0/pantrywork-0.9.0-fabric-mc26.jar` | 26.1.2, 26.2 | fabric | Fabric API, required |
 | `0.9.0+mc26` | `dist/0.9.0/pantrywork-0.9.0-neoforge-mc26.jar` | 26.1.2, 26.2 | neoforge | none |
+| `0.10.0+mc1.20.1-forge` | `dist/0.10.0/pantrywork-0.10.0-forge-mc1201.jar` | 1.20.1 | **forge** | none |
 
 Publish: `tools\publish.ps1 -Version 0.9.0 -ChangelogFile tools\changelog-current.md` (dry-run first).
 The version names above are exactly what `publish.ps1` generates (`<Version>+mc<label>[-fabric]`).
@@ -475,6 +479,10 @@ the live pages since 0.1.0, so this is now a standing step):
 
 ## Summary (the short-description field)
 
+**The count stays "twenty-four" at 0.10.0.** Summary is one field for the whole page, and 24 is
+what the 1.21.1 file bridges. The Forge file's 21 is stated in the description and the changelog,
+which is where a per-file difference belongs. Do not change one of the three without the others.
+
 **HARD LIMIT 256 CHARACTERS on Modrinth** — the API rejects a longer one. Measure before pasting;
 the first 0.8.0 draft was 295 and would have failed. The line below is **247** (twenty-one -> twenty-four cost one character; re-measure on every roster change).
 
@@ -500,7 +508,9 @@ NeoForge / Farmer's Delight `c:foods/*` convention, then adds a second layer des
 ingredient *does*. No blocks, no items, no gameplay changes. Just recipes that finally work.
 
 **NeoForge** on Minecraft 1.21.1 and 26.1–26.2, **Fabric** on 1.21.1–1.21.11 and 26.1–26.2 (Fabric
-needs Fabric API).
+needs Fabric API), and **Forge** on 1.20.1. The 1.20.1 file bridges 21 of the 24 mods and leaves out
+the swaps that need a conditional overlay, because that version has none — the
+"Forge 1.20.1" section below says exactly which, and the changelog says it again.
 
 ## 🏷️ Two layers
 
@@ -563,6 +573,27 @@ Refabricated) · **Pam's HarvestCraft 2 — all four modules: Food Core, Crops, 
 worldgen mod, here for the four fruits it grows) · **Origins** (carnivore/vegetarian
 diet tags).
 
+## 🔧 On Forge 1.20.1
+
+There is a Forge 1.20.1 file, and it is a real port rather than a repackage — on that version the
+shared vocabulary is `forge:` instead of `c:`, and the tag files live in a differently named folder,
+so every file in the payload is rebuilt. The food mods there have the same problem and the same
+four dialects: seven spellings of cheese, seven of milk, four of onion with **no** cross-references
+at all, and Hearth and Harvest filing its cheese in a tag nothing else on that version reads.
+
+Two things are smaller than on 1.21.1, and worth knowing before you install it. It bridges **21**
+of the 24 mods — Pam's Crops and Trees have no Forge 1.20.1 build and Bountiful Fares is
+Fabric-only there. And 19 swaps that 1.21 ships *conditionally* are left out: some substitutions
+are only fair when a particular mod is installed, 1.21 handles that with a conditional pack
+overlay, and Minecraft 1.20.1 does not have those. Rather than ship them unconditionally and let an
+underpriced item into your recipes, this file leaves them out — cheese, dough, milk, salt, flour,
+cabbage, chicken parts and sashimi each lose one entry or a few. The practical difference, measured
+on a running server: with Farm & Charm installed, the 1.21 file unifies six doughs in Croptopia's
+dough tag and this one unifies two.
+
+Everything else is the same mod, including the fair-swap rule and the price checks behind it, which
+were re-read from the 1.20.1 recipes rather than assumed unchanged.
+
 ## 🧑‍🍳 For pack makers
 
 Stop writing one recipe per food mod. Target a role tag and the recipe covers every mod your
@@ -570,7 +601,8 @@ players have installed, plus the ones they install later.
 
 ## 🛠️ For mod authors
 
-`PantryworkTagKeys` (NeoForge jar) exposes the role tags and the most-asked-for identity tags —
+`PantryworkTagKeys` (the **1.21.1 NeoForge jar only** — the Fabric, 26.x and Forge 1.20.1 files
+are pure data with no classes) exposes the role tags and the most-asked-for identity tags —
 cheese, butter, dough, cooked rice, flour — as compile-time constants, so you can reference the
 taxonomy without hardcoding strings or taking a dependency on the mods being bridged. Anything else
 in the layer is a plain `c:` tag id you can write directly.
@@ -595,6 +627,15 @@ thirteen of the fourteen conditions both open and closed. The few they cannot re
 development boot instead, and the changelog says which rather than implying full coverage. Automated
 GameTests cover role tags, cross-mod identity, reverse bridges, cost floors, and recipe resolution
 through `RecipeManager`.
+
+**Forge 1.20.1** is held to the same standard on its own dedicated server: the file alone passes 50
+tag assertions with a log that carries no errors at all, and with 16 of the roster mods loaded
+it passes 338 across 83 tags. A third boot runs that identical mod set with Pantrywork removed, so
+the 31 errors those mods log are proven to be theirs and not ours — the two lists come back
+identical. On that version the assertions are tag membership rather than crafts (1.20.1 has neither
+the command nor the block the craft tests use), and the suite was shown able to fail by rebuilding
+the file with 1.21's folder name: 39 of the 50 assertions fail, which is every one that asserts
+presence.
 
 Where something *cannot* be fixed with tags, the changelog says so rather than implying otherwise:
 a recipe that names an exact item id cannot be widened by any datapack, and several of the supported
@@ -712,6 +753,16 @@ this pass — counted out of the BUILT jar's `neoforge.mods.toml`, not the templ
 
 ## Changelog for the uploads
 
+> **0.10.0 — Forge 1.20.1, and an answer that had been wrong since August.** Paste-ready body in
+> `tools/changelog-current.md` (0.9.0's body was moved to `tools/changelog-0.9.0.md`, since the four
+> 1.21.1/26.x files keep it): the fifth file and what it is; why the refusal was wrong, with the
+> number that disproves it (FD's 1.20 branch declares 64 `forge:` tags; 957 `forge:` item-tag files
+> and 336 food tag paths across the nineteen 1.20.1 jars); the roster being 21 not 24 and why; the
+> Hearth and Harvest cheese case and the wok lighting on six mods' oil; **the 19 dropped conditional
+> swaps, named by family, with the measured dough consequence (two, not six)**; no
+> `PantryworkTagKeys`; the boot numbers and the mutation that proves the suite can fail; and the
+> three things tags cannot fix on that version.
+
 > **0.9.0 — The rest of Pam's HarvestCraft, and a free lunch taken off the menu.** Paste-ready body
 > in `tools/changelog-current.md`: Pam's HarvestCraft 2 Crops, Trees and Food Extended, taking the
 > roster to 24; Crops' and Trees' ~250 items landing in tag families the pack already reads, with
@@ -781,6 +832,12 @@ this pass — counted out of the BUILT jar's `neoforge.mods.toml`, not the templ
   resource loader, which also applies the conditional overlays. Both Fabric jars declare
   `"fabric-api": "*"` and `publish.ps1` sends it as a required dependency (see the top of this file).
   Booted 2026-09-13: without Fabric API, Fabric Loader refuses to start and names the missing dependency.
+- Minecraft 1.20.1 (**Forge** 47+, data-only jar, from 0.10.0): declared range
+  `[1.20.1,1.20.2)`, `META-INF/mods.toml` with `modLoader = "lowcodefml"` and
+  `mandatory = true|false`. Tag it for the **forge** loader only — NeoForge 1.20.1 was never
+  tested and must not be claimed. 21 optional AFTER deps, not 24: `pamhc2crops` and `pamhc2trees`
+  have no 1.20.1 build (javafml `[49,)` vs the 47 Forge supplies, measured) and `bountifulfares`
+  is Fabric-only there.
 - Categories: `library`, `utility`, `food` — this is a library first; listing it under food/farming
   alone buries it for the pack makers who are the actual audience.
 - Environment: client **optional**, server **required** — pure data (tags/recipes) that runs on the
@@ -803,68 +860,141 @@ this pass — counted out of the BUILT jar's `neoforge.mods.toml`, not the templ
   release log every release — a stale "not yet published" line here is the same failure mode as the
   three store claims the 0.8.0 audit found had been false on the live pages since 0.1.0.)
 
-## Why no Forge build? (SUPERSEDED 2026-11-04 — DO NOT PASTE)
+## Forge 1.20.1 — the fifth file (0.10.0)
 
-> **STOP. The reasoning below is factually wrong and the decision has been reversed.** SapperSquad
-> asked for the 1.20.1 Forge build on 2026-11-04, and a measurement the same day disproved its
-> premise. Farmer's Delight's **1.20 branch ships `ForgeTags.java` declaring 64 `forge:` tags**,
-> among them `forge:crops/{cabbage,onion,rice,tomato}`, `forge:vegetables/*`, `forge:milk`,
-> `forge:milk/milk_bottle`, `forge:dough`, `forge:pasta`, `forge:grain`, `forge:raw_fishes/*`,
-> `forge:cooked_fishes/*`, the four raw and the four cooked meats, `forge:eggs`, `forge:berries`,
-> `forge:bread` and `forge:salad_ingredients` — the same two-level `<family>` plus
-> `<family>/<leaf>` shape Pantrywork bridges on 1.21, under a different namespace. On the 1.21
-> branch that file is gone and `CommonTags.java` builds the identical ids under `c` instead.
-> **So a 1.20.1 build is a port, not an invention.**
+**Greenlit 2026-11-04 by SapperSquad after the measurement disproved the refusal; built, booted and
+suite-tested 2026-11-05/06.** It goes up as a **fifth file on this same project**, not a new page
+(SapperSquad's call). The four 1.21.1 / 26.x files stay at 0.9.0 and are **not** re-uploaded — their
+bytes are unchanged, and the modern payload was re-verified byte-identical after every edit the port
+needed. So 0.10.0 is a one-file release.
+
+| | value | read from |
+|---|---|---|
+| upload version | `0.10.0+mc1.20.1-forge` | `publish.ps1`'s `<Version>+mc<label>` shape |
+| game version tag | 1.20.1 | |
+| loader tag | **forge** only | NeoForge 1.20.1 untested — do not tick it |
+| dependencies | none | every cross-mod entry is `required = false` |
+| payload | 107 files (106 data + `pack.mcmeta`), 0 classes | the built jar |
+| `pack.mcmeta` | bare `pack_format: 15`, no overlay section | the built jar |
+| metadata | `META-INF/mods.toml`, `lowcodefml`, `loaderVersion = "[47,)"`, MC `[1.20.1,1.20.2)` | the built jar |
+| optional AFTER deps | **21** | the built jar |
+
+**Before uploading, two things are genuinely not done yet** — neither is a copy question:
+
+- [ ] **`tools/publish.ps1` has no forge1201 leg.** Grep it: nothing matches `forge1201`, `mc1201`
+      or `1.20.1`. It cannot send this file, its game version or its loader. That has to be added
+      (and dry-run) before any upload, or the file goes up mislabelled.
+- [ ] **The jar is still built at `0.9.0`.** `gradle.properties` says `mod_version=0.9.0`, so
+      `gradlew forgeJar1201` currently produces `pantrywork-0.9.0-forge-mc1201.jar`
+      (54,037 bytes, SHA-1 `CFB35115CA49192EFF143FCC2242E01602FAAD95`, the bytes every boot below
+      ran). Bump to `0.10.0`, rebuild, re-run both suites against the new SHA-1, and stage into
+      `dist/0.10.0/`.
+
+### What is different from the four modern files, and must be said rather than implied
+
+1. **The roster is 21, not 24.** `pamhc2crops` and `pamhc2trees` have **no Forge 1.20.1 build at
+   all** — their only 1.20.x builds declare javafml `[49,)` and 1.20.1 supplies 47, measured by
+   trying to boot them — and `bountifulfares` is Fabric-only on 1.20.1. The project-level summary
+   stays at "twenty-four" because that is what the 1.21.1 file bridges and the summary is one field
+   for the whole page; the per-file difference belongs in the description and the changelog, where it
+   now is. **Do not quietly change one without the other.**
+2. **19 conditional swaps are dropped.** 1.20.1 has no pack overlays (vanilla gained them in 1.20.2,
+   format 18; the conditional kind is later still; 1.20.1 is format 15), so a swap that is only fair
+   alongside a rescuing mod cannot be shipped conditionally and is left out instead. By family:
+   Pam's cheese (needed Croptopia) · four cheap doughs — Create, FD, Kaleidoscope, Pam's (needed
+   Farm & Charm) · three milk bottles — FD, H&H goat, Pam's fresh (needed Croptopia) · three salts
+   (needed Cook's Collection, or Croptopia, or H&H) · H&H flour and corn meal (needed Bountiful
+   Fares, Create or Farm & Charm) · FD's cabbage leaf · Farm & Charm's chicken parts ·
+   Kaleidoscope's sashimi.
+3. **The one place that is observable in game, measured on the compat boot:** with Farm & Charm
+   installed, the 1.21 file unifies **six** doughs in Croptopia's `doughs` tag; on 1.20.1 that tag
+   holds **two**. (`forge:dough` holds all six on both.) Upstream compounds it — Croptopia 4.0.1's
+   `forge:doughs → #forge:dough` edge is optional and sits in a cycle with Kaleidoscope's reverse
+   edge, so the game drops it silently. Asserted as a negative in the compat suite with the reason
+   attached, so delivering it later is a deliberate, visible change.
+4. **No `PantryworkTagKeys`.** The API class compiles against 1.21.1 MC types, so the 1.20.1 file is
+   tags and nothing else — same as the Fabric and 26.x files.
+5. **Price judgments were re-derived, not copied.** 39 floors and 4 item costs were read out of
+   1.20.1 recipes because the mods are at different versions there (FD 1.3.4 not 1.3.2, Cultural
+   Delights 0.16.7 not 0.18.1, Croptopia 4.0.1 not 4.2.4); 89 floors are scoped out as not applying.
+   Never assume a 1.21 floor carries across.
+
+### Verification record (2026-11-06)
+
+Its own harness: `tools/forge-server-1201` (Forge 1.20.1-47.4.28), driven by
+`tools/boot-forge1201.ps1`. The suites are generated by `tools/GenForge1201Suites.py` — re-derive,
+never hand-edit.
+
+| scenario | mods/ | result |
+|---|---|---|
+| `-Scenario solo` | the forge jar alone | **50 passed / 0 failed**, log with 0 errors of any class |
+| `-Scenario compat` | + 18 jars (16 roster mods + 2 libraries) | **338 passed / 0 failed** over 83 tags |
+| `-Scenario control` | the same 18, Pantrywork REMOVED | upstream error set **byte-identical**, 31 for 31 |
+
+The compat count moved **314 → 338** on 2026-11-06: the generator had been filtering probes to
+tags in the `forge:` namespace, which silently excluded the three mod-namespaced tags the payload
+also writes — `kaleidoscope_cookery:oil`, `rusticdelight:cooking_oil` and `origins:meat`. The
+first is the gate in front of all 225 of Kaleidoscope's wok recipes, i.e. the single claim 0.8.0
+was built on, with no coverage on this line. Now asserted: six mods' oils reach the wok tag.
+
+`ERROR`/`FATAL` lines naming `pantrywork`: **0 in all three.** Generator and `AuditRoles.ps1` both
+exit 0 on `-Platform forge1201`, every counter 0 including the new stricter-referrer check.
+
+**The suite is mutation-proven on this port's central hazard.** Rebuild the jar with 1.21's singular
+`data/<ns>/tags/item/` instead of 1.20.1's plural `tags/items/`, nothing else changed: **39 failed /
+11 passed** — every positive collapses, exactly the negatives survive. That is the argument for the
+positives; the negatives alone would have called a completely dead payload green.
+
+**On 1.20.1 the assertions are tag membership, not crafts.** `execute if items` and
+`minecraft:crafter` are both 1.21, so the 1.21 copy's craft claims **must not be transplanted onto
+this file**. What a 1.20.1 boot proves is that the item is in the tag the recipe reads — which is
+what `RecipeManager` consumes, but it is a weaker sentence and the copy says the weaker sentence.
+
+**Five of the 21 were not in the boot:** Create, Fish of Thieves, Refurbished Furniture, Hybrid
+Delights and Oh The Biomes We've Gone each need a further library mod to start, which was not
+fetched. Their items are in the payload (the generator read their own 1.20.1 jars) but no boot
+exercised them, and the changelog says so. Adding them means fetching their libraries and re-running
+both generator phases.
+
+### The Forge paragraph is IN the description above
+
+It sits in "## Project description" between "No food mod required" and "For pack makers", so
+pasting the body carries it. Do not keep a second copy down here - a copy that is not pasted is a
+copy that goes stale, which is how three claims stayed false on the live pages from 0.1.0 to 0.8.0.
+
+### The Forge 1.20.1 reply, now that it ships (paste-ready)
+
+Replaces the refusal that stood here until 2026-11-04. A player asked on 2026-11-01.
+
+> Good news — there's a Forge 1.20.1 file now, and I owe you a correction: the answer you got
+> before was wrong, not just cautious. I'd said 1.20.1 has no food tags to extend, because the
+> `forge:` namespace only documents five crops. That's true of the platform and false of the mods —
+> Farmer's Delight's 1.20 branch declares 64 `forge:` tags of its own, in the same shape it later
+> rebuilt under `c:`, and across the nineteen 1.20.1 jars I read there are 957 `forge:` item-tag
+> files. I'd quoted the documentation instead of reading the jars.
 >
-> Where the old answer went wrong: it quoted the **vanilla/NeoForge-documented** `forge:` crop set
-> (beetroot, carrot, nether wart, potato, wheat) and concluded there was no food vocabulary to
-> extend. That set is what the *platform* documents; the food mods extended `forge:` themselves,
-> which is exactly what they later did to `c:`. The project's own standing rule — measure the jars,
-> do not quote the docs — is what would have caught it, and this was the one claim that never got
-> measured. The "one caveat to keep honest" at the end of the old answer was pointing straight at
-> this gap.
+> Two honest caveats on the 1.20.1 file. It bridges 21 of the 24 mods — Pam's Crops and Trees have
+> no Forge 1.20.1 build at all, and Bountiful Fares is Fabric-only there. And 19 of the swaps are
+> left out, because some are only fair when a particular mod is installed, 1.21 ships those as a
+> conditional overlay, and 1.20.1 doesn't have overlays. Concretely: with Farm & Charm installed the
+> 1.21 file unifies six doughs in Croptopia's dough tag, and the 1.20.1 one unifies two.
 >
-> Kept below only as the record of what was believed, and why it was wrong.
+> Everything else is there, and it's tested on a Forge 1.20.1 server rather than assumed — including
+> Kaleidoscope's wok, which now lights on five other mods' cooking oil as well as its own.
 
-## Why no Forge build? (the SUPERSEDED pre-2026-11-04 answer)
+### Why no Forge build? — the superseded answer, kept as the lesson
 
-Asked again by a player 2026-11-01 ("a Forge 1.20.1 version"). The answer has been the project's
-position since the 2026-08-29 roadmap note ("no 1.20.x, pre-`c:`-unification"); the evidence below
-was re-checked against the NeoForge/Forge docs on 2026-11-01 so the reply can cite facts, not taste.
+**The old "paste as-is" refusal has been deleted on purpose.** It was a ready-made answer telling
+players a build was impossible, and the build now exists; keeping it where it could be pasted was the
+hazard. The full account of what it claimed and why it was wrong is in `docs/FORGE-1201.md`
+("Why the old refusal was wrong"), and the lesson is one line:
 
-**The short reply, paste as-is:**
-
-> Short answer: there won't be a Forge 1.20.1 build, and it's not a packaging decision — on 1.20.1
-> the thing this mod does doesn't exist yet.
->
-> Pantrywork works by extending the shared `c:` tag convention, so that one mod's cheese satisfies
-> another mod's recipe. The `c:` namespace only became the convention in **NeoForge 1.20.5**. On
-> 1.20.1 the equivalent namespace is `forge:`, and the `forge:` vocabulary has no food tags at all —
-> its crop tags are beetroot, carrot, nether wart, potato and wheat, full stop. There is no
-> `forge:foods/*` for a mod like this to extend. 1.20.1 also uses the plural `tags/items/` folder
-> where 1.21+ uses singular `tags/item/`, so every file would also be in the wrong place.
->
-> So a 1.20.1 build wouldn't be a port — it would be inventing a food-tag vocabulary from scratch
-> and hoping twenty other mods adopt it. That's a different mod, and a worse bet for you: on 1.21.1
-> the mods you'd want bridged already agree on `c:`.
->
-> If you're on 1.20.1 and want cross-mod food recipes working, the honest recommendation is a
-> handful of hand-written tag files for your own pack — happy to point at how the tags are laid out
-> here so you can copy the shape.
-
-**The facts behind it, if pressed:**
-
-| Claim | Evidence |
-|---|---|
-| `c:` is a 1.20.5+ convention | NeoForge docs: the 1.20.3/1.20.4 pages say `forge`, the 1.20.6 pages say `c` |
-| 1.20.1 has no food tags to extend | the documented `forge:` crop set is beetroot, carrot, nether_wart, potato, wheat |
-| path differs too | 1.20.1 `data/<ns>/tags/items/`, 1.21+ `data/<ns>/tags/item/` (singular) |
-| it is not a repackage | all 151 payload files would change namespace AND path, and every bridged mod's 1.20.1 jar would need re-reading and re-costing (195 item costs, 249 floors, 14 gates re-derived) |
-
-**One caveat to keep honest:** nobody has proven that *no* 1.20.1 Forge mod reads `c:` tags. The
-2026-11-01 check could not reach MinecraftForge's own 1.20.x source, so this rests on documented
-convention, not an exhaustive survey. It does not change the conclusion — there is still no
-`forge:` food vocabulary to extend — but do not claim "`c:` does not work on 1.20.1" as a fact.
+> It quoted the `forge:` crop set the **platform** documents (beetroot, carrot, nether wart, potato,
+> wheat) and concluded there was no food vocabulary to extend. The **mods** had extended `forge:`
+> themselves, exactly as they later extended `c:`. The project's own standing rule — measure the
+> jars, do not quote the docs — would have caught it, and this was the one claim that never got
+> measured. The old answer even flagged its own gap ("nobody has proven that *no* 1.20.1 Forge mod
+> reads `c:` tags") and that gap is precisely where it was wrong.
 
 ## Publish-time hazard: the store-id env vars are GLOBAL
 

@@ -288,7 +288,14 @@ def gen_compat(phase, existence_out):
     resolve = resolver(defs)
 
     ours = set(load({}, payload_jar()).keys())
-    canon = sorted(t for t in ours if t.startswith('forge:'))
+    # EVERY tag the payload writes except the role layer (handled by the role/umbrella
+    # sections above). A `forge:`-only filter stood here first, and it quietly excluded the
+    # three mod-namespaced tags the payload also writes - kaleidoscope_cookery:oil,
+    # rusticdelight:cooking_oil and origins:meat. The first of those is the single
+    # highest-value bridge in the whole payload: Kaleidoscope's wok checks it before it will
+    # cook, so all 225 of its wok recipes sit behind it. Leaving it unasserted meant the one
+    # claim the 0.8.0 release was built on had no coverage on this line.
+    canon = sorted(t for t in ours if not t.startswith('pantrywork:'))
 
     probes = []   # (section, item, tag, positive, note)
 

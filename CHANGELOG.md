@@ -1,5 +1,49 @@
 # Changelog
 
+## 0.10.0 — unreleased
+
+**Forge 1.20.1, and an answer that had been wrong since August.**
+
+A fifth file: **Forge 1.20.1**, pure data like the Fabric and 26.x files. The four 1.21.1 / 26.x
+files are unchanged at 0.9.0 and are not re-uploaded, so this is a one-file release.
+
+The refusal it reverses was wrong on a point of fact, not of taste. The page said 1.20.1 has no
+food vocabulary to extend because `forge:` documents only five crops. That is what the *platform*
+documents; the *mods* extended `forge:` themselves, exactly as they later extended `c:` — Farmer's
+Delight's 1.20 branch declares 64 `forge:` tags in the same two-level shape, and the nineteen
+1.20.1 jars read for this carry **957 `forge:` item-tag files across 336 distinct food tag paths**.
+The claim had never been measured, which is the one thing this project has a standing rule against.
+
+What is smaller on 1.20.1, stated rather than implied:
+
+- **21 mods bridged, not 24.** Pam's HC2 Crops and Trees have no Forge 1.20.1 build (their only
+  1.20.x builds want javafml `[49,)`; 1.20.1 supplies 47 — measured by trying to boot them), and
+  Bountiful Fares is Fabric-only there.
+- **19 conditional swaps dropped.** 1.20.1 has no pack overlays (vanilla gained them in 1.20.2,
+  format 18), so a swap that is only fair alongside a rescuing mod cannot ship conditionally and is
+  left out instead: Pam's cheese, four cheap doughs, three milk bottles, three salts, Hearth and
+  Harvest's flour and corn meal, FD's cabbage leaf, Farm & Charm's chicken parts, Kaleidoscope's
+  sashimi. Measured consequence: with Farm & Charm installed the 1.21 file unifies six doughs in
+  Croptopia's `doughs` tag and this one unifies two (`forge:dough` holds all six on both).
+- **No `PantryworkTagKeys`** — it compiles against 1.21.1 MC types.
+- **Forge only.** NeoForge 1.20.1 was not tested and is not claimed.
+
+Price judgments were re-derived where the mods differ by version: 39 floors and 4 item costs read
+out of 1.20.1 recipes, 89 floors scoped out as not applying on that line.
+
+Verified on its own Forge 1.20.1 server: solo **50/0** with a log carrying no errors of any class;
+compat **338/0** over 83 tags with 16 roster mods loaded; and a control boot of that identical mod
+set with Pantrywork removed, which returns a **byte-identical** upstream error list, 31 for 31. No
+`ERROR`/`FATAL` line on any boot names Pantrywork. On 1.20.1 the assertions are tag membership, not
+crafts — `execute if items` and `minecraft:crafter` are both 1.21 — and the suite was shown able to
+fail by rebuilding the jar with 1.21's singular `tags/item/` path: 39 of the 50 assertions fail,
+which is every one that asserts presence.
+
+Also in this pass: the suite generator had been filtering probes to the `forge:` namespace, which
+silently left the three mod-namespaced tags the payload writes unasserted — including
+`kaleidoscope_cookery:oil`, the gate in front of all 225 of Kaleidoscope's wok recipes. Now covered
+(314 → 338 assertions), and the wok is confirmed to light on six mods' oil.
+
 ## 0.9.0 — 2026-11-03
 
 **The rest of Pam's HarvestCraft, and a free lunch taken off the menu.**

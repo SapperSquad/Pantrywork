@@ -310,6 +310,55 @@ recipe — so `GenerateBridges.ps1` excludes planting seeds from every injection
 `tools/tagtest-letsdo.txt`, `tools/tagtest-seedfix.txt` and
 `tools/tagtest-kaleido.txt` assert it.
 
+### Known gap: chocolate and cream are unbridged on every platform (found 2026-11-06)
+
+From SapperSquad relaying player feedback that AnvilCraft "has a bunch of incompatible food items,
+like the chocolate bar and flour". Measured rather than taken on trust, and the chocolate half is
+right: **Pantrywork writes no chocolate tag and no cream tag, on either platform.** There is no
+`c:foods/chocolate` or `forge:foods/chocolate` in `src/generated/resources`, none in
+`src/generated/forge1201`, and none hand-authored.
+
+Chocolate is the cheese problem untouched. On the 1.20.1 roster, four mods ship the same food under
+four tags with **zero** references between them:
+
+| mod | tag | item |
+|---|---|---|
+| Pam's Food Core | `forge:chocolatebar` → `forge:chocolatebar/chocolatebar` | `pamhc2foodcore:chocolatebaritem` |
+| Croptopia | `forge:chocolates` | `croptopia:chocolate` |
+| Hearth and Harvest | `forge:foods/chocolate` | `hearthandharvest:chocolate_bar` |
+| AnvilCraft (not on the roster) | the catch-all `forge:foods` only | `anvilcraft:chocolate`, `:chocolate_black`, `:chocolate_white` |
+
+Note that H&H already uses the canonical spelling `forge:foods/chocolate` — so the canonical name is
+not an invention here either, exactly as with `forge:foods/cheese`. Pam's also ships a cocoa family
+(`forge:cocoapowder` → `/cocoapowder`, and `forge:crops/cocoabeans`), which a chocolate bridge should
+not be confused with: powder and bar are different costs.
+
+Cream is thinner but real: Pam's writes `forge:cream` → `forge:cream/cream` (and Food Extended adds
+`forge:cream/silkentofu`, its own analogue, its own call), AnvilCraft has a `cream` item, and nothing
+joins them.
+
+**Two hazards to respect if either family is bridged.** Both are the sort of thing that only shows up
+by reading the jar:
+
+- **`anvilcraft:cocoa_butter` is not dairy butter.** It is a plant fat pressed from cocoa, and it
+  carries no tag at all on either of AnvilCraft's lines. Putting it in `c:foods/butter` would make it
+  substitutable in every butter recipe on the roster, which is wrong on identity, not just on price.
+  It needs its own leaf or nothing.
+- **`anvilcraft:oil` / `:oil_bucket` is machine oil, not cooking oil.** AnvilCraft files the bucket
+  in `c:buckets/oil` alongside its cements. A careless "oil" bridge would let a player light
+  Kaleidoscope's wok with industrial lubricant. The wok oil tag enumerates named cooking oils for
+  exactly this reason — keep it that way.
+
+The flour half of the feedback is half right, and the interesting half. AnvilCraft is a **good**
+citizen there: on 1.20.1 it dual-publishes its flour into `forge:flour` **and** `c:flour`, plus the
+`/wheat` leaves of both. But the 1.20.1 roster has three flour spellings — `forge:flour` (Croptopia,
+Create, Kaleidoscope, Farm & Charm, Pam's), `forge:flours` (+ `/wheat`, `/corn`) which is Hearth and
+Harvest's alone, and Create's `forge:flour/wheat` — and AnvilCraft reaches only the first.
+**Pantrywork's `forge:flours` enumerates items; it does not reference `#forge:flour`**, so an
+unscanned mod's flour does not flow in by itself. That is the cost-floor model working as designed
+(§ "What a bridge may add": an unjudged item never gets a free pass), and it is also why adding
+AnvilCraft to the roster is a real change rather than a no-op.
+
 ### Known gap: fruit has no role
 
 `c:foods/fruit` is bridged on the identity axis but maps to **no role tag** —
